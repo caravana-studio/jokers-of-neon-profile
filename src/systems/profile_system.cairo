@@ -1,5 +1,5 @@
 use starknet::ContractAddress;
-use crate::models::{InventoryItem, SeasonProgress};
+use crate::models::SeasonProgress;
 use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile};
 
 
@@ -15,16 +15,12 @@ trait IJokersProfile<T> {
     fn get_season_progress(
         self: @T, player_address: ContractAddress, season_id: u32,
     ) -> SeasonProgress;
-    fn get_inventory(self: @T, player_address: ContractAddress) -> Span<InventoryItem>;
 }
 
 #[dojo::contract]
 pub mod profile_system {
     use super::IJokersProfile;
-    use crate::{
-        utils::contains_address, models::{InventoryItem, SeasonProgress},
-        store::StoreTrait,
-    };
+    use crate::{models::SeasonProgress, store::StoreTrait};
     use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile};
     use starknet::ContractAddress;
     use openzeppelin::introspection::src5::SRC5Component;
@@ -126,33 +122,12 @@ pub mod profile_system {
             let mut store = StoreTrait::new(self.world_default());
             store.get_season_progress(player_address, season_id)
         }
-
-        fn get_inventory(
-            self: @ContractState, player_address: ContractAddress,
-        ) -> Span<InventoryItem> {
-            let mut store = StoreTrait::new(self.world_default());
-            let mut items = array![];
-            let inventory = store.get_inventory(player_address);
-
-            for slot in 0..inventory.items_quantity {
-                items.append(store.get_inventory_item(player_address, slot));
-            };
-            items.span()
-        }
     }
 
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn world_default(self: @ContractState) -> dojo::world::WorldStorage {
             self.world(@"jokers_of_neon_profile")
-        }
-
-        fn assert_caller_ownership(self: @ContractState) {
-            let mut store = StoreTrait::new(self.world_default());
-            assert!(
-                contains_address(@store.get_owners().owners, starknet::get_caller_address()),
-                "Profile: Not authorized",
-            );
         }
 
         fn _add_stats(self: @ContractState, player_stats: PlayerStats) {

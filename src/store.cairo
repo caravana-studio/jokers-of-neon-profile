@@ -1,6 +1,6 @@
 use crate::models::{
-    Owners, InventoryItem, Inventory, SeasonProgress, DailyProgress, MissionXPConfig, 
-    LevelXPConfig, SeasonConfig, SeasonTierConfig, MissionDifficulty
+    SeasonProgress, DailyProgress, MissionXPConfig, LevelXPConfig, SeasonConfig, SeasonNivelConfig,
+    MissionDifficulty,
 };
 use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile};
 use dojo::{model::ModelStorage, world::WorldStorage};
@@ -34,22 +34,6 @@ pub impl StoreImpl of StoreTrait {
         self.world.write_model(@player_stats)
     }
 
-    fn get_inventory_item(ref self: Store, address: ContractAddress, slot: u32) -> InventoryItem {
-        self.world.read_model((address, slot))
-    }
-
-    fn set_inventory_item(ref self: Store, inventory_item: InventoryItem) {
-        self.world.write_model(@inventory_item)
-    }
-
-    fn get_inventory(ref self: Store, address: ContractAddress) -> Inventory {
-        self.world.read_model(address)
-    }
-
-    fn set_inventory(ref self: Store, inventory: Inventory) {
-        self.world.write_model(@inventory)
-    }
-
     fn get_season_progress(
         ref self: Store, address: ContractAddress, season_id: u32,
     ) -> SeasonProgress {
@@ -60,14 +44,6 @@ pub impl StoreImpl of StoreTrait {
         self.world.write_model(@season_progress)
     }
 
-    fn get_owners(ref self: Store) -> Owners {
-        self.world.read_model('OWNERS_KEY')
-    }
-
-    fn set_owners(ref self: Store, owners: Span<ContractAddress>) {
-        self.world.write_model(@Owners { key: 'OwNERS_KEY', owners })
-    }
-
     fn get_daily_progress(ref self: Store, address: ContractAddress, day: u64) -> DailyProgress {
         self.world.read_model((address, day))
     }
@@ -76,7 +52,9 @@ pub impl StoreImpl of StoreTrait {
         self.world.write_model(@daily_progress)
     }
 
-    fn get_mission_xp_config(ref self: Store, season_id: u32, difficulty: MissionDifficulty, completion_count: u32) -> MissionXPConfig {
+    fn get_mission_xp_config(
+        ref self: Store, season_id: u32, difficulty: MissionDifficulty, completion_count: u32,
+    ) -> MissionXPConfig {
         self.world.read_model((season_id, difficulty, completion_count))
     }
 
@@ -84,7 +62,9 @@ pub impl StoreImpl of StoreTrait {
         self.world.write_model(@config)
     }
 
-    fn get_level_xp_config(ref self: Store, season_id: u32, level: u32, completion_count: u32) -> LevelXPConfig {
+    fn get_level_xp_config(
+        ref self: Store, season_id: u32, level: u32, completion_count: u32,
+    ) -> LevelXPConfig {
         self.world.read_model((season_id, level, completion_count))
     }
 
@@ -100,11 +80,11 @@ pub impl StoreImpl of StoreTrait {
         self.world.write_model(@config)
     }
 
-    fn get_season_tier_config(ref self: Store, season_id: u32, tier: u32) -> SeasonTierConfig {
-        self.world.read_model((season_id, tier))
+    fn get_season_nivel_config(ref self: Store, season_id: u32, nivel: u32) -> SeasonNivelConfig {
+        self.world.read_model((season_id, nivel))
     }
 
-    fn set_season_tier_config(ref self: Store, config: SeasonTierConfig) {
+    fn set_season_nivel_config(ref self: Store, config: SeasonNivelConfig) {
         self.world.write_model(@config)
     }
 }

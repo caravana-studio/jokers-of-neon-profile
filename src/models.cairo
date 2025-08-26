@@ -2,26 +2,6 @@ use starknet::ContractAddress;
 
 #[derive(Copy, Drop, Serde, Debug)]
 #[dojo::model]
-pub struct Inventory {
-    #[key]
-    pub address: ContractAddress,
-    pub items_quantity: u32,
-    pub available_slots: u32,
-}
-
-#[derive(Copy, Drop, Serde, Debug)]
-#[dojo::model]
-pub struct InventoryItem {
-    #[key]
-    pub address: ContractAddress,
-    #[key]
-    pub slot: u32,
-    pub item_id: u32,
-    pub quantity: u32,
-}
-
-#[derive(Copy, Drop, Serde, Debug)]
-#[dojo::model]
 pub struct SeasonProgress {
     #[key]
     pub address: ContractAddress,
@@ -60,14 +40,6 @@ pub struct DailyProgress {
 
 #[derive(Copy, Drop, Serde, Debug)]
 #[dojo::model]
-pub struct Owners {
-    #[key]
-    pub key: felt252,
-    pub owners: Span<ContractAddress>,
-}
-
-#[derive(Copy, Drop, Serde, Debug)]
-#[dojo::model]
 pub struct MissionXPConfig {
     #[key]
     pub season_id: u32,
@@ -100,13 +72,12 @@ pub struct SeasonConfig {
 
 #[derive(Drop, Serde, Debug)]
 #[dojo::model]
-pub struct SeasonTierConfig {
+pub struct SeasonNivelConfig {
     #[key]
     pub season_id: u32,
     #[key]
-    pub tier: u32,
+    pub nivel: u32,
     pub required_xp: u256,
-    pub tier_name: ByteArray,
     pub free_rewards: Span<u32>,
     pub premium_rewards: Span<u32>,
 }
