@@ -29,7 +29,7 @@ pub mod xp_system {
         },
         utils::{
             get_current_day, get_mission_xp_configurable, get_level_xp_configurable,
-            get_season_nivel, get_tier_from_nivel,
+            get_tier_from_nivel,
         },
         store::StoreTrait,
     };
@@ -727,8 +727,7 @@ pub mod xp_system {
             profile.xp += xp;
             season_progress.season_xp += xp;
 
-            let current_nivel = get_season_nivel(world, season_id, season_progress.season_xp);
-            let new_tier = get_tier_from_nivel(current_nivel);
+            let new_tier = get_tier_from_nivel(season_progress.level);
             if new_tier > season_progress.tier {
                 season_progress.tier = new_tier;
             }

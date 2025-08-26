@@ -11,6 +11,7 @@ pub struct SeasonProgress {
     pub has_season_pass: bool,
     pub claimable_rewards_id: Span<u32>,
     pub tier: u32,
+    pub level: u32,
 }
 
 #[derive(Copy, Drop, Serde, Debug, PartialEq, Introspect)]

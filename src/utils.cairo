@@ -22,28 +22,6 @@ pub fn get_level_xp_configurable(
     config.xp_reward
 }
 
-pub fn get_season_nivel(world: WorldStorage, season_id: u32, season_xp: u256) -> u32 {
-    let mut store = StoreTrait::new(world);
-    let mut current_nivel = 0;
-
-    // Find the highest nivel that the player qualifies for
-    let mut nivel = 1;
-    loop {
-        let nivel_config = store.get_season_nivel_config(season_id, nivel);
-        if nivel_config.required_xp == 0 {
-            break; // No more niveles configured
-        }
-        if season_xp >= nivel_config.required_xp {
-            current_nivel = nivel;
-        }
-        nivel += 1;
-        if nivel > 50 { // Safety limit
-            break;
-        }
-    };
-
-    current_nivel
-}
 
 pub fn get_tier_from_nivel(nivel: u32) -> u32 {
     if nivel >= 1 && nivel <= 11 {
