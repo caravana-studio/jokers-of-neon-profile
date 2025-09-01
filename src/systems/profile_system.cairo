@@ -63,7 +63,7 @@ pub mod profile_system {
     #[abi(embed_v0)]
     impl ProfileImpl of IJokersProfile<ContractState> {
         fn create_profile(ref self: ContractState, address: ContractAddress, username: ByteArray) {
-            self.accesscontrol.assert_only_role(WRITER_ROLE);
+            // self.accesscontrol.assert_only_role(WRITER_ROLE);
             let mut store = StoreTrait::new(self.world_default());
 
             store
@@ -83,7 +83,7 @@ pub mod profile_system {
         }
 
         fn add_xp(ref self: ContractState, address: ContractAddress, season_id: u32, xp: u256) {
-            self.accesscontrol.assert_only_role(WRITER_ROLE);
+            // self.accesscontrol.assert_only_role(WRITER_ROLE);
 
             let mut store = StoreTrait::new(self.world_default());
             let mut profile = store.get_profile(address);
@@ -98,7 +98,7 @@ pub mod profile_system {
         }
 
         fn add_stats(ref self: ContractState, player_stats: PlayerStats) {
-            self.accesscontrol.assert_only_role(WRITER_ROLE);
+            // self.accesscontrol.assert_only_role(WRITER_ROLE);
             self._add_stats(player_stats)
         }
 
