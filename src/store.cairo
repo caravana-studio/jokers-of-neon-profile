@@ -7,7 +7,7 @@ use dojo::{model::ModelStorage, world::WorldStorage};
 use starknet::ContractAddress;
 
 #[derive(Drop)]
-struct Store {
+pub struct Store {
     world: WorldStorage,
 }
 

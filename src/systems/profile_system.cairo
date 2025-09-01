@@ -6,7 +6,6 @@ use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile};
 #[starknet::interface]
 trait IJokersProfile<T> {
     fn create_profile(ref self: T, address: ContractAddress, username: ByteArray);
-    fn add_xp(ref self: T, address: ContractAddress, season_id: u32, xp: u256);
     fn add_stats(ref self: T, player_stats: PlayerStats);
 
     fn get_profile(self: @T, player_address: ContractAddress) -> Profile;
@@ -80,21 +79,6 @@ pub mod profile_system {
                         badges_ids: [].span(),
                     },
                 )
-        }
-
-        fn add_xp(ref self: ContractState, address: ContractAddress, season_id: u32, xp: u256) {
-            // self.accesscontrol.assert_only_role(WRITER_ROLE);
-
-            let mut store = StoreTrait::new(self.world_default());
-            let mut profile = store.get_profile(address);
-            let mut season_progress = store.get_season_progress(address, season_id);
-
-            profile.xp += xp;
-            season_progress.season_xp += xp;
-
-            store.set_profile(profile);
-            store.set_season_progress(season_progress);
-            // TODO: Check if player has new season unlockeables
         }
 
         fn add_stats(ref self: ContractState, player_stats: PlayerStats) {

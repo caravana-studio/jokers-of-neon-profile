@@ -5,10 +5,8 @@ use crate::models::{
 
 #[starknet::interface]
 trait IXPSystem<T> {
-    fn add_daily_mission_xp(
-        ref self: T, address: ContractAddress, season_id: u32, mission_type: MissionDifficulty,
-    );
-    fn add_level_completion_xp(ref self: T, address: ContractAddress, season_id: u32, level: u32);
+    fn add_daily_mission_xp(ref self: T, address: ContractAddress, mission_type: MissionDifficulty);
+    fn add_level_completion_xp(ref self: T, address: ContractAddress, level: u32);
 
     // Configuration methods
     fn set_mission_xp_config(ref self: T, config: MissionXPConfig);
@@ -31,7 +29,7 @@ pub mod xp_system {
             get_current_day, get_mission_xp_configurable, get_level_xp_configurable,
             get_tier_from_nivel,
         },
-        store::StoreTrait,
+        store::{StoreTrait, Store},
     };
     use starknet::ContractAddress;
     use openzeppelin::introspection::src5::SRC5Component;
@@ -96,19 +94,20 @@ pub mod xp_system {
     #[abi(embed_v0)]
     impl XPSystemImpl of IXPSystem<ContractState> {
         fn add_daily_mission_xp(
-            ref self: ContractState,
-            address: ContractAddress,
-            season_id: u32,
-            mission_type: MissionDifficulty,
+            ref self: ContractState, address: ContractAddress, mission_type: MissionDifficulty,
         ) {
             self.accesscontrol.assert_only_role(WRITER_ROLE);
 
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
 
-            // Validate that the season is active
-            let season_config = store.get_season_config(season_id);
-            assert(season_config.is_active, 'Season is not active');
+            // TODO: Validate that the season is active
+            let season_id = 1;
+            let mut season_config = store.get_season_config(season_id);
+            season_config.is_active = true;
+            // let season_config = store.get_season_config(season_id);
+            // assert(season_config.is_active, 'Season is not active');
+
             let current_day = get_current_day();
             let mut daily_progress = store.get_daily_progress(address, current_day);
 
@@ -130,10 +129,13 @@ pub mod xp_system {
                 };
 
                 daily_progress.daily_xp += xp_earned;
-
                 store.set_daily_progress(daily_progress);
 
-                self._add_season_xp(address, season_id, xp_earned.into());
+                self._add_profile_xp(ref store, address, xp_earned.into());
+
+                if season_config.is_active {
+                    self._add_season_xp(ref store, address, season_id, xp_earned.into());
+                }
 
                 self
                     .emit(
@@ -144,17 +146,18 @@ pub mod xp_system {
             }
         }
 
-        fn add_level_completion_xp(
-            ref self: ContractState, address: ContractAddress, season_id: u32, level: u32,
-        ) {
+        fn add_level_completion_xp(ref self: ContractState, address: ContractAddress, level: u32) {
             self.accesscontrol.assert_only_role(WRITER_ROLE);
 
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
 
-            // Validate that the season is active
-            let season_config = store.get_season_config(season_id);
-            assert(season_config.is_active, 'Season is not active');
+            // TODO: Validate that the season is active
+            let season_id = 1;
+            let mut season_config = store.get_season_config(season_id);
+            season_config.is_active = true;
+            // let season_config = store.get_season_config(season_id);
+            // assert(season_config.is_active, 'Season is not active');
 
             let current_day = get_current_day();
             let mut daily_progress = store.get_daily_progress(address, current_day);
@@ -189,10 +192,13 @@ pub mod xp_system {
                 }
 
                 daily_progress.daily_xp += xp_earned;
-
                 store.set_daily_progress(daily_progress);
 
-                self._add_season_xp(address, season_id, xp_earned.into());
+                self._add_profile_xp(ref store, address, xp_earned.into());
+
+                if season_config.is_active {
+                    self._add_season_xp(ref store, address, season_id, xp_earned.into());
+                }
 
                 self
                     .emit(
@@ -716,15 +722,24 @@ pub mod xp_system {
             self.world(@"jokers_of_neon_profile")
         }
 
-        fn _add_season_xp(
-            self: @ContractState, address: ContractAddress, season_id: u32, xp: u256,
+        fn _add_profile_xp(
+            ref self: ContractState, ref store: Store, address: ContractAddress, xp: u256,
         ) {
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
             let mut profile = store.get_profile(address);
-            let mut season_progress = store.get_season_progress(address, season_id);
 
             profile.xp += xp;
+            store.set_profile(profile);
+        }
+
+        fn _add_season_xp(
+            ref self: ContractState,
+            ref store: Store,
+            address: ContractAddress,
+            season_id: u32,
+            xp: u256,
+        ) {
+            let mut season_progress = store.get_season_progress(address, season_id);
+
             season_progress.season_xp += xp;
 
             let new_tier = get_tier_from_nivel(season_progress.level);
@@ -732,7 +747,6 @@ pub mod xp_system {
                 season_progress.tier = new_tier;
             }
 
-            store.set_profile(profile);
             store.set_season_progress(season_progress);
         }
     }
