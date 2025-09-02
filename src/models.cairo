@@ -69,11 +69,11 @@ pub struct SeasonConfig {
 
 #[derive(Drop, Serde, Debug)]
 #[dojo::model]
-pub struct SeasonNivelConfig {
+pub struct SeasonLevelConfig {
     #[key]
     pub season_id: u32,
     #[key]
-    pub nivel: u32,
+    pub level: u32,
     pub required_xp: u256,
     pub free_rewards: Span<u32>,
     pub premium_rewards: Span<u32>,

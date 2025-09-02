@@ -23,14 +23,14 @@ pub fn get_level_xp_configurable(
 }
 
 
-pub fn get_tier_from_nivel(nivel: u32) -> u32 {
-    if nivel >= 1 && nivel <= 11 {
+pub fn get_tier_from_level(level: u32) -> u32 {
+    if level >= 1 && level <= 11 {
         1 // Casual
-    } else if nivel >= 12 && nivel <= 25 {
+    } else if level >= 12 && level <= 25 {
         2 // Average
-    } else if nivel >= 26 && nivel <= 32 {
+    } else if level >= 26 && level <= 32 {
         3 // Hardcore
-    } else { // if nivel >= 33
+    } else { // if level >= 33
         4 // Legend
     }
 }

@@ -1,5 +1,5 @@
 use crate::models::{
-    SeasonProgress, DailyProgress, MissionXPConfig, LevelXPConfig, SeasonConfig, SeasonNivelConfig,
+    SeasonProgress, DailyProgress, MissionXPConfig, LevelXPConfig, SeasonConfig, SeasonLevelConfig,
     MissionDifficulty,
 };
 use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile};
@@ -80,11 +80,11 @@ pub impl StoreImpl of StoreTrait {
         self.world.write_model(@config)
     }
 
-    fn get_season_nivel_config(ref self: Store, season_id: u32, nivel: u32) -> SeasonNivelConfig {
-        self.world.read_model((season_id, nivel))
+    fn get_season_level_config(ref self: Store, season_id: u32, level: u32) -> SeasonLevelConfig {
+        self.world.read_model((season_id, level))
     }
 
-    fn set_season_nivel_config(ref self: Store, config: SeasonNivelConfig) {
+    fn set_season_level_config(ref self: Store, config: SeasonLevelConfig) {
         self.world.write_model(@config)
     }
 }
