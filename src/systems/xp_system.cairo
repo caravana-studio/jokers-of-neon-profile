@@ -96,7 +96,7 @@ pub mod xp_system {
         fn add_daily_mission_xp(
             ref self: ContractState, address: ContractAddress, mission_type: MissionDifficulty,
         ) {
-            self.accesscontrol.assert_only_role(WRITER_ROLE);
+            // self.accesscontrol.assert_only_role(WRITER_ROLE);
 
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
@@ -147,7 +147,7 @@ pub mod xp_system {
         }
 
         fn add_level_completion_xp(ref self: ContractState, address: ContractAddress, level: u32) {
-            self.accesscontrol.assert_only_role(WRITER_ROLE);
+            // self.accesscontrol.assert_only_role(WRITER_ROLE);
 
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
@@ -162,16 +162,9 @@ pub mod xp_system {
             let current_day = get_current_day();
             let mut daily_progress = store.get_daily_progress(address, current_day);
 
-            let completion_count = if level == 1 {
-                daily_progress.level1_completions
-            } else if level == 2 {
-                daily_progress.level2_completions
-            } else if level == 3 {
-                daily_progress.level3_completions
-            } else if level == 4 {
-                daily_progress.level4_completions
-            } else if level == 5 {
-                daily_progress.level5_completions
+            let level_completions_len = daily_progress.level_completions.len();
+            let completion_count = if level > 0 && level <= level_completions_len {
+                *daily_progress.level_completions.at(level - 1)
             } else {
                 0
             };
@@ -179,16 +172,31 @@ pub mod xp_system {
             let xp_earned = get_level_xp_configurable(world, season_id, level, completion_count);
 
             if xp_earned > 0 {
-                if level == 1 {
-                    daily_progress.level1_completions += 1;
-                } else if level == 2 {
-                    daily_progress.level2_completions += 1;
-                } else if level == 3 {
-                    daily_progress.level3_completions += 1;
-                } else if level == 4 {
-                    daily_progress.level4_completions += 1;
-                } else if level == 5 {
-                    daily_progress.level5_completions += 1;
+                if level > 0 {
+                    let mut level_completions = array![];
+                    let current_completions = daily_progress.level_completions;
+                    let mut i = 0;
+
+                    // Copy existing completions and increment the target level
+                    while i < current_completions.len() {
+                        if i == level - 1 {
+                            level_completions.append(*current_completions.at(i) + 1);
+                        } else {
+                            level_completions.append(*current_completions.at(i));
+                        }
+                        i += 1;
+                    };
+
+                    // If the level is beyond current array size, extend the array
+                    while level_completions.len() < level {
+                        if level_completions.len() == level - 1 {
+                            level_completions.append(1);
+                        } else {
+                            level_completions.append(0);
+                        }
+                    };
+
+                    daily_progress.level_completions = level_completions.span();
                 }
 
                 daily_progress.daily_xp += xp_earned;

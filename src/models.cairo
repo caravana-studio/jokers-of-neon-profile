@@ -32,11 +32,7 @@ pub struct DailyProgress {
     pub easy_missions: u32,
     pub medium_missions: u32,
     pub hard_missions: u32,
-    pub level1_completions: u32,
-    pub level2_completions: u32,
-    pub level3_completions: u32,
-    pub level4_completions: u32,
-    pub level5_completions: u32,
+    pub level_completions: Span<u32>,
 }
 
 #[derive(Copy, Drop, Serde, Debug)]
