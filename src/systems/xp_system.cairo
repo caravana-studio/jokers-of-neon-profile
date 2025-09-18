@@ -16,6 +16,14 @@ pub trait IXPSystem<T> {
 
     // Setup methods for initializing default configurations
     fn setup_default_season_config(ref self: T, season_id: u32);
+
+    // View methods for getting SeasonLevelConfig
+    fn get_season_level_config_by_level(
+        self: @T, season_id: u32, level: u32,
+    ) -> SeasonLevelConfig;
+    fn get_season_level_config_by_address(
+        self: @T, address: ContractAddress, season_id: u32,
+    ) -> SeasonLevelConfig;
 }
 
 #[dojo::contract]
@@ -721,6 +729,21 @@ pub mod xp_system {
                         premium_rewards: [].span(),
                     },
                 );
+        }
+
+        fn get_season_level_config_by_level(
+            self: @ContractState, season_id: u32, level: u32,
+        ) -> SeasonLevelConfig {
+            let mut store = StoreTrait::new(self.world_default());
+            store.get_season_level_config(season_id, level)
+        }
+
+        fn get_season_level_config_by_address(
+            self: @ContractState, address: ContractAddress, season_id: u32,
+        ) -> SeasonLevelConfig {
+            let mut store = StoreTrait::new(self.world_default());
+            let season_progress = store.get_season_progress(address, season_id);
+            store.get_season_level_config(season_id, season_progress.level)
         }
     }
 
