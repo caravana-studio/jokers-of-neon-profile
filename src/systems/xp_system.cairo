@@ -2,7 +2,6 @@ use starknet::ContractAddress;
 use crate::models::{
     MissionDifficulty, MissionXPConfig, LevelXPConfig, SeasonConfig, SeasonLevelConfig,
 };
-use jokers_of_neon_lib::models::external::profile::ProfileLevelConfig;
 
 #[starknet::interface]
 pub trait IXPSystem<T> {
@@ -26,11 +25,6 @@ pub trait IXPSystem<T> {
     fn get_season_level_config_by_address(
         self: @T, address: ContractAddress, season_id: u32,
     ) -> SeasonLevelConfig;
-
-    // View methods for getting ProfileLevelConfig
-    fn get_profile_level_config_by_level(self: @T, level: u32) -> ProfileLevelConfig;
-    fn get_profile_level_config_by_address(self: @T, address: ContractAddress) -> ProfileLevelConfig;
-    
 }
 
 #[dojo::contract]
@@ -787,21 +781,6 @@ pub mod xp_system {
             let mut store = StoreTrait::new(self.world_default());
             let season_progress = store.get_season_progress(address, season_id);
             store.get_season_level_config(season_id, season_progress.level)
-        }
-
-        fn get_profile_level_config_by_level(
-            self: @ContractState, level: u32,
-        ) -> ProfileLevelConfig {
-            let mut store = StoreTrait::new(self.world_default());
-            store.get_profile_level_config(level)
-        }
-
-        fn get_profile_level_config_by_address(
-            self: @ContractState, address: ContractAddress,
-        ) -> ProfileLevelConfig {
-            let mut store = StoreTrait::new(self.world_default());
-            let profile = store.get_profile(address);
-            store.get_profile_level_config(profile.level)
         }
     }
 

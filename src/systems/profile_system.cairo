@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
 use crate::models::SeasonProgress;
-use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile};
+use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, ProfileLevelConfig};
 
 
 #[starknet::interface]
@@ -14,13 +14,15 @@ pub trait IJokersProfile<T> {
     fn get_season_progress(
         self: @T, player_address: ContractAddress, season_id: u32,
     ) -> SeasonProgress;
+    fn get_profile_level_config_by_level(self: @T, level: u32) -> ProfileLevelConfig;
+    fn get_profile_level_config_by_address(self: @T, address: ContractAddress) -> ProfileLevelConfig;
 }
 
 #[dojo::contract]
 pub mod profile_system {
     use super::IJokersProfile;
     use crate::{models::SeasonProgress, store::StoreTrait};
-    use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile};
+    use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, ProfileLevelConfig};
     use starknet::ContractAddress;
     use openzeppelin::introspection::src5::SRC5Component;
     use openzeppelin::access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
@@ -106,6 +108,21 @@ pub mod profile_system {
         ) -> SeasonProgress {
             let mut store = StoreTrait::new(self.world_default());
             store.get_season_progress(player_address, season_id)
+        }
+
+        fn get_profile_level_config_by_level(
+            self: @ContractState, level: u32,
+        ) -> ProfileLevelConfig {
+            let mut store = StoreTrait::new(self.world_default());
+            store.get_profile_level_config(level)
+        }
+
+        fn get_profile_level_config_by_address(
+            self: @ContractState, address: ContractAddress,
+        ) -> ProfileLevelConfig {
+            let mut store = StoreTrait::new(self.world_default());
+            let profile = store.get_profile(address);
+            store.get_profile_level_config(profile.level)
         }
     }
 
