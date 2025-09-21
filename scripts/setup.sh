@@ -36,3 +36,8 @@ sozo -P ${profile} execute xp_system setup_default_season_config \
     1 \
     --wait \
     --world $world_address
+
+echo -e "\n🎮 Default config xp profile en profile..."
+sozo -P ${profile} execute xp_system setup_default_profile_config \
+    --wait \
+    --world $world_address
