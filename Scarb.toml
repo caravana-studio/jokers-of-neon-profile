@@ -15,7 +15,7 @@ move = "sozo execute dojo_starter-actions move -c 1 --wait" # scarb run move
 [dependencies]
 dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.6.0-alpha.1" }
 openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v1.0.0" }
-jokers_of_neon_lib = { git = "https://github.com/caravana-studio/jokers-of-neon-lib", branch="develop" }
+jokers_of_neon_lib = { git = "https://github.com/caravana-studio/jokers-of-neon-lib", branch="profile-xp" }
 
 [[target.starknet-contract]]
 build-external-contracts = [

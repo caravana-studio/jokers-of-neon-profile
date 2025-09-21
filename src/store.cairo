@@ -1,6 +1,6 @@
 use crate::models::{
     SeasonProgress, DailyProgress, MissionXPConfig, LevelXPConfig, SeasonConfig, SeasonLevelConfig,
-    MissionDifficulty,
+    ProfileLevelConfig, MissionDifficulty,
 };
 use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile};
 use dojo::{model::ModelStorage, world::WorldStorage};
@@ -85,6 +85,14 @@ pub impl StoreImpl of StoreTrait {
     }
 
     fn set_season_level_config(ref self: Store, config: SeasonLevelConfig) {
+        self.world.write_model(@config)
+    }
+
+    fn get_profile_level_config(ref self: Store, level: u32) -> ProfileLevelConfig {
+        self.world.read_model(level)
+    }
+
+    fn set_profile_level_config(ref self: Store, config: ProfileLevelConfig) {
         self.world.write_model(@config)
     }
 }

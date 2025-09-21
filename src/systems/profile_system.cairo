@@ -70,6 +70,7 @@ pub mod profile_system {
                     Profile {
                         address,
                         username,
+                        total_xp: 0,
                         xp: 0,
                         level: 1,
                         available_games: 3,
