@@ -1,8 +1,8 @@
 use starknet::ContractAddress;
 use crate::models::{
     MissionDifficulty, MissionXPConfig, LevelXPConfig, SeasonConfig, SeasonLevelConfig,
-    ProfileLevelConfig,
 };
+use jokers_of_neon_lib::models::external::profile::ProfileLevelConfig;
 
 #[starknet::interface]
 pub trait IXPSystem<T> {
@@ -39,7 +39,6 @@ pub mod xp_system {
     use crate::{
         models::{
             MissionDifficulty, MissionXPConfig, LevelXPConfig, SeasonConfig, SeasonLevelConfig,
-    ProfileLevelConfig,
         },
         utils::{
             get_current_day, get_mission_xp_configurable, get_level_xp_configurable,
@@ -47,6 +46,8 @@ pub mod xp_system {
         },
         store::{StoreTrait, Store},
     };
+    use jokers_of_neon_lib::models::external::profile::ProfileLevelConfig;
+
     use starknet::ContractAddress;
     use openzeppelin::introspection::src5::SRC5Component;
     use openzeppelin::access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};

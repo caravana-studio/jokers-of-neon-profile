@@ -78,11 +78,3 @@ pub struct SeasonLevelConfig {
     pub free_rewards: Span<u32>,
     pub premium_rewards: Span<u32>,
 }
-
-#[derive(Drop, Serde, Debug)]
-#[dojo::model]
-pub struct ProfileLevelConfig {
-    #[key]
-    pub level: u32,
-    pub required_xp: u256,
-}

@@ -1,8 +1,8 @@
 use crate::models::{
     SeasonProgress, DailyProgress, MissionXPConfig, LevelXPConfig, SeasonConfig, SeasonLevelConfig,
-    ProfileLevelConfig, MissionDifficulty,
+    MissionDifficulty,
 };
-use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile};
+use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, ProfileLevelConfig};
 use dojo::{model::ModelStorage, world::WorldStorage};
 use starknet::ContractAddress;
 
