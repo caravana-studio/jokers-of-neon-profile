@@ -16,11 +16,10 @@ pub trait IXPSystem<T> {
 
     // Setup methods for initializing default configurations
     fn setup_default_season_config(ref self: T, season_id: u32);
+    fn setup_default_profile_config(ref self: T);
 
     // View methods for getting SeasonLevelConfig
-    fn get_season_level_config_by_level(
-        self: @T, season_id: u32, level: u32,
-    ) -> SeasonLevelConfig;
+    fn get_season_level_config_by_level(self: @T, season_id: u32, level: u32) -> SeasonLevelConfig;
     fn get_season_level_config_by_address(
         self: @T, address: ContractAddress, season_id: u32,
     ) -> SeasonLevelConfig;
@@ -39,6 +38,8 @@ pub mod xp_system {
         },
         store::{StoreTrait, Store},
     };
+    use jokers_of_neon_lib::models::external::profile::ProfileLevelConfig;
+
     use starknet::ContractAddress;
     use openzeppelin::introspection::src5::SRC5Component;
     use openzeppelin::access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
@@ -731,6 +732,38 @@ pub mod xp_system {
                 );
         }
 
+        fn setup_default_profile_config(ref self: ContractState) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            let mut store = StoreTrait::new(self.world_default());
+
+            // Set profile level configs with exponential XP requirements
+            let mut level = 1;
+            loop {
+                if level > 100 {
+                    break;
+                }
+
+                let required_xp = if level == 1 {
+                    100
+                } else if level <= 10 {
+                    level * level * 50
+                } else if level <= 25 {
+                    level * level * 75
+                } else if level <= 50 {
+                    level * level * 100
+                } else {
+                    level * level * 150
+                };
+
+                store
+                    .set_profile_level_config(
+                        ProfileLevelConfig { level, required_xp: required_xp.into() },
+                    );
+
+                level += 1;
+            }
+        }
+
         fn get_season_level_config_by_level(
             self: @ContractState, season_id: u32, level: u32,
         ) -> SeasonLevelConfig {
@@ -757,8 +790,47 @@ pub mod xp_system {
             ref self: ContractState, ref store: Store, address: ContractAddress, xp: u256,
         ) {
             let mut profile = store.get_profile(address);
+            let old_level = profile.level;
 
+            // Add to both total XP and current XP
+            profile.total_xp += xp;
             profile.xp += xp;
+
+            // Check if player leveled up
+            let mut new_level = old_level;
+            let mut level_to_check = old_level + 1;
+
+            loop {
+                let level_config = store.get_profile_level_config(level_to_check);
+                if profile.total_xp >= level_config.required_xp {
+                    new_level = level_to_check;
+                    level_to_check += 1;
+                } else {
+                    break;
+                }
+
+                // Safety check to prevent infinite loop
+                if level_to_check > 100 {
+                    break;
+                }
+            };
+
+            if new_level > old_level {
+                profile.level = new_level;
+
+                // Calculate current XP for new level
+                // Get the required XP for the previous level (or 0 if level 1)
+                let prev_level_required_xp = if new_level > 1 {
+                    let prev_level_config = store.get_profile_level_config(new_level - 1);
+                    prev_level_config.required_xp
+                } else {
+                    0
+                };
+
+                // Current XP = total XP - required XP for previous level
+                profile.xp = profile.total_xp - prev_level_required_xp;
+            }
+
             store.set_profile(profile);
         }
 

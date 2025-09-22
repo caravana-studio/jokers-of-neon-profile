@@ -21,7 +21,8 @@ jokers_of_neon_lib = { git = "https://github.com/caravana-studio/jokers-of-neon-
 build-external-contracts = [
     "dojo::world::world_contract::world",
     "jokers_of_neon_lib::models::external::profile::m_Profile",
-    "jokers_of_neon_lib::models::external::profile::m_PlayerStats"
+    "jokers_of_neon_lib::models::external::profile::m_PlayerStats",
+    "jokers_of_neon_lib::models::external::profile::m_ProfileLevelConfig"
 ]
 
 [dev-dependencies]
