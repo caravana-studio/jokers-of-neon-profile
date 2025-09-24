@@ -23,45 +23,17 @@ pub trait IJokersProfile<T> {
 #[dojo::contract]
 pub mod profile_system {
     use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, ProfileLevelConfig};
-    use openzeppelin::access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
-    use openzeppelin::introspection::src5::SRC5Component;
     use starknet::ContractAddress;
     use crate::models::SeasonProgress;
     use crate::store::StoreTrait;
     use super::IJokersProfile;
 
-    component!(path: SRC5Component, storage: src5, event: SRC5Event);
-    component!(path: AccessControlComponent, storage: accesscontrol, event: AccessControlEvent);
-
-    #[abi(embed_v0)]
-    impl AccessControlMixinImpl =
-        AccessControlComponent::AccessControlMixinImpl<ContractState>;
-
-    impl AccessControlInternalImpl = AccessControlComponent::InternalImpl<ContractState>;
-
-    #[storage]
-    struct Storage {
-        #[substorage(v0)]
-        src5: SRC5Component::Storage,
-        #[substorage(v0)]
-        accesscontrol: AccessControlComponent::Storage,
-    }
-
-    #[event]
-    #[derive(Drop, starknet::Event)]
-    enum Event {
-        #[flat]
-        SRC5Event: SRC5Component::Event,
-        #[flat]
-        AccessControlEvent: AccessControlComponent::Event,
-    }
-
     const WRITER_ROLE: felt252 = selector!("WRITER_ROLE");
 
     fn dojo_init(ref self: ContractState, owner: ContractAddress) {
-        self.accesscontrol.initializer();
-        self.accesscontrol._grant_role(DEFAULT_ADMIN_ROLE, owner);
-        self.accesscontrol._grant_role(WRITER_ROLE, owner);
+        // self.accesscontrol.initializer();
+        // self.accesscontrol._grant_role(DEFAULT_ADMIN_ROLE, owner);
+        // self.accesscontrol._grant_role(WRITER_ROLE, owner);
     }
 
     #[abi(embed_v0)]
