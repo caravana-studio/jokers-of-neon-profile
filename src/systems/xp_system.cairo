@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
 use crate::models::{
-    MissionDifficulty, MissionXPConfig, LevelXPConfig, SeasonConfig, SeasonLevelConfig,
+    LevelXPConfig, MissionDifficulty, MissionXPConfig, SeasonConfig, SeasonLevelConfig,
 };
 
 #[starknet::interface]
@@ -27,22 +27,19 @@ pub trait IXPSystem<T> {
 
 #[dojo::contract]
 pub mod xp_system {
-    use super::IXPSystem;
-    use crate::{
-        models::{
-            MissionDifficulty, MissionXPConfig, LevelXPConfig, SeasonConfig, SeasonLevelConfig,
-        },
-        utils::{
-            get_current_day, get_mission_xp_configurable, get_level_xp_configurable,
-            get_tier_from_level,
-        },
-        store::{StoreTrait, Store},
-    };
     use jokers_of_neon_lib::models::external::profile::ProfileLevelConfig;
-
-    use starknet::ContractAddress;
-    use openzeppelin::introspection::src5::SRC5Component;
     use openzeppelin::access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
+    use openzeppelin::introspection::src5::SRC5Component;
+    use starknet::ContractAddress;
+    use crate::models::{
+        LevelXPConfig, MissionDifficulty, MissionXPConfig, SeasonConfig, SeasonLevelConfig,
+    };
+    use crate::store::{Store, StoreTrait};
+    use crate::utils::{
+        get_current_day, get_level_xp_configurable, get_mission_xp_configurable,
+        get_tier_from_level,
+    };
+    use super::IXPSystem;
 
     component!(path: SRC5Component, storage: src5, event: SRC5Event);
     component!(path: AccessControlComponent, storage: accesscontrol, event: AccessControlEvent);
@@ -135,7 +132,7 @@ pub mod xp_system {
                     MissionDifficulty::Easy => daily_progress.easy_missions += 1,
                     MissionDifficulty::Medium => daily_progress.medium_missions += 1,
                     MissionDifficulty::Hard => daily_progress.hard_missions += 1,
-                };
+                }
 
                 daily_progress.daily_xp += xp_earned;
                 store.set_daily_progress(daily_progress);
@@ -194,7 +191,7 @@ pub mod xp_system {
                             level_completions.append(*current_completions.at(i));
                         }
                         i += 1;
-                    };
+                    }
 
                     // If the level is beyond current array size, extend the array
                     while level_completions.len() < level {
@@ -203,7 +200,7 @@ pub mod xp_system {
                         } else {
                             level_completions.append(0);
                         }
-                    };
+                    }
 
                     daily_progress.level_completions = level_completions.span();
                 }
@@ -813,7 +810,7 @@ pub mod xp_system {
                 if level_to_check > 100 {
                     break;
                 }
-            };
+            }
 
             if new_level > old_level {
                 profile.level = new_level;
