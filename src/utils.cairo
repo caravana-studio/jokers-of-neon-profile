@@ -1,6 +1,6 @@
+use dojo::world::WorldStorage;
 use crate::models::MissionDifficulty;
 use crate::store::StoreTrait;
-use dojo::world::WorldStorage;
 
 pub fn get_current_day() -> u64 {
     starknet::get_block_timestamp() / 86400 // Seconds per day

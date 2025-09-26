@@ -1,10 +1,11 @@
-use crate::models::{
-    SeasonProgress, DailyProgress, MissionXPConfig, LevelXPConfig, SeasonConfig, SeasonLevelConfig,
-    MissionDifficulty,
-};
+use dojo::model::ModelStorage;
+use dojo::world::WorldStorage;
 use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, ProfileLevelConfig};
-use dojo::{model::ModelStorage, world::WorldStorage};
 use starknet::ContractAddress;
+use crate::models::{
+    DailyProgress, LevelXPConfig, MissionDifficulty, MissionXPConfig, SeasonConfig,
+    SeasonLevelConfig, SeasonProgress,
+};
 
 #[derive(Drop)]
 pub struct Store {
