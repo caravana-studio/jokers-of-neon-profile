@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
 use crate::models::{
-    MissionDifficulty, MissionXPConfig, LevelXPConfig, SeasonConfig, SeasonLevelConfig,
+    LevelXPConfig, MissionDifficulty, MissionXPConfig, SeasonConfig, SeasonLevelConfig,
 };
 
 #[starknet::interface]
@@ -27,47 +27,21 @@ pub trait IXPSystem<T> {
 
 #[dojo::contract]
 pub mod xp_system {
-    use super::IXPSystem;
-    use crate::{
-        models::{
-            MissionDifficulty, MissionXPConfig, LevelXPConfig, SeasonConfig, SeasonLevelConfig,
-        },
-        utils::{
-            get_current_day, get_mission_xp_configurable, get_level_xp_configurable,
-            get_tier_from_level,
-        },
-        store::{StoreTrait, Store},
-    };
     use jokers_of_neon_lib::models::external::profile::ProfileLevelConfig;
-
     use starknet::ContractAddress;
-    use openzeppelin::introspection::src5::SRC5Component;
-    use openzeppelin::access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
-
-    component!(path: SRC5Component, storage: src5, event: SRC5Event);
-    component!(path: AccessControlComponent, storage: accesscontrol, event: AccessControlEvent);
-
-    #[abi(embed_v0)]
-    impl AccessControlMixinImpl =
-        AccessControlComponent::AccessControlMixinImpl<ContractState>;
-
-    impl AccessControlInternalImpl = AccessControlComponent::InternalImpl<ContractState>;
-
-    #[storage]
-    struct Storage {
-        #[substorage(v0)]
-        src5: SRC5Component::Storage,
-        #[substorage(v0)]
-        accesscontrol: AccessControlComponent::Storage,
-    }
+    use crate::models::{
+        LevelXPConfig, MissionDifficulty, MissionXPConfig, SeasonConfig, SeasonLevelConfig,
+    };
+    use crate::store::{Store, StoreTrait};
+    use crate::utils::{
+        get_current_day, get_level_xp_configurable, get_mission_xp_configurable,
+        get_tier_from_level,
+    };
+    use super::IXPSystem;
 
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
-        #[flat]
-        SRC5Event: SRC5Component::Event,
-        #[flat]
-        AccessControlEvent: AccessControlComponent::Event,
         MissionXPAdded: MissionXPAdded,
         LevelXPAdded: LevelXPAdded,
     }
@@ -94,10 +68,11 @@ pub mod xp_system {
 
     const WRITER_ROLE: felt252 = selector!("WRITER_ROLE");
 
-    fn dojo_init(ref self: ContractState, owner: ContractAddress) {
-        self.accesscontrol.initializer();
-        self.accesscontrol._grant_role(DEFAULT_ADMIN_ROLE, owner);
-        self.accesscontrol._grant_role(WRITER_ROLE, owner);
+    fn dojo_init(
+        ref self: ContractState, owner: ContractAddress,
+    ) { // self.accesscontrol.initializer();
+    // self.accesscontrol._grant_role(DEFAULT_ADMIN_ROLE, owner);
+    // self.accesscontrol._grant_role(WRITER_ROLE, owner);
     }
 
     #[abi(embed_v0)]
@@ -135,7 +110,7 @@ pub mod xp_system {
                     MissionDifficulty::Easy => daily_progress.easy_missions += 1,
                     MissionDifficulty::Medium => daily_progress.medium_missions += 1,
                     MissionDifficulty::Hard => daily_progress.hard_missions += 1,
-                };
+                }
 
                 daily_progress.daily_xp += xp_earned;
                 store.set_daily_progress(daily_progress);
@@ -194,7 +169,7 @@ pub mod xp_system {
                             level_completions.append(*current_completions.at(i));
                         }
                         i += 1;
-                    };
+                    }
 
                     // If the level is beyond current array size, extend the array
                     while level_completions.len() < level {
@@ -203,7 +178,7 @@ pub mod xp_system {
                         } else {
                             level_completions.append(0);
                         }
-                    };
+                    }
 
                     daily_progress.level_completions = level_completions.span();
                 }
@@ -227,31 +202,31 @@ pub mod xp_system {
         }
 
         fn set_mission_xp_config(ref self: ContractState, config: MissionXPConfig) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
             store.set_mission_xp_config(config);
         }
 
         fn set_level_xp_config(ref self: ContractState, config: LevelXPConfig) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
             store.set_level_xp_config(config);
         }
 
         fn set_season_config(ref self: ContractState, config: SeasonConfig) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
             store.set_season_config(config);
         }
 
         fn set_season_level_config(ref self: ContractState, config: SeasonLevelConfig) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
             store.set_season_level_config(config);
         }
 
         fn setup_default_season_config(ref self: ContractState, season_id: u32) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
 
             // Set season config
@@ -733,7 +708,7 @@ pub mod xp_system {
         }
 
         fn setup_default_profile_config(ref self: ContractState) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
 
             // Set profile level configs with exponential XP requirements
@@ -813,7 +788,7 @@ pub mod xp_system {
                 if level_to_check > 100 {
                     break;
                 }
-            };
+            }
 
             if new_level > old_level {
                 profile.level = new_level;
