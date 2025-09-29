@@ -68,10 +68,9 @@ pub mod xp_system {
 
     const WRITER_ROLE: felt252 = selector!("WRITER_ROLE");
 
-    fn dojo_init(ref self: ContractState, owner: ContractAddress) {
-        // self.accesscontrol.initializer();
-        // self.accesscontrol._grant_role(DEFAULT_ADMIN_ROLE, owner);
-        // self.accesscontrol._grant_role(WRITER_ROLE, owner);
+    fn dojo_init(ref self: ContractState, owner: ContractAddress) {// self.accesscontrol.initializer();
+    // self.accesscontrol._grant_role(DEFAULT_ADMIN_ROLE, owner);
+    // self.accesscontrol._grant_role(WRITER_ROLE, owner);
     }
 
     #[abi(embed_v0)]
