@@ -23,18 +23,45 @@ pub trait IJokersProfile<T> {
 #[dojo::contract]
 pub mod profile_system {
     use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, ProfileLevelConfig};
+    use openzeppelin_access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
+    use openzeppelin_introspection::src5::SRC5Component;
     use starknet::ContractAddress;
     use crate::models::SeasonProgress;
     use crate::store::StoreTrait;
     use super::IJokersProfile;
 
+    component!(path: SRC5Component, storage: src5, event: SRC5Event);
+    component!(path: AccessControlComponent, storage: accesscontrol, event: AccessControlEvent);
+
+    #[abi(embed_v0)]
+    impl AccessControlMixinImpl =
+        AccessControlComponent::AccessControlMixinImpl<ContractState>;
+
+    impl AccessControlInternalImpl = AccessControlComponent::InternalImpl<ContractState>;
+
+    #[storage]
+    struct Storage {
+        #[substorage(v0)]
+        src5: SRC5Component::Storage,
+        #[substorage(v0)]
+        accesscontrol: AccessControlComponent::Storage,
+    }
+
+    #[event]
+    #[derive(Drop, starknet::Event)]
+    enum Event {
+        #[flat]
+        SRC5Event: SRC5Component::Event,
+        #[flat]
+        AccessControlEvent: AccessControlComponent::Event,
+    }
+
     const WRITER_ROLE: felt252 = selector!("WRITER_ROLE");
 
-    fn dojo_init(
-        ref self: ContractState, owner: ContractAddress,
-    ) { // self.accesscontrol.initializer();
-    // self.accesscontrol._grant_role(DEFAULT_ADMIN_ROLE, owner);
-    // self.accesscontrol._grant_role(WRITER_ROLE, owner);
+    fn dojo_init(ref self: ContractState, owner: ContractAddress) {
+        self.accesscontrol.initializer();
+        self.accesscontrol._grant_role(DEFAULT_ADMIN_ROLE, owner);
+        self.accesscontrol._grant_role(WRITER_ROLE, owner);
     }
 
     #[abi(embed_v0)]
@@ -64,12 +91,12 @@ pub mod profile_system {
         }
 
         fn add_stats(ref self: ContractState, player_stats: PlayerStats) {
-            // self.accesscontrol.assert_only_role(WRITER_ROLE);
+            self.accesscontrol.assert_only_role(WRITER_ROLE);
             self._add_stats(player_stats)
         }
 
         fn update_avatar(ref self: ContractState, player_address: ContractAddress, avatar_id: u16) {
-            // self.accesscontrol.assert_only_role(WRITER_ROLE);
+            self.accesscontrol.assert_only_role(WRITER_ROLE);
             let mut store = StoreTrait::new(self.world_default());
             let mut profile = store.get_profile(player_address);
             profile.avatar_id = avatar_id;
