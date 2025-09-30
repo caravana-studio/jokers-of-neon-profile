@@ -1,24 +1,27 @@
 [world]
-description = "jokers_of_neon_profile"
-name = "jokers_of_neon_profile"
-seed = "jokers_of_neon_profile"
+description = "jon_profile_tournament"
+name = "jon_profile_tournament"
+seed = "jon_profile_tournament"
 
 [namespace]
-default = "jokers_of_neon_profile"
+default = "jon_profile_tournament"
 
 [env]
-rpc_url = "https://api.cartridge.gg/x/starknet/mainnet"
+rpc_url = "https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_9/NWCu9tuBdPGQBWPnfgyzF"
+account_address = "0x053c80dd051d0a515ba87dc8a3a32d56dc792e30d046ced89c6a537364e3435e"
+private_key = "0x07222e994e5fd0379d6224d8e7412c01c2008b993fb6b81f3f8dca5465d9123d"
 
 [writers]
 
-"jokers_of_neon_profile" = [
-    "jokers_of_neon_profile-profile_system",
+"jon_profile_tournament" = [
+    "jon_profile_tournament-profile_system",
+    "jon_profile_tournament-xp_system",
 ]
 
 [init_call_args]
-"jokers_of_neon_profile-profile_system" = [
+"jon_profile_tournament-profile_system" = [
     "0x6677fe62ee39c7b07401f754138502bab7fac99d2d3c5d37df7d1c6fab10819",
 ]
-"jokers_of_neon_profile-xp_system" = [
+"jon_profile_tournament-xp_system" = [
     "0x6677fe62ee39c7b07401f754138502bab7fac99d2d3c5d37df7d1c6fab10819",
 ]

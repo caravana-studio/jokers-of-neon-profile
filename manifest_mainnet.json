@@ -1,9 +1,9 @@
 {
   "world": {
     "class_hash": "0x57994b6a75fad550ca18b41ee82e2110e158c59028c4478109a67965a0e5b1e",
-    "address": "0x69fa3647c3a29dfc2b9a0769837b518eac8d69bad58b676029f861ce9e0ed1d",
-    "seed": "jokers_of_neon_profile",
-    "name": "jokers_of_neon_profile",
+    "address": "0x39b7b8258b1976efbb4932f10986a062990dbe2f4a06154cf38e1770baf909a",
+    "seed": "jon_profile_tournament",
+    "name": "jon_profile_tournament",
     "entrypoints": [
       "uuid",
       "set_metadata",
@@ -1479,8 +1479,8 @@
   },
   "contracts": [
     {
-      "address": "0xfdfb503dc4e7d75b346e165b5b136fd84f8fcdefbd54f5ae2ecbf96fc3e937",
-      "class_hash": "0x55a280e53f030cfa967755cf8ef8697f2ea6752cef06a290f3457b2b982d3c8",
+      "address": "0x17be85f8f72667cd25199a9a0223e4863fcd00256affd1ec5abc71071698c81",
+      "class_hash": "0x363001d5f3659485fe947ed44e91ff082e340982ff52de004455e43dabe6fe",
       "abi": [
         {
           "type": "impl",
@@ -2343,8 +2343,8 @@
       "init_calldata": [
         "0x6677fe62ee39c7b07401f754138502bab7fac99d2d3c5d37df7d1c6fab10819"
       ],
-      "tag": "jokers_of_neon_profile-profile_system",
-      "selector": "0x3ca0433f12e7d79ef7d1e0b8cb138aa7ef8fcb199942e9a36066dc9417529b0",
+      "tag": "jon_profile_tournament-profile_system",
+      "selector": "0x23d552f9438ea49bedf0edee52dadc328abcdd711c3ca64527f78c8afba2d55",
       "systems": [
         "dojo_init",
         "create_profile",
@@ -2360,8 +2360,8 @@
       ]
     },
     {
-      "address": "0x30c0351a863164f762749145becf8aced5cb67b7e2b81b93d7c44f03ff665a9",
-      "class_hash": "0x665328f9ef26f7c936f8ae8118a7e2a6ed0c890faafa740039e4f429ca148c8",
+      "address": "0x2238ff66ed044ae4e406171ccbadbbd7b6c359ce8b28ccba9903d7e4d327477",
+      "class_hash": "0x59c84eccae07f1accb4463ce759f29a5593959a078bd11b89ad99f3a895f67f",
       "abi": [
         {
           "type": "impl",
@@ -2900,8 +2900,8 @@
       "init_calldata": [
         "0x6677fe62ee39c7b07401f754138502bab7fac99d2d3c5d37df7d1c6fab10819"
       ],
-      "tag": "jokers_of_neon_profile-xp_system",
-      "selector": "0x72c5b922039f8b328beaa57df743201bcc3ab63d14ed1548b1b5cba2ce18731",
+      "tag": "jon_profile_tournament-xp_system",
+      "selector": "0x2869aeb502a5430dc3a697b839595eb4f56223764cb4d66c37cad9f0353400e",
       "systems": [
         "dojo_init",
         "add_daily_mission_xp",
@@ -2921,56 +2921,56 @@
     {
       "members": [],
       "class_hash": "0x6a3f5e9c1f469a79ff0b306e6e079e5f2b2cb1b075ebfdc55d98560d69a905",
-      "tag": "jokers_of_neon_profile-DailyProgress",
-      "selector": "0x3eba2b69c1b9d866f898c7e868a32bff7a85d41ca3ea09457a2a8194b4a316c"
+      "tag": "jon_profile_tournament-DailyProgress",
+      "selector": "0x8e72dd8e5e7c0ce4b9a5e09c74a9b17e650e461b9d6be979abbaf10191e3bd"
     },
     {
       "members": [],
       "class_hash": "0x4f7da1d85b3c42670cc8c1becb951607e2d63ab1eaf187c72165e2122f563e6",
-      "tag": "jokers_of_neon_profile-LevelXPConfig",
-      "selector": "0x46728301576f681a49af65d408391787ea662b8423e65da5839dc1f4e6ba15"
+      "tag": "jon_profile_tournament-LevelXPConfig",
+      "selector": "0x451fbc904318690a32580dd4b67c665a914457b50cdd447caba96c0f52da48f"
     },
     {
       "members": [],
       "class_hash": "0x32600332403ffbc49f184dd33313d62f13a1623d1bf601ac5f79c9b07d98fec",
-      "tag": "jokers_of_neon_profile-MissionXPConfig",
-      "selector": "0x6e778b4cf35c085544321164d618161eaf05394994b597172ce2cf79f59c40"
+      "tag": "jon_profile_tournament-MissionXPConfig",
+      "selector": "0x64e7258057cb6454a9fadae59c5eba1a9f61a26d3f0285deedce762aab11c25"
     },
     {
       "members": [],
       "class_hash": "0x200771106b86a0290cd62ca07df3462a232eeeba2897961a0b08e429759bf26",
-      "tag": "jokers_of_neon_profile-PlayerStats",
-      "selector": "0x13c5e54cf4ae01a1f16302492259ebde00c0f8a0b2f347cb1b85f3b14be15af"
+      "tag": "jon_profile_tournament-PlayerStats",
+      "selector": "0x14df15eee92def1df7d743a8de01a2eee2b43484423bd47536f5f90f6b13e4a"
     },
     {
       "members": [],
       "class_hash": "0x781306689f2223991a70b1b47fa337723fd06582623370781bae55cff2a2289",
-      "tag": "jokers_of_neon_profile-Profile",
-      "selector": "0x384cb3d3c89f80be3962324500205a8e8a653fe9777d681fb38aa0353a23021"
+      "tag": "jon_profile_tournament-Profile",
+      "selector": "0x4fac805e9fa62cfe0046f9a28df7f0a0b6ca4d7092912f1c15840e8482be4cb"
     },
     {
       "members": [],
       "class_hash": "0x2c1526a36ecb4d3ecf3d5fb064e4dd574c56e10488d17177d1b0bbc9aa0f24c",
-      "tag": "jokers_of_neon_profile-ProfileLevelConfig",
-      "selector": "0x28cdd2641b55f8dd5a42a5096033aeb9cebce70d5a18943450d46f662bf3d10"
+      "tag": "jon_profile_tournament-ProfileLevelConfig",
+      "selector": "0x4ece838aa67459af7bb1199dc22184c288bca2db872b75ad010116b348c141c"
     },
     {
       "members": [],
       "class_hash": "0x7b88e083d06ae8ee7bfa5f34a6892ecdbf35a51c51f1b94dc16a09f450bd382",
-      "tag": "jokers_of_neon_profile-SeasonConfig",
-      "selector": "0x165c694f835f85eb7ac074c24bca7ab5f492b0fdfafc5ce7b08eb27f6271e19"
+      "tag": "jon_profile_tournament-SeasonConfig",
+      "selector": "0x7ac4d203c953b6052d59f8f74334a2a9db576f8ea13340a4f1a17cbf62c1c5e"
     },
     {
       "members": [],
       "class_hash": "0x1b762f21c5f59b0254259b4dad7fa97ee5830366a09b7671662ab687b8b2f5d",
-      "tag": "jokers_of_neon_profile-SeasonLevelConfig",
-      "selector": "0x168dec8aa72b4d17ae494fe4ffec4b46a27e28eb103c535473ab0e9792fad84"
+      "tag": "jon_profile_tournament-SeasonLevelConfig",
+      "selector": "0x73e7951bee3c36a3b745971ad282327b78d6e8f9ce45af4fa6efd59fae6cb95"
     },
     {
       "members": [],
       "class_hash": "0x571098e2c14d4a9cf65ca43e21cabb0c5ddec40db4f2c7eb801415e1000e33a",
-      "tag": "jokers_of_neon_profile-SeasonProgress",
-      "selector": "0xc3accb189bcc1e7e75a72ba636c91bd4588be10f4b9a5dc2dbf9717aab9713"
+      "tag": "jon_profile_tournament-SeasonProgress",
+      "selector": "0x5ec3a2128bbf717441969b1e8f77220170c9c5d43228dd95eff9d462281b8be"
     }
   ],
   "events": [],

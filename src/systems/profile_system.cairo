@@ -143,7 +143,7 @@ pub mod profile_system {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn world_default(self: @ContractState) -> dojo::world::WorldStorage {
-            self.world(@"jokers_of_neon_profile")
+            self.world(@"jon_profile_tournament")
         }
 
         fn _add_stats(self: @ContractState, player_stats: PlayerStats) {
