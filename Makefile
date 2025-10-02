@@ -2,7 +2,7 @@ katana:
 	katana --dev --dev.no-fee --http.cors_origins "*" 
 
 setup:
-	@./scripts/setup.sh $(PROFILE)
+	@./scripts/setup.sh $(PROFILE) $(PROFILE_SYSTEM_ADDRESS)
 
 build: 
 	@clear; scarb fmt; sozo build
