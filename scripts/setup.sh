@@ -3,6 +3,7 @@
 set -e
 
 profile="${1:-dev}"
+profile_system_address="${2:-}"
 
 # Validate profile parameter
 if [ "$profile" != "dev" ] && [ "$profile" != "slot" ] && [ "$profile" != "testnet" ] && [ "$profile" != "mainnet" ]; then
@@ -39,5 +40,12 @@ sozo -P ${profile} execute xp_system setup_default_season_config \
 
 echo -e "\n🎮 Default config xp profile en profile..."
 sozo -P ${profile} execute xp_system setup_default_profile_config \
+    --wait \
+    --world $world_address
+
+echo -e "\n🎮 Register game system in profile..."
+sozo -P ${profile} execute profile_system grant_role \
+    0x038f168f361ac1393a163ed4adfa899a87be7b7c71645167bdaddd822ae453c8 \
+    $profile_system_address \
     --wait \
     --world $world_address
