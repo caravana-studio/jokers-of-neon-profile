@@ -16,7 +16,7 @@ move = "sozo execute dojo_starter-actions move -c 1 --wait" # scarb run move
 dojo = "1.7.0"
 dojo_cairo_macros = "1.7.0"
 starknet = "2.12.2"
-jokers_of_neon_lib = { git = "https://github.com/caravana-studio/jokers-of-neon-lib", branch="develop" }
+jokers_of_neon_lib = { git = "https://github.com/caravana-studio/jokers-of-neon-lib", branch="card-type-discard-condition" }
 openzeppelin_introspection = "1.0.0"
 openzeppelin_access = "1.0.0"
 
