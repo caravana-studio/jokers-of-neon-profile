@@ -1,7 +1,5 @@
 use starknet::ContractAddress;
-use crate::models::{
-    LevelXPConfig, MissionDifficulty, MissionXPConfig, SeasonConfig, SeasonLevelConfig,
-};
+use crate::models::MissionDifficulty;
 
 #[starknet::interface]
 pub trait IXPSystem<T> {
@@ -9,29 +7,14 @@ pub trait IXPSystem<T> {
     fn add_level_completion_xp(ref self: T, address: ContractAddress, level: u32);
 
     // Configuration methods
-    fn set_mission_xp_config(ref self: T, config: MissionXPConfig);
-    fn set_level_xp_config(ref self: T, config: LevelXPConfig);
-    fn set_season_config(ref self: T, config: SeasonConfig);
-    fn set_season_level_config(ref self: T, config: SeasonLevelConfig);
-
-    // Setup methods for initializing default configurations
-    fn setup_default_season_config(ref self: T, season_id: u32);
     fn setup_default_profile_config(ref self: T);
-
-    // View methods for getting SeasonLevelConfig
-    fn get_season_level_config_by_level(self: @T, season_id: u32, level: u32) -> SeasonLevelConfig;
-    fn get_season_level_config_by_address(
-        self: @T, address: ContractAddress, season_id: u32,
-    ) -> SeasonLevelConfig;
 }
 
 #[dojo::contract]
 pub mod xp_system {
     use jokers_of_neon_lib::models::external::profile::ProfileLevelConfig;
     use starknet::ContractAddress;
-    use crate::models::{
-        LevelXPConfig, MissionDifficulty, MissionXPConfig, SeasonConfig, SeasonLevelConfig,
-    };
+    use crate::models::MissionDifficulty;
     use crate::store::{Store, StoreTrait};
     use crate::utils::{
         get_current_day, get_level_xp_configurable, get_mission_xp_configurable,
@@ -87,10 +70,8 @@ pub mod xp_system {
 
             // TODO: Validate that the season is active
             let season_id = 1;
-            let mut season_config = store.get_season_config(season_id);
-            season_config.is_active = true;
-            // let season_config = store.get_season_config(season_id);
-            // assert(season_config.is_active, 'Season is not active');
+            let season = store.get_season(season_id);
+            // assert(season.is_active, 'Season is not active');
 
             let current_day = get_current_day();
             let mut daily_progress = store.get_daily_progress(address, current_day);
@@ -117,7 +98,7 @@ pub mod xp_system {
 
                 self._add_profile_xp(ref store, address, xp_earned.into());
 
-                if season_config.is_active {
+                if season.is_active {
                     self._add_season_xp(ref store, address, season_id, xp_earned.into());
                 }
 
@@ -138,10 +119,8 @@ pub mod xp_system {
 
             // TODO: Validate that the season is active
             let season_id = 1;
-            let mut season_config = store.get_season_config(season_id);
-            season_config.is_active = true;
-            // let season_config = store.get_season_config(season_id);
-            // assert(season_config.is_active, 'Season is not active');
+            let season = store.get_season(season_id);
+            // assert(season.is_active, 'Season is not active');
 
             let current_day = get_current_day();
             let mut daily_progress = store.get_daily_progress(address, current_day);
@@ -188,7 +167,7 @@ pub mod xp_system {
 
                 self._add_profile_xp(ref store, address, xp_earned.into());
 
-                if season_config.is_active {
+                if season.is_active {
                     self._add_season_xp(ref store, address, season_id, xp_earned.into());
                 }
 
@@ -199,512 +178,6 @@ pub mod xp_system {
                         },
                     );
             }
-        }
-
-        fn set_mission_xp_config(ref self: ContractState, config: MissionXPConfig) {
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-            let mut store = StoreTrait::new(self.world_default());
-            store.set_mission_xp_config(config);
-        }
-
-        fn set_level_xp_config(ref self: ContractState, config: LevelXPConfig) {
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-            let mut store = StoreTrait::new(self.world_default());
-            store.set_level_xp_config(config);
-        }
-
-        fn set_season_config(ref self: ContractState, config: SeasonConfig) {
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-            let mut store = StoreTrait::new(self.world_default());
-            store.set_season_config(config);
-        }
-
-        fn set_season_level_config(ref self: ContractState, config: SeasonLevelConfig) {
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-            let mut store = StoreTrait::new(self.world_default());
-            store.set_season_level_config(config);
-        }
-
-        fn setup_default_season_config(ref self: ContractState, season_id: u32) {
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-            let mut store = StoreTrait::new(self.world_default());
-
-            // Set season config
-            store.set_season_config(SeasonConfig { season_id, is_active: true });
-
-            // Set mission XP configs based on sistema_xp.md
-            // Easy missions
-            store
-                .set_mission_xp_config(
-                    MissionXPConfig {
-                        season_id,
-                        difficulty: MissionDifficulty::Easy,
-                        completion_count: 0,
-                        xp_reward: 10,
-                    },
-                );
-            store
-                .set_mission_xp_config(
-                    MissionXPConfig {
-                        season_id,
-                        difficulty: MissionDifficulty::Easy,
-                        completion_count: 1,
-                        xp_reward: 0,
-                    },
-                );
-
-            // Medium missions
-            store
-                .set_mission_xp_config(
-                    MissionXPConfig {
-                        season_id,
-                        difficulty: MissionDifficulty::Medium,
-                        completion_count: 0,
-                        xp_reward: 20,
-                    },
-                );
-            store
-                .set_mission_xp_config(
-                    MissionXPConfig {
-                        season_id,
-                        difficulty: MissionDifficulty::Medium,
-                        completion_count: 1,
-                        xp_reward: 0,
-                    },
-                );
-
-            // Hard missions
-            store
-                .set_mission_xp_config(
-                    MissionXPConfig {
-                        season_id,
-                        difficulty: MissionDifficulty::Hard,
-                        completion_count: 0,
-                        xp_reward: 30,
-                    },
-                );
-            store
-                .set_mission_xp_config(
-                    MissionXPConfig {
-                        season_id,
-                        difficulty: MissionDifficulty::Hard,
-                        completion_count: 1,
-                        xp_reward: 0,
-                    },
-                );
-
-            // Set level XP configs
-            // Level 1
-            store
-                .set_level_xp_config(
-                    LevelXPConfig { season_id, level: 1, completion_count: 0, xp_reward: 5 },
-                );
-            store
-                .set_level_xp_config(
-                    LevelXPConfig { season_id, level: 1, completion_count: 1, xp_reward: 0 },
-                );
-
-            // Level 2
-            store
-                .set_level_xp_config(
-                    LevelXPConfig { season_id, level: 2, completion_count: 0, xp_reward: 10 },
-                );
-            store
-                .set_level_xp_config(
-                    LevelXPConfig { season_id, level: 2, completion_count: 1, xp_reward: 0 },
-                );
-
-            // Level 3
-            store
-                .set_level_xp_config(
-                    LevelXPConfig { season_id, level: 3, completion_count: 0, xp_reward: 15 },
-                );
-            store
-                .set_level_xp_config(
-                    LevelXPConfig { season_id, level: 3, completion_count: 1, xp_reward: 5 },
-                );
-            store
-                .set_level_xp_config(
-                    LevelXPConfig { season_id, level: 3, completion_count: 2, xp_reward: 0 },
-                );
-
-            // Level 4
-            store
-                .set_level_xp_config(
-                    LevelXPConfig { season_id, level: 4, completion_count: 0, xp_reward: 20 },
-                );
-            store
-                .set_level_xp_config(
-                    LevelXPConfig { season_id, level: 4, completion_count: 1, xp_reward: 10 },
-                );
-            store
-                .set_level_xp_config(
-                    LevelXPConfig { season_id, level: 4, completion_count: 2, xp_reward: 0 },
-                );
-
-            // Level 5
-            store
-                .set_level_xp_config(
-                    LevelXPConfig { season_id, level: 5, completion_count: 0, xp_reward: 25 },
-                );
-            store
-                .set_level_xp_config(
-                    LevelXPConfig { season_id, level: 5, completion_count: 1, xp_reward: 15 },
-                );
-            store
-                .set_level_xp_config(
-                    LevelXPConfig { season_id, level: 5, completion_count: 2, xp_reward: 5 },
-                );
-            store
-                .set_level_xp_config(
-                    LevelXPConfig { season_id, level: 5, completion_count: 3, xp_reward: 0 },
-                );
-
-            // Set season level configs based on sistema_xp.md
-            // Leveles 1-11 - Casual (Tier 1)
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 1,
-                        required_xp: 25,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 2,
-                        required_xp: 50,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 3,
-                        required_xp: 75,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 4,
-                        required_xp: 100,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 5,
-                        required_xp: 150,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 6,
-                        required_xp: 200,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 7,
-                        required_xp: 300,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 8,
-                        required_xp: 400,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 9,
-                        required_xp: 500,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 10,
-                        required_xp: 600,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 11,
-                        required_xp: 700,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            // Leveles 12-25 - Average (Tier 2)
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 12,
-                        required_xp: 800,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 13,
-                        required_xp: 900,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 14,
-                        required_xp: 1000,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 15,
-                        required_xp: 1100,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 16,
-                        required_xp: 1200,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 17,
-                        required_xp: 1300,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 18,
-                        required_xp: 1400,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 19,
-                        required_xp: 1500,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 20,
-                        required_xp: 1600,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 21,
-                        required_xp: 1700,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 22,
-                        required_xp: 1800,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 23,
-                        required_xp: 1900,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 24,
-                        required_xp: 2000,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 25,
-                        required_xp: 2100,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            // Leveles 26-32 - Hardcore (Tier 3)
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 26,
-                        required_xp: 2200,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 27,
-                        required_xp: 2300,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 28,
-                        required_xp: 2400,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 29,
-                        required_xp: 2500,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 30,
-                        required_xp: 2750,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 31,
-                        required_xp: 3000,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 32,
-                        required_xp: 3500,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            // Leveles 33+ - Legend (Tier 4)
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 33,
-                        required_xp: 4000,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
-            store
-                .set_season_level_config(
-                    SeasonLevelConfig {
-                        season_id,
-                        level: 34,
-                        required_xp: 5000,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
-                    },
-                );
         }
 
         fn setup_default_profile_config(ref self: ContractState) {
@@ -737,21 +210,6 @@ pub mod xp_system {
 
                 level += 1;
             }
-        }
-
-        fn get_season_level_config_by_level(
-            self: @ContractState, season_id: u32, level: u32,
-        ) -> SeasonLevelConfig {
-            let mut store = StoreTrait::new(self.world_default());
-            store.get_season_level_config(season_id, level)
-        }
-
-        fn get_season_level_config_by_address(
-            self: @ContractState, address: ContractAddress, season_id: u32,
-        ) -> SeasonLevelConfig {
-            let mut store = StoreTrait::new(self.world_default());
-            let season_progress = store.get_season_progress(address, season_id);
-            store.get_season_level_config(season_id, season_progress.level)
         }
     }
 
@@ -817,8 +275,39 @@ pub mod xp_system {
             xp: u256,
         ) {
             let mut season_progress = store.get_season_progress(address, season_id);
+            let old_level = season_progress.level;
 
             season_progress.season_xp += xp;
+
+            // Check if player leveled up in the season
+            let mut new_level = old_level;
+            let mut level_to_check = old_level + 1;
+
+            loop {
+                let level_config = store.get_season_level_config(season_id, level_to_check);
+
+                // If level config doesn't exist (required_xp is 0), we've reached the max level
+                if level_config.required_xp == 0 {
+                    break;
+                }
+
+                if season_progress.season_xp >= level_config.required_xp {
+                    new_level = level_to_check;
+                    level_to_check += 1;
+                } else {
+                    break;
+                }
+
+                // Safety check to prevent infinite loop (max 100 levels)
+                if level_to_check > 100 {
+                    break;
+                }
+            }
+
+            // Update level if changed
+            if new_level > old_level {
+                season_progress.level = new_level;
+            }
 
             let new_tier = get_tier_from_level(season_progress.level);
             if new_tier > season_progress.tier {

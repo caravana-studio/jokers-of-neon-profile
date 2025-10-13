@@ -3,8 +3,8 @@ use dojo::world::WorldStorage;
 use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, ProfileLevelConfig};
 use starknet::ContractAddress;
 use crate::models::{
-    DailyProgress, LevelXPConfig, MissionDifficulty, MissionXPConfig, SeasonConfig,
-    SeasonLevelConfig, SeasonProgress,
+    ClaimedReward, DailyProgress, LevelXPConfig, MissionDifficulty, MissionXPConfig, Season,
+    SeasonLevelConfig, SeasonProgress, SeasonReward,
 };
 
 #[derive(Drop)]
@@ -73,14 +73,6 @@ pub impl StoreImpl of StoreTrait {
         self.world.write_model(@config)
     }
 
-    fn get_season_config(ref self: Store, season_id: u32) -> SeasonConfig {
-        self.world.read_model(season_id)
-    }
-
-    fn set_season_config(ref self: Store, config: SeasonConfig) {
-        self.world.write_model(@config)
-    }
-
     fn get_season_level_config(ref self: Store, season_id: u32, level: u32) -> SeasonLevelConfig {
         self.world.read_model((season_id, level))
     }
@@ -95,5 +87,31 @@ pub impl StoreImpl of StoreTrait {
 
     fn set_profile_level_config(ref self: Store, config: ProfileLevelConfig) {
         self.world.write_model(@config)
+    }
+
+    fn get_season(ref self: Store, season_id: u32) -> Season {
+        self.world.read_model(season_id)
+    }
+
+    fn set_season(ref self: Store, season: Season) {
+        self.world.write_model(@season)
+    }
+
+    fn get_season_reward(ref self: Store, reward_id: u32) -> SeasonReward {
+        self.world.read_model(reward_id)
+    }
+
+    fn set_season_reward(ref self: Store, reward: SeasonReward) {
+        self.world.write_model(@reward)
+    }
+
+    fn get_claimed_reward(
+        ref self: Store, address: ContractAddress, season_id: u32, level: u32, is_premium: bool,
+    ) -> ClaimedReward {
+        self.world.read_model((address, season_id, level, is_premium))
+    }
+
+    fn set_claimed_reward(ref self: Store, claimed_reward: ClaimedReward) {
+        self.world.write_model(@claimed_reward)
     }
 }

@@ -1,5 +1,16 @@
 use starknet::ContractAddress;
 
+#[derive(Drop, Serde, Debug)]
+#[dojo::model]
+pub struct Season {
+    #[key]
+    pub id: u32,
+    pub name: ByteArray,
+    pub is_active: bool,
+    pub start_date: u64,
+    pub end_date: u64,
+}
+
 #[derive(Copy, Drop, Serde, Debug)]
 #[dojo::model]
 pub struct SeasonProgress {
@@ -9,9 +20,20 @@ pub struct SeasonProgress {
     pub season_id: u32,
     pub season_xp: u256,
     pub has_season_pass: bool,
-    pub claimable_rewards_id: Span<u32>,
     pub tier: u32,
     pub level: u32,
+}
+
+#[derive(Drop, Serde, Debug)]
+#[dojo::model]
+pub struct SeasonLevelConfig {
+    #[key]
+    pub season_id: u32,
+    #[key]
+    pub level: u32,
+    pub required_xp: u256,
+    pub free_rewards: Span<u32>,
+    pub premium_rewards: Span<u32>,
 }
 
 #[derive(Copy, Drop, Serde, Debug, PartialEq, Introspect)]
@@ -59,22 +81,26 @@ pub struct LevelXPConfig {
     pub xp_reward: u32,
 }
 
-#[derive(Copy, Drop, Serde, Debug)]
-#[dojo::model]
-pub struct SeasonConfig {
-    #[key]
-    pub season_id: u32,
-    pub is_active: bool,
-}
-
 #[derive(Drop, Serde, Debug)]
 #[dojo::model]
-pub struct SeasonLevelConfig {
+pub struct SeasonReward {
+    #[key]
+    pub id: u32,
+    pub reward_type: u8,
+    pub value: u256,
+    pub description: ByteArray,
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+pub struct ClaimedReward {
+    #[key]
+    pub address: ContractAddress,
     #[key]
     pub season_id: u32,
     #[key]
     pub level: u32,
-    pub required_xp: u256,
-    pub free_rewards: Span<u32>,
-    pub premium_rewards: Span<u32>,
+    #[key]
+    pub is_premium: bool,
+    pub claimed_at: u64,
 }
