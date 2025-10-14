@@ -1,5 +1,5 @@
 use starknet::ContractAddress;
-use crate::models::{Season, SeasonReward, SeasonLevelConfig, MissionXPConfig, LevelXPConfig};
+use crate::models::{Season, SeasonLevelConfig, MissionXPConfig, LevelXPConfig, SeasonProgress};
 
 #[starknet::interface]
 pub trait ISeasonSystem<T> {
@@ -10,12 +10,6 @@ pub trait ISeasonSystem<T> {
     fn activate_season(ref self: T, season_id: u32);
     fn deactivate_season(ref self: T, season_id: u32);
     fn get_season(self: @T, season_id: u32) -> Season;
-
-    // Reward management
-    fn create_reward(
-        ref self: T, id: u32, reward_type: u8, value: u256, description: ByteArray,
-    ) -> SeasonReward;
-    fn get_reward(self: @T, reward_id: u32) -> SeasonReward;
 
     // Configuration methods
     fn configure_season_level(
@@ -30,23 +24,16 @@ pub trait ISeasonSystem<T> {
     // Season Pass purchase
     fn purchase_season_pass(ref self: T, address: ContractAddress, season_id: u32);
 
-    // Reward claiming
-    fn claim_reward(ref self: T, address: ContractAddress, season_id: u32, level: u32, is_premium: bool);
-    fn claim_all_available_rewards(ref self: T, address: ContractAddress, season_id: u32);
-
     // User initialization
     fn initialize_user_progress(ref self: T, address: ContractAddress, season_id: u32);
 
     // View methods
-    fn get_claimable_rewards(
-        self: @T, address: ContractAddress, season_id: u32,
-    ) -> (Span<u32>, Span<u32>); // (free_levels, premium_levels)
-    fn is_reward_claimed(
-        self: @T, address: ContractAddress, season_id: u32, level: u32, is_premium: bool,
-    ) -> bool;
     fn get_user_progress(
         self: @T, address: ContractAddress, season_id: u32,
     ) -> (u256, u32, bool); // (xp, level, has_pass)
+    fn get_season_progress(
+        self: @T, player_address: ContractAddress, season_id: u32,
+    ) -> SeasonProgress;
     fn has_season_pass(self: @T, address: ContractAddress, season_id: u32) -> bool;
 
     // Season configuration methods
@@ -58,15 +45,17 @@ pub trait ISeasonSystem<T> {
     fn get_season_level_config_by_address(
         self: @T, address: ContractAddress, season_id: u32,
     ) -> SeasonLevelConfig;
+
+    // Get pending packs for a player
+    fn get_pending_packs(self: @T, address: ContractAddress) -> Span<u32>;
 }
 
 #[dojo::contract]
 pub mod season_system {
     use core::num::traits::Zero;
-    use starknet::{ContractAddress, get_block_timestamp};
+    use starknet::ContractAddress;
     use crate::models::{
-        ClaimedReward, Season, SeasonLevelConfig, SeasonProgress, SeasonReward, MissionXPConfig,
-        LevelXPConfig,
+        PendingPacks, Season, SeasonLevelConfig, SeasonProgress, MissionXPConfig, LevelXPConfig,
     };
     use crate::store::{Store, StoreTrait};
     use super::ISeasonSystem;
@@ -77,9 +66,8 @@ pub mod season_system {
         SeasonCreated: SeasonCreated,
         SeasonActivated: SeasonActivated,
         SeasonDeactivated: SeasonDeactivated,
-        RewardCreated: RewardCreated,
         SeasonPassPurchased: SeasonPassPurchased,
-        RewardClaimed: RewardClaimed,
+        PacksGranted: PacksGranted,
         SeasonLevelReached: SeasonLevelReached,
         UserProgressInitialized: UserProgressInitialized,
     }
@@ -106,14 +94,6 @@ pub mod season_system {
     }
 
     #[derive(Drop, starknet::Event)]
-    struct RewardCreated {
-        #[key]
-        reward_id: u32,
-        reward_type: u8,
-        value: u256,
-    }
-
-    #[derive(Drop, starknet::Event)]
     struct SeasonPassPurchased {
         #[key]
         player: ContractAddress,
@@ -121,13 +101,13 @@ pub mod season_system {
     }
 
     #[derive(Drop, starknet::Event)]
-    struct RewardClaimed {
+    struct PacksGranted {
         #[key]
         player: ContractAddress,
         season_id: u32,
         level: u32,
         is_premium: bool,
-        reward_id: u32,
+        pack_count: u32,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -205,245 +185,22 @@ pub mod season_system {
             store.get_season(season_id)
         }
 
-        fn create_reward(
-            ref self: ContractState,
-            id: u32,
-            reward_type: u8,
-            value: u256,
-            description: ByteArray,
-        ) -> SeasonReward {
-            // self.accesscontrol.assert_only_role(ADMIN_ROLE);
-
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
-
-            let reward = SeasonReward { id, reward_type, value, description: description.clone() };
-
-            store.set_season_reward(reward);
-
-            self.emit(RewardCreated { reward_id: id, reward_type, value });
-
-            SeasonReward { id, reward_type, value, description }
-        }
-
-        fn get_reward(self: @ContractState, reward_id: u32) -> SeasonReward {
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
-            store.get_season_reward(reward_id)
-        }
-
         fn purchase_season_pass(
             ref self: ContractState, address: ContractAddress, season_id: u32,
         ) {
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
 
-            let season = store.get_season(season_id);
+            let season = StoreTrait::get_season(ref store, season_id);
             assert(season.is_active, 'Season not active');
 
-            let mut progress = store.get_season_progress(address, season_id);
+            let mut progress = StoreTrait::get_season_progress(ref store, address, season_id);
             assert(!progress.has_season_pass, 'Already has season pass');
 
             progress.has_season_pass = true;
-            store.set_season_progress(progress);
-
-            // Auto-grant all premium rewards for already reached levels
-            self._grant_retroactive_premium_rewards(ref store, address, season_id, progress.level);
+            StoreTrait::set_season_progress(ref store, progress);
 
             self.emit(SeasonPassPurchased { player: address, season_id });
-        }
-
-        fn claim_reward(
-            ref self: ContractState,
-            address: ContractAddress,
-            season_id: u32,
-            level: u32,
-            is_premium: bool,
-        ) {
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
-
-            let season = store.get_season(season_id);
-            assert(season.is_active, 'Season not active');
-
-            let progress = store.get_season_progress(address, season_id);
-
-            // Verify user has reached this level
-            assert(progress.level >= level, 'Level not reached');
-
-            // Verify user has season pass if claiming premium reward
-            if is_premium {
-                assert(progress.has_season_pass, 'No season pass');
-            }
-
-            // Check if already claimed
-            let claimed = store.get_claimed_reward(address, season_id, level, is_premium);
-            assert(claimed.address.is_zero(), 'Reward already claimed');
-
-            // Get the reward for this level
-            let level_config = store.get_season_level_config(season_id, level);
-            let rewards = if is_premium {
-                level_config.premium_rewards
-            } else {
-                level_config.free_rewards
-            };
-
-            assert(rewards.len() > 0, 'No reward for this level');
-
-            // Grant the rewards
-            self._grant_rewards(ref store, address, rewards);
-
-            // Mark as claimed
-            let claimed_reward = ClaimedReward {
-                address,
-                season_id,
-                level,
-                is_premium,
-                claimed_at: get_block_timestamp()
-            };
-            store.set_claimed_reward(claimed_reward);
-
-            // Emit event for the first reward (in reality you might want to emit for all)
-            let reward_id = *rewards.at(0);
-            self.emit(RewardClaimed { player: address, season_id, level, is_premium, reward_id });
-        }
-
-        fn claim_all_available_rewards(
-            ref self: ContractState, address: ContractAddress, season_id: u32,
-        ) {
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
-
-            let season = store.get_season(season_id);
-            assert(season.is_active, 'Season not active');
-
-            let progress = store.get_season_progress(address, season_id);
-
-            // Claim all free rewards up to current level
-            let mut level = 1;
-            loop {
-                if level > progress.level {
-                    break;
-                }
-
-                // Check if free reward is claimed
-                let claimed_free = store.get_claimed_reward(address, season_id, level, false);
-                if claimed_free.address.is_zero() {
-                    let level_config = store.get_season_level_config(season_id, level);
-                    if level_config.free_rewards.len() > 0 {
-                        self._grant_rewards(ref store, address, level_config.free_rewards);
-                        let claimed_reward = ClaimedReward {
-                            address,
-                            season_id,
-                            level,
-                            is_premium: false,
-                            claimed_at: get_block_timestamp()
-                        };
-                        store.set_claimed_reward(claimed_reward);
-
-                        let reward_id = *level_config.free_rewards.at(0);
-                        self
-                            .emit(
-                                RewardClaimed {
-                                    player: address,
-                                    season_id,
-                                    level,
-                                    is_premium: false,
-                                    reward_id,
-                                },
-                            );
-                    }
-                }
-
-                // If has season pass, claim premium rewards too
-                if progress.has_season_pass {
-                    let claimed_premium = store.get_claimed_reward(address, season_id, level, true);
-                    if claimed_premium.address.is_zero() {
-                        let level_config = store.get_season_level_config(season_id, level);
-                        if level_config.premium_rewards.len() > 0 {
-                            self._grant_rewards(ref store, address, level_config.premium_rewards);
-                            let claimed_reward = ClaimedReward {
-                                address,
-                                season_id,
-                                level,
-                                is_premium: true,
-                                claimed_at: get_block_timestamp()
-                            };
-                            store.set_claimed_reward(claimed_reward);
-
-                            let reward_id = *level_config.premium_rewards.at(0);
-                            self
-                                .emit(
-                                    RewardClaimed {
-                                        player: address,
-                                        season_id,
-                                        level,
-                                        is_premium: true,
-                                        reward_id,
-                                    },
-                                );
-                        }
-                    }
-                }
-
-                level += 1;
-            }
-        }
-
-        fn get_claimable_rewards(
-            self: @ContractState, address: ContractAddress, season_id: u32,
-        ) -> (Span<u32>, Span<u32>) {
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
-
-            let progress = store.get_season_progress(address, season_id);
-
-            let mut free_levels = array![];
-            let mut premium_levels = array![];
-
-            let mut level = 1;
-            loop {
-                if level > progress.level {
-                    break;
-                }
-
-                // Check free rewards
-                let claimed_free = store.get_claimed_reward(address, season_id, level, false);
-                if claimed_free.address.is_zero() {
-                    let level_config = store.get_season_level_config(season_id, level);
-                    if level_config.free_rewards.len() > 0 {
-                        free_levels.append(level);
-                    }
-                }
-
-                // Check premium rewards if has season pass
-                if progress.has_season_pass {
-                    let claimed_premium = store.get_claimed_reward(address, season_id, level, true);
-                    if claimed_premium.address.is_zero() {
-                        let level_config = store.get_season_level_config(season_id, level);
-                        if level_config.premium_rewards.len() > 0 {
-                            premium_levels.append(level);
-                        }
-                    }
-                }
-
-                level += 1;
-            }
-
-            (free_levels.span(), premium_levels.span())
-        }
-
-        fn is_reward_claimed(
-            self: @ContractState,
-            address: ContractAddress,
-            season_id: u32,
-            level: u32,
-            is_premium: bool,
-        ) -> bool {
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
-            let claimed = store.get_claimed_reward(address, season_id, level, is_premium);
-            !claimed.address.is_zero()
         }
 
         fn get_user_progress(
@@ -451,8 +208,15 @@ pub mod season_system {
         ) -> (u256, u32, bool) {
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
-            let progress = store.get_season_progress(address, season_id);
+            let progress = StoreTrait::get_season_progress(ref store, address, season_id);
             (progress.season_xp, progress.level, progress.has_season_pass)
+        }
+
+        fn get_season_progress(
+            self: @ContractState, player_address: ContractAddress, season_id: u32,
+        ) -> SeasonProgress {
+            let mut store = StoreTrait::new(self.world_default());
+            StoreTrait::get_season_progress(ref store, player_address, season_id)
         }
 
         fn has_season_pass(
@@ -460,7 +224,7 @@ pub mod season_system {
         ) -> bool {
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
-            let progress = store.get_season_progress(address, season_id);
+            let progress = StoreTrait::get_season_progress(ref store, address, season_id);
             progress.has_season_pass
         }
 
@@ -478,14 +242,14 @@ pub mod season_system {
             let mut store = StoreTrait::new(world);
 
             // Verify season exists
-            let season = store.get_season(season_id);
+            let season = StoreTrait::get_season(ref store, season_id);
             assert(season.id == season_id, 'Season does not exist');
 
             let config = SeasonLevelConfig {
                 season_id, level, required_xp, free_rewards, premium_rewards,
             };
 
-            store.set_season_level_config(config);
+            StoreTrait::set_season_level_config(ref store, config);
         }
 
         fn initialize_user_progress(
@@ -495,11 +259,11 @@ pub mod season_system {
             let mut store = StoreTrait::new(world);
 
             // Verify season exists and is active
-            let season = store.get_season(season_id);
+            let season = StoreTrait::get_season(ref store, season_id);
             assert(season.is_active, 'Season not active');
 
             // Check if progress already exists
-            let progress = store.get_season_progress(address, season_id);
+            let progress = StoreTrait::get_season_progress(ref store, address, season_id);
             if progress.address.is_zero() {
                 // Initialize new progress
                 let new_progress = SeasonProgress {
@@ -510,7 +274,7 @@ pub mod season_system {
                     tier: 1,
                     level: 0,
                 };
-                store.set_season_progress(new_progress);
+                StoreTrait::set_season_progress(ref store, new_progress);
 
                 self.emit(UserProgressInitialized { player: address, season_id });
             }
@@ -538,15 +302,15 @@ pub mod season_system {
             self: @ContractState, season_id: u32, level: u32,
         ) -> SeasonLevelConfig {
             let mut store = StoreTrait::new(self.world_default());
-            store.get_season_level_config(season_id, level)
+            StoreTrait::get_season_level_config(ref store, season_id, level)
         }
 
         fn get_season_level_config_by_address(
             self: @ContractState, address: ContractAddress, season_id: u32,
         ) -> SeasonLevelConfig {
             let mut store = StoreTrait::new(self.world_default());
-            let season_progress = store.get_season_progress(address, season_id);
-            store.get_season_level_config(season_id, season_progress.level)
+            let season_progress = StoreTrait::get_season_progress(ref store, address, season_id);
+            StoreTrait::get_season_level_config(ref store, season_id, season_progress.level)
         }
 
         fn setup_default_season_config(ref self: ContractState, season_id: u32) {
@@ -899,6 +663,12 @@ pub mod season_system {
                 },
             );
         }
+
+        fn get_pending_packs(self: @ContractState, address: ContractAddress) -> Span<u32> {
+            let mut store = StoreTrait::new(self.world_default());
+            let pending_packs = StoreTrait::get_pending_packs(ref store, address);
+            pending_packs.pack_ids.span()
+        }
     }
 
     #[generate_trait]
@@ -910,78 +680,32 @@ pub mod season_system {
         fn _grant_rewards(
             ref self: ContractState, ref store: Store, address: ContractAddress, rewards: Span<u32>,
         ) {
-            // This is where you would implement the actual reward granting logic
-            // For example, adding items to inventory, granting currency, etc.
-            // For now, we just acknowledge that rewards should be granted
+            // Get current pending packs for the player
+            let mut pending_packs = StoreTrait::get_pending_packs(ref store, address);
 
+            // If this is a new player (no existing record), initialize the array
+            let mut pack_list = if pending_packs.address.is_zero() {
+                array![]
+            } else {
+                pending_packs.pack_ids.clone()
+            };
+
+            // Add all reward pack IDs to the player's pending packs
             let mut i = 0;
             loop {
                 if i >= rewards.len() {
                     break;
                 }
 
-                let reward_id = *rewards.at(i);
-                let _reward = store.get_season_reward(reward_id);
-
-                // TODO: Implement actual reward granting based on reward_type
-                // match reward.reward_type {
-                //     RewardType::Item => { /* grant item */ },
-                //     RewardType::Currency => { /* grant currency */ },
-                //     RewardType::Badge => { /* grant badge */ },
-                //     RewardType::Avatar => { /* grant avatar */ },
-                // }
+                let pack_id = *rewards.at(i);
+                pack_list.append(pack_id);
 
                 i += 1;
             }
-        }
 
-        fn _grant_retroactive_premium_rewards(
-            ref self: ContractState,
-            ref store: Store,
-            address: ContractAddress,
-            season_id: u32,
-            current_level: u32,
-        ) {
-            // Grant all premium rewards for levels already reached
-            let mut level = 1;
-            loop {
-                if level > current_level {
-                    break;
-                }
-
-                // Check if premium reward is already claimed
-                let claimed = store.get_claimed_reward(address, season_id, level, true);
-                if claimed.address.is_zero() {
-                    let level_config = store.get_season_level_config(season_id, level);
-                    if level_config.premium_rewards.len() > 0 {
-                        self._grant_rewards(ref store, address, level_config.premium_rewards);
-
-                        // Mark as claimed
-                        let claimed_reward = ClaimedReward {
-                            address,
-                            season_id,
-                            level,
-                            is_premium: true,
-                            claimed_at: get_block_timestamp()
-                        };
-                        store.set_claimed_reward(claimed_reward);
-
-                        let reward_id = *level_config.premium_rewards.at(0);
-                        self
-                            .emit(
-                                RewardClaimed {
-                                    player: address,
-                                    season_id,
-                                    level,
-                                    is_premium: true,
-                                    reward_id,
-                                },
-                            );
-                    }
-                }
-
-                level += 1;
-            }
+            // Save the updated pending packs
+            let updated_pending_packs = PendingPacks { address, pack_ids: pack_list };
+            StoreTrait::set_pending_packs(ref store, updated_pending_packs);
         }
     }
 }

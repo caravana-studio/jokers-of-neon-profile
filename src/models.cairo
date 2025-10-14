@@ -81,26 +81,10 @@ pub struct LevelXPConfig {
     pub xp_reward: u32,
 }
 
-#[derive(Drop, Serde, Debug)]
+#[derive(Drop, Serde, Clone)]
 #[dojo::model]
-pub struct SeasonReward {
-    #[key]
-    pub id: u32,
-    pub reward_type: u8,
-    pub value: u256,
-    pub description: ByteArray,
-}
-
-#[derive(Copy, Drop, Serde, Debug)]
-#[dojo::model]
-pub struct ClaimedReward {
+pub struct PendingPacks {
     #[key]
     pub address: ContractAddress,
-    #[key]
-    pub season_id: u32,
-    #[key]
-    pub level: u32,
-    #[key]
-    pub is_premium: bool,
-    pub claimed_at: u64,
+    pub pack_ids: Array<u32>,
 }

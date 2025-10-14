@@ -3,8 +3,8 @@ use dojo::world::WorldStorage;
 use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, ProfileLevelConfig};
 use starknet::ContractAddress;
 use crate::models::{
-    ClaimedReward, DailyProgress, LevelXPConfig, MissionDifficulty, MissionXPConfig, Season,
-    SeasonLevelConfig, SeasonProgress, SeasonReward,
+    DailyProgress, LevelXPConfig, MissionDifficulty, MissionXPConfig, PendingPacks, Season,
+    SeasonLevelConfig, SeasonProgress,
 };
 
 #[derive(Drop)]
@@ -97,21 +97,11 @@ pub impl StoreImpl of StoreTrait {
         self.world.write_model(@season)
     }
 
-    fn get_season_reward(ref self: Store, reward_id: u32) -> SeasonReward {
-        self.world.read_model(reward_id)
+    fn get_pending_packs(ref self: Store, address: ContractAddress) -> PendingPacks {
+        self.world.read_model(address)
     }
 
-    fn set_season_reward(ref self: Store, reward: SeasonReward) {
-        self.world.write_model(@reward)
-    }
-
-    fn get_claimed_reward(
-        ref self: Store, address: ContractAddress, season_id: u32, level: u32, is_premium: bool,
-    ) -> ClaimedReward {
-        self.world.read_model((address, season_id, level, is_premium))
-    }
-
-    fn set_claimed_reward(ref self: Store, claimed_reward: ClaimedReward) {
-        self.world.write_model(@claimed_reward)
+    fn set_pending_packs(ref self: Store, pending_packs: PendingPacks) {
+        self.world.write_model(@pending_packs)
     }
 }
