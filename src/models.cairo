@@ -11,7 +11,7 @@ pub struct Season {
     pub end_date: u64,
 }
 
-#[derive(Copy, Drop, Serde, Debug)]
+#[derive(Drop, Serde, Debug)]
 #[dojo::model]
 pub struct SeasonProgress {
     #[key]
@@ -22,6 +22,7 @@ pub struct SeasonProgress {
     pub has_season_pass: bool,
     pub tier: u32,
     pub level: u32,
+    pub claimable_rewards_id: Span<u32>,
 }
 
 #[derive(Drop, Serde, Debug)]
@@ -79,12 +80,4 @@ pub struct LevelXPConfig {
     #[key]
     pub completion_count: u32,
     pub xp_reward: u32,
-}
-
-#[derive(Drop, Serde, Clone)]
-#[dojo::model]
-pub struct PendingPacks {
-    #[key]
-    pub address: ContractAddress,
-    pub pack_ids: Array<u32>,
 }

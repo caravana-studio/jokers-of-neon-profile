@@ -46,17 +46,21 @@ pub trait ISeasonSystem<T> {
         self: @T, address: ContractAddress, season_id: u32,
     ) -> SeasonLevelConfig;
 
-    // Get pending packs for a player
-    fn get_pending_packs(self: @T, address: ContractAddress) -> Span<u32>;
+    // Get pending packs for a player in a season
+    fn get_pending_packs(self: @T, address: ContractAddress, season_id: u32) -> Span<u32>;
+
+    // Grant rewards when player levels up
+    fn grant_level_rewards(ref self: T, address: ContractAddress, season_id: u32, level: u32);
+
+    // Open/consume a pack and remove it from claimable rewards
+    fn open_pack(ref self: T, address: ContractAddress, season_id: u32, pack_id: u32);
 }
 
 #[dojo::contract]
 pub mod season_system {
     use core::num::traits::Zero;
     use starknet::ContractAddress;
-    use crate::models::{
-        PendingPacks, Season, SeasonLevelConfig, SeasonProgress, MissionXPConfig, LevelXPConfig,
-    };
+    use crate::models::{Season, SeasonLevelConfig, SeasonProgress, MissionXPConfig, LevelXPConfig};
     use crate::store::{Store, StoreTrait};
     use super::ISeasonSystem;
 
@@ -68,6 +72,7 @@ pub mod season_system {
         SeasonDeactivated: SeasonDeactivated,
         SeasonPassPurchased: SeasonPassPurchased,
         PacksGranted: PacksGranted,
+        PackOpened: PackOpened,
         SeasonLevelReached: SeasonLevelReached,
         UserProgressInitialized: UserProgressInitialized,
     }
@@ -108,6 +113,14 @@ pub mod season_system {
         level: u32,
         is_premium: bool,
         pack_count: u32,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct PackOpened {
+        #[key]
+        player: ContractAddress,
+        season_id: u32,
+        pack_id: u32,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -273,6 +286,7 @@ pub mod season_system {
                     has_season_pass: false,
                     tier: 1,
                     level: 0,
+                    claimable_rewards_id: [].span(),
                 };
                 StoreTrait::set_season_progress(ref store, new_progress);
 
@@ -664,10 +678,128 @@ pub mod season_system {
             );
         }
 
-        fn get_pending_packs(self: @ContractState, address: ContractAddress) -> Span<u32> {
+        fn get_pending_packs(
+            self: @ContractState, address: ContractAddress, season_id: u32,
+        ) -> Span<u32> {
             let mut store = StoreTrait::new(self.world_default());
-            let pending_packs = StoreTrait::get_pending_packs(ref store, address);
-            pending_packs.pack_ids.span()
+            let progress = StoreTrait::get_season_progress(ref store, address, season_id);
+            progress.claimable_rewards_id
+        }
+
+        fn grant_level_rewards(
+            ref self: ContractState, address: ContractAddress, season_id: u32, level: u32,
+        ) {
+            let world = self.world_default();
+            let mut store = StoreTrait::new(world);
+
+            // Get season and verify it's active
+            let season = StoreTrait::get_season(ref store, season_id);
+            assert(season.is_active, 'Season not active');
+
+            // Get player progress
+            let progress = StoreTrait::get_season_progress(ref store, address, season_id);
+
+            // Verify player has reached this level
+            assert(progress.level >= level, 'Level not reached');
+
+            // Get level config
+            let level_config = StoreTrait::get_season_level_config(ref store, season_id, level);
+
+            // Grant free rewards if there are any
+            if level_config.free_rewards.len() > 0 {
+                self
+                    ._grant_rewards(
+                        ref store, address, season_id, level_config.free_rewards
+                    );
+                self
+                    .emit(
+                        PacksGranted {
+                            player: address,
+                            season_id,
+                            level,
+                            is_premium: false,
+                            pack_count: level_config.free_rewards.len(),
+                        },
+                    );
+            }
+
+            // Grant premium rewards if player has season pass
+            if progress.has_season_pass && level_config.premium_rewards.len() > 0 {
+                self
+                    ._grant_rewards(
+                        ref store, address, season_id, level_config.premium_rewards
+                    );
+                self
+                    .emit(
+                        PacksGranted {
+                            player: address,
+                            season_id,
+                            level,
+                            is_premium: true,
+                            pack_count: level_config.premium_rewards.len(),
+                        },
+                    );
+            }
+        }
+
+        fn open_pack(
+            ref self: ContractState, address: ContractAddress, season_id: u32, pack_id: u32,
+        ) {
+            let world = self.world_default();
+            let mut store = StoreTrait::new(world);
+
+            // Get current season progress
+            let progress = StoreTrait::get_season_progress(ref store, address, season_id);
+
+            // Verify the pack exists in claimable_rewards_id
+            let mut found = false;
+            let mut i = 0;
+            loop {
+                if i >= progress.claimable_rewards_id.len() {
+                    break;
+                }
+                if *progress.claimable_rewards_id.at(i) == pack_id {
+                    found = true;
+                    break;
+                }
+                i += 1;
+            }
+            assert(found, 'Pack not found');
+
+            // Remove the pack from claimable_rewards_id
+            let mut new_pack_list = array![];
+            let mut j = 0;
+            loop {
+                if j >= progress.claimable_rewards_id.len() {
+                    break;
+                }
+                let current_pack = *progress.claimable_rewards_id.at(j);
+                // Skip the pack we're opening (only remove first occurrence)
+                if current_pack != pack_id || (current_pack == pack_id && !found) {
+                    new_pack_list.append(current_pack);
+                } else if current_pack == pack_id && found {
+                    found = false; // Mark as removed, won't skip duplicates
+                }
+                j += 1;
+            }
+
+            // Update season progress with the pack removed
+            let updated_progress = SeasonProgress {
+                address: progress.address,
+                season_id: progress.season_id,
+                season_xp: progress.season_xp,
+                has_season_pass: progress.has_season_pass,
+                tier: progress.tier,
+                level: progress.level,
+                claimable_rewards_id: new_pack_list.span(),
+            };
+            StoreTrait::set_season_progress(ref store, updated_progress);
+
+            // Emit event
+            self.emit(PackOpened { player: address, season_id, pack_id });
+
+            // TODO: Generate pack content and grant items to player
+            // This would integrate with your inventory/items system
         }
     }
 
@@ -678,34 +810,47 @@ pub mod season_system {
         }
 
         fn _grant_rewards(
-            ref self: ContractState, ref store: Store, address: ContractAddress, rewards: Span<u32>,
+            ref self: ContractState,
+            ref store: Store,
+            address: ContractAddress,
+            season_id: u32,
+            rewards: Span<u32>,
         ) {
-            // Get current pending packs for the player
-            let mut pending_packs = StoreTrait::get_pending_packs(ref store, address);
+            // Get current season progress
+            let mut progress = StoreTrait::get_season_progress(ref store, address, season_id);
 
-            // If this is a new player (no existing record), initialize the array
-            let mut pack_list = if pending_packs.address.is_zero() {
-                array![]
-            } else {
-                pending_packs.pack_ids.clone()
-            };
-
-            // Add all reward pack IDs to the player's pending packs
+            // Convert current claimable_rewards_id to array
+            let mut pack_list = array![];
             let mut i = 0;
             loop {
-                if i >= rewards.len() {
+                if i >= progress.claimable_rewards_id.len() {
                     break;
                 }
-
-                let pack_id = *rewards.at(i);
-                pack_list.append(pack_id);
-
+                pack_list.append(*progress.claimable_rewards_id.at(i));
                 i += 1;
             }
 
-            // Save the updated pending packs
-            let updated_pending_packs = PendingPacks { address, pack_ids: pack_list };
-            StoreTrait::set_pending_packs(ref store, updated_pending_packs);
+            // Add all new reward pack IDs
+            let mut j = 0;
+            loop {
+                if j >= rewards.len() {
+                    break;
+                }
+                pack_list.append(*rewards.at(j));
+                j += 1;
+            }
+
+            // Update season progress with new claimable rewards
+            let updated_progress = SeasonProgress {
+                address: progress.address,
+                season_id: progress.season_id,
+                season_xp: progress.season_xp,
+                has_season_pass: progress.has_season_pass,
+                tier: progress.tier,
+                level: progress.level,
+                claimable_rewards_id: pack_list.span(),
+            };
+            StoreTrait::set_season_progress(ref store, updated_progress);
         }
     }
 }

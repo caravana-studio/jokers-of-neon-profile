@@ -3,8 +3,8 @@ use dojo::world::WorldStorage;
 use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, ProfileLevelConfig};
 use starknet::ContractAddress;
 use crate::models::{
-    DailyProgress, LevelXPConfig, MissionDifficulty, MissionXPConfig, PendingPacks, Season,
-    SeasonLevelConfig, SeasonProgress,
+    DailyProgress, LevelXPConfig, MissionDifficulty, MissionXPConfig, Season, SeasonLevelConfig,
+    SeasonProgress,
 };
 
 #[derive(Drop)]
@@ -95,13 +95,5 @@ pub impl StoreImpl of StoreTrait {
 
     fn set_season(ref self: Store, season: Season) {
         self.world.write_model(@season)
-    }
-
-    fn get_pending_packs(ref self: Store, address: ContractAddress) -> PendingPacks {
-        self.world.read_model(address)
-    }
-
-    fn set_pending_packs(ref self: Store, pending_packs: PendingPacks) {
-        self.world.write_model(@pending_packs)
     }
 }
