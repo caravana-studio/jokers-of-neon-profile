@@ -24,7 +24,8 @@ pub trait ILivesSystem<T> {
     ///
     /// # Errors
     /// - `[LivesSystem] - You already have the maximum number of lives` - When player has max lives
-    /// - `[LivesSystem] - You have to wait X seconds to claim a new life` - When cooldown hasn't elapsed
+    /// - `[LivesSystem] - You have to wait X seconds to claim a new life` - When cooldown hasn't
+    /// elapsed
     fn claim(ref self: T, player: ContractAddress, season_id: u32);
 
     /// Initializes a new player account with default lives configuration.
@@ -68,7 +69,8 @@ pub trait ILivesSystem<T> {
     /// - Adjusts next_life_timestamp to use battle pass cooldown
     ///
     /// # Errors
-    /// - `[LivesSystem] - You must have a season pass to upgrade your account` - When player lacks season pass
+    /// - `[LivesSystem] - You must have a season pass to upgrade your account` - When player lacks
+    /// season pass
     fn upgrade_account(ref self: T, player: ContractAddress, season_id: u32);
 
     /// Retrieves the current lives information for a specific player.
@@ -134,13 +136,50 @@ pub struct LivesConfig {
 
 #[dojo::contract]
 pub mod lives_system {
+    use openzeppelin_access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
+    use openzeppelin_introspection::src5::SRC5Component;
     use starknet::{ContractAddress, get_block_timestamp, get_caller_address};
     use crate::store::{Store, StoreTrait};
     use crate::systems::lives_system::{LivesConfig, PlayerLives};
 
+    component!(path: SRC5Component, storage: src5, event: SRC5Event);
+    component!(path: AccessControlComponent, storage: accesscontrol, event: AccessControlEvent);
+
+    #[abi(embed_v0)]
+    impl AccessControlMixinImpl =
+        AccessControlComponent::AccessControlMixinImpl<ContractState>;
+
+    impl AccessControlInternalImpl = AccessControlComponent::InternalImpl<ContractState>;
+
+    #[storage]
+    struct Storage {
+        #[substorage(v0)]
+        src5: SRC5Component::Storage,
+        #[substorage(v0)]
+        accesscontrol: AccessControlComponent::Storage,
+    }
+
+    #[event]
+    #[derive(Drop, starknet::Event)]
+    enum Event {
+        #[flat]
+        SRC5Event: SRC5Component::Event,
+        #[flat]
+        AccessControlEvent: AccessControlComponent::Event,
+    }
+
+    const WRITER_ROLE: felt252 = selector!("WRITER_ROLE");
+
+    fn dojo_init(ref self: ContractState, owner: ContractAddress) {
+        self.accesscontrol.initializer();
+        self.accesscontrol._grant_role(DEFAULT_ADMIN_ROLE, owner);
+        self.accesscontrol._grant_role(WRITER_ROLE, owner);
+    }
+
     #[abi(embed_v0)]
     impl LivesSystem of super::ILivesSystem<ContractState> {
         fn claim(ref self: ContractState, player: ContractAddress, season_id: u32) {
+            self.accesscontrol.assert_only_role(WRITER_ROLE);
             let mut store = self.default_store();
             let mut player_lives = store.get_player_lives(player, season_id);
 
@@ -183,6 +222,7 @@ pub mod lives_system {
         }
 
         fn init_account(ref self: ContractState, player: ContractAddress, season_id: u32) {
+            self.accesscontrol.assert_only_role(WRITER_ROLE);
             let mut store = self.default_store();
             let config = store.get_lives_config();
 
@@ -199,6 +239,7 @@ pub mod lives_system {
         }
 
         fn upgrade_account(ref self: ContractState, player: ContractAddress, season_id: u32) {
+            self.accesscontrol.assert_only_role(WRITER_ROLE);
             let mut store = self.default_store();
             let config = store.get_lives_config();
             let has_season_pass = store.get_season_progress(player, season_id).has_season_pass;
