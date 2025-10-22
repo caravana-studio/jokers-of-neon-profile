@@ -1,4 +1,5 @@
 pub mod systems {
+    pub mod lives_system;
     pub mod profile_system;
     pub mod xp_system;
 }

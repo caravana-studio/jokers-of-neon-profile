@@ -6,6 +6,7 @@ use crate::models::{
     DailyProgress, LevelXPConfig, MissionDifficulty, MissionXPConfig, SeasonConfig,
     SeasonLevelConfig, SeasonProgress,
 };
+use crate::systems::lives_system::{LIVES_CONFIG_KEY, LivesConfig, PlayerLives};
 
 #[derive(Drop)]
 pub struct Store {
@@ -95,5 +96,21 @@ pub impl StoreImpl of StoreTrait {
 
     fn set_profile_level_config(ref self: Store, config: ProfileLevelConfig) {
         self.world.write_model(@config)
+    }
+
+    fn get_lives_config(ref self: Store) -> LivesConfig {
+        self.world.read_model(LIVES_CONFIG_KEY)
+    }
+
+    fn set_lives_config(ref self: Store, config: LivesConfig) {
+        self.world.write_model(@config)
+    }
+
+    fn get_player_lives(ref self: Store, address: ContractAddress, season_id: u32) -> PlayerLives {
+        self.world.read_model((address, season_id))
+    }
+
+    fn set_player_lives(ref self: Store, lives: PlayerLives) {
+        self.world.write_model(@lives)
     }
 }
