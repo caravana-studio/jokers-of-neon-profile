@@ -4,7 +4,7 @@ name = "jokers_of_neon_profile"
 seed = "jokers_of_neon_profile"
 
 [namespace]
-default = "jokers_of_neon_profile"
+default = "jon_profile_testnet"
 
 [env]
 rpc_url = "https://api.cartridge.gg/x/starknet/sepolia"
@@ -13,20 +13,20 @@ private_key = "0x06c3f4d5e62d4b873a1389cec6671a9ef3414af6321d893bdf3967bc9c77fa4
 
 [writers]
 
-"jokers_of_neon_profile" = [
-    "jokers_of_neon_profile-profile_system",
-    "jokers_of_neon_profile-xp_system",
-    "jokers_of_neon_profile-pack_minter",
+"jon_profile_testnet" = [
+    "jon_profile_testnet-profile_system",
+    "jon_profile_testnet-xp_system",
+    "jon_profile_testnet-pack_minter",
 ]
 
 [init_call_args]
-"jokers_of_neon_profile-profile_system" = [
+"jon_profile_testnet-profile_system" = [
     "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245",
 ]
-"jokers_of_neon_profile-xp_system" = [
+"jon_profile_testnet-xp_system" = [
     "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245",
 ]
-"jokers_of_neon_profile-pack_minter" = [
+"jon_profile_testnet-pack_minter" = [
     "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245",
     "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245",
     "0x00f0d676b1ec606a761995f1e61d66afb0abb880eb779e8895f4480ba7f9c515",
