@@ -21,12 +21,23 @@ pub trait ILivesSystem<T> {
     /// # Season Pass Benefits
     /// - Players with season pass have higher max lives and shorter cooldown
     /// - Cooldown and max lives are determined by `LivesConfig`
-    ///
-    /// # Errors
-    /// - `[LivesSystem] - You already have the maximum number of lives` - When player has max lives
-    /// - `[LivesSystem] - You have to wait X seconds to claim a new life` - When cooldown hasn't
-    /// elapsed
     fn claim(ref self: T, player: ContractAddress, season_id: u32);
+
+    /// Removes a life from a player's account.
+    ///
+    /// This method consumes one life from the player's available lives. If the player
+    /// was at maximum lives, it starts the cooldown timer for the next life regeneration.
+    ///
+    /// # Parameters
+    /// * `player` - The contract address of the player to remove a life from
+    /// * `season_id` - The ID of the current season
+    ///
+    /// # Behavior
+    /// - Verifies the player has at least one life available
+    /// - Decrements the player's available lives by 1
+    /// - If player was at max lives, starts cooldown timer for next life regeneration
+    /// - Cooldown duration depends on player's season pass status
+    fn remove(ref self: T, player: ContractAddress, season_id: u32);
 
     /// Initializes a new player account with default lives configuration.
     ///
@@ -43,10 +54,6 @@ pub trait ILivesSystem<T> {
     /// - Sets available_lives to the maximum allowed (from config)
     /// - Sets max_lives to the standard maximum (not battle pass maximum)
     /// - Initializes next_life_timestamp to 0 (no cooldown initially)
-    ///
-    /// # Note
-    /// This method should only be called once per player per season.
-    /// Subsequent calls may overwrite existing player data.
     fn init_account(ref self: T, player: ContractAddress, season_id: u32);
 
     /// Upgrades a player's account to battle pass benefits.
@@ -67,10 +74,6 @@ pub trait ILivesSystem<T> {
     /// - Preserves the player's current available lives
     /// - Updates max_lives to the battle pass maximum
     /// - Adjusts next_life_timestamp to use battle pass cooldown
-    ///
-    /// # Errors
-    /// - `[LivesSystem] - You must have a season pass to upgrade your account` - When player lacks
-    /// season pass
     fn upgrade_account(ref self: T, player: ContractAddress, season_id: u32);
 
     /// Retrieves the current lives information for a specific player.
@@ -103,10 +106,6 @@ pub trait ILivesSystem<T> {
     /// - `max_lives_battle_pass`: Maximum lives for battle pass holders
     /// - `lives_cooldown`: Cooldown period in seconds for standard players
     /// - `lives_cooldown_battle_pass`: Cooldown period in seconds for battle pass holders
-    ///
-    /// # Usage
-    /// This configuration is used internally by other methods to determine
-    /// player limits and cooldown periods based on their season pass status.
     fn get_lives_config(self: @T) -> LivesConfig;
 }
 
@@ -218,6 +217,39 @@ pub mod lives_system {
 
             player_lives.available_lives += 1;
             player_lives.next_life_timestamp = current_timestamp + cooldown;
+            store.set_player_lives(player_lives);
+        }
+
+        fn remove(ref self: ContractState, player: ContractAddress, season_id: u32) {
+            self.accesscontrol.assert_only_role(WRITER_ROLE);
+            let mut store = self.default_store();
+            let mut player_lives = store.get_player_lives(player, season_id);
+
+            assert!(
+                player_lives.available_lives > 0, "[LivesSystem] - You don't have any lives to use",
+            );
+            // Get config and check if player has season pass
+            let config = store.get_lives_config();
+            let has_season_pass = store
+                .get_season_progress(get_caller_address(), season_id)
+                .has_season_pass;
+
+            let max_lives = if has_season_pass {
+                config.max_lives_battle_pass
+            } else {
+                config.max_lives
+            };
+
+            if player_lives.available_lives == max_lives {
+                let cooldown = if has_season_pass {
+                    config.lives_cooldown_battle_pass
+                } else {
+                    config.lives_cooldown
+                };
+                player_lives.next_life_timestamp = get_block_timestamp() + cooldown;
+            }
+
+            player_lives.available_lives -= 1;
             store.set_player_lives(player_lives);
         }
 
