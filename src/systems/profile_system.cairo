@@ -26,6 +26,7 @@ pub mod profile_system {
     use openzeppelin_access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
     use openzeppelin_introspection::src5::SRC5Component;
     use starknet::ContractAddress;
+    use crate::constants::constants::DEFAULT_NS_BYTE;
     use crate::models::SeasonProgress;
     use crate::store::StoreTrait;
     use super::IJokersProfile;
@@ -143,7 +144,7 @@ pub mod profile_system {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn world_default(self: @ContractState) -> dojo::world::WorldStorage {
-            self.world(@"jokers_of_neon_profile")
+            self.world(@DEFAULT_NS_BYTE())
         }
 
         fn _add_stats(self: @ContractState, player_stats: PlayerStats) {

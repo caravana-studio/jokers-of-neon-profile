@@ -29,6 +29,7 @@ pub trait IXPSystem<T> {
 pub mod xp_system {
     use jokers_of_neon_lib::models::external::profile::ProfileLevelConfig;
     use starknet::ContractAddress;
+    use crate::constants::constants::DEFAULT_NS_BYTE;
     use crate::models::{
         LevelXPConfig, MissionDifficulty, MissionXPConfig, SeasonConfig, SeasonLevelConfig,
     };
@@ -758,7 +759,7 @@ pub mod xp_system {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn world_default(self: @ContractState) -> dojo::world::WorldStorage {
-            self.world(@"jokers_of_neon_profile")
+            self.world(@DEFAULT_NS_BYTE())
         }
 
         fn _add_profile_xp(
