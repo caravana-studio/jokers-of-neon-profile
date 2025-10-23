@@ -76,6 +76,17 @@ pub trait ILivesSystem<T> {
     /// - Adjusts next_life_timestamp to use battle pass cooldown
     fn upgrade_account(ref self: T, player: ContractAddress, season_id: u32);
 
+    /// Sets the global lives configuration for the system.
+    ///
+    /// This method allows the configuration of the lives system to be updated.
+    ///
+    /// # Parameters
+    /// * `config` - The new `LivesConfig` to set
+    ///
+    /// # Behavior
+    /// - Updates the global lives configuration with the new values
+    fn set_config(ref self: T, config: LivesConfig);
+
     /// Retrieves the current lives information for a specific player.
     ///
     /// This method returns the complete lives state for a player in a given season,
@@ -167,18 +178,15 @@ pub mod lives_system {
         AccessControlEvent: AccessControlComponent::Event,
     }
 
-    const WRITER_ROLE: felt252 = selector!("WRITER_ROLE");
-
     fn dojo_init(ref self: ContractState, owner: ContractAddress) {
         self.accesscontrol.initializer();
         self.accesscontrol._grant_role(DEFAULT_ADMIN_ROLE, owner);
-        self.accesscontrol._grant_role(WRITER_ROLE, owner);
     }
 
     #[abi(embed_v0)]
     impl LivesSystem of super::ILivesSystem<ContractState> {
         fn claim(ref self: ContractState, player: ContractAddress, season_id: u32) {
-            self.accesscontrol.assert_only_role(WRITER_ROLE);
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = self.default_store();
             let mut player_lives = store.get_player_lives(player, season_id);
 
@@ -221,7 +229,7 @@ pub mod lives_system {
         }
 
         fn remove(ref self: ContractState, player: ContractAddress, season_id: u32) {
-            self.accesscontrol.assert_only_role(WRITER_ROLE);
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = self.default_store();
             let mut player_lives = store.get_player_lives(player, season_id);
 
@@ -254,7 +262,7 @@ pub mod lives_system {
         }
 
         fn init_account(ref self: ContractState, player: ContractAddress, season_id: u32) {
-            self.accesscontrol.assert_only_role(WRITER_ROLE);
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = self.default_store();
             let config = store.get_lives_config();
 
@@ -271,7 +279,7 @@ pub mod lives_system {
         }
 
         fn upgrade_account(ref self: ContractState, player: ContractAddress, season_id: u32) {
-            self.accesscontrol.assert_only_role(WRITER_ROLE);
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = self.default_store();
             let config = store.get_lives_config();
             let has_season_pass = store.get_season_progress(player, season_id).has_season_pass;
@@ -297,6 +305,13 @@ pub mod lives_system {
                         next_life_timestamp: cooldown,
                     },
                 );
+        }
+
+
+        fn set_config(ref self: ContractState, config: LivesConfig) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            let mut store = self.default_store();
+            store.set_lives_config(config);
         }
 
         fn get_player_lives(
