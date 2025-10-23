@@ -135,8 +135,6 @@ pub mod pack_system {
                             );
                     },
                     ItemType::None => {
-                        println!("[mint] - Warning - `item_id` {} has `None` as ItemType", item.id)
-                        continue;
                     },
                 }
             }
