@@ -79,14 +79,14 @@ pub mod pack_minter {
         ref self: ContractState,
         owner: ContractAddress,
         minter: ContractAddress,
-        nft_manager: ContractAddress,
+        nft_address: ContractAddress,
     ) {
         self.accesscontrol.initializer();
         self.accesscontrol._grant_role(DEFAULT_ADMIN_ROLE, owner);
         self.accesscontrol._grant_role(MINTER_ROLE, minter);
 
         let mut store = StoreTrait::new(self.world_default());
-        store.set_nft_manager(NFTManager { key: NFT_MANAGER_KEY(), address: nft_manager });
+        store.set_nft_manager(NFTManager { key: NFT_MANAGER_KEY(), address: nft_address });
     }
 
     #[abi(embed_v0)]
