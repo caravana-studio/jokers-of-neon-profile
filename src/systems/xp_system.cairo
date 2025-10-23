@@ -33,7 +33,7 @@ pub mod xp_system {
         LevelXPConfig, MissionDifficulty, MissionXPConfig, SeasonConfig, SeasonLevelConfig,
     };
     use crate::store::{Store, StoreTrait};
-    use crate::utils::{
+    use crate::utils::utils::{
         get_current_day, get_level_xp_configurable, get_mission_xp_configurable,
         get_tier_from_level,
     };

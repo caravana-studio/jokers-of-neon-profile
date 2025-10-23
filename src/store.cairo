@@ -2,15 +2,16 @@ use dojo::model::ModelStorage;
 use dojo::world::WorldStorage;
 use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, ProfileLevelConfig};
 use starknet::ContractAddress;
+use crate::constants::constants::NFT_MANAGER_KEY;
 use crate::models::{
-    DailyProgress, LevelXPConfig, MissionDifficulty, MissionXPConfig, SeasonConfig,
-    SeasonLevelConfig, SeasonProgress,
+    DailyProgress, Item, LevelXPConfig, MissionDifficulty, MissionXPConfig, NFTManager, Pack,
+    SeasonConfig, SeasonContent, SeasonLevelConfig, SeasonProgress,
 };
 use crate::systems::lives_system::{LIVES_CONFIG_KEY, LivesConfig, PlayerLives};
 
 #[derive(Drop)]
 pub struct Store {
-    world: WorldStorage,
+    pub world: WorldStorage,
 }
 
 #[generate_trait]
@@ -112,5 +113,37 @@ pub impl StoreImpl of StoreTrait {
 
     fn set_player_lives(ref self: Store, lives: PlayerLives) {
         self.world.write_model(@lives)
+    }
+
+    fn get_pack(ref self: Store, id: u32) -> Pack {
+        self.world.read_model(id)
+    }
+
+    fn set_pack(ref self: Store, pack: Pack) {
+        self.world.write_model(@pack)
+    }
+
+    fn get_season_content(ref self: Store, season_id: u32) -> SeasonContent {
+        self.world.read_model(season_id)
+    }
+
+    fn set_season_content(ref self: Store, season_content: SeasonContent) {
+        self.world.write_model(@season_content)
+    }
+
+    fn get_item(ref self: Store, id: u32) -> Item {
+        self.world.read_model(id)
+    }
+
+    fn set_item(ref self: Store, item: Item) {
+        self.world.write_model(@item)
+    }
+
+    fn get_nft_manager(ref self: Store) -> NFTManager {
+        self.world.read_model(NFT_MANAGER_KEY())
+    }
+
+    fn set_nft_manager(ref self: Store, nft_manager: NFTManager) {
+        self.world.write_model(@nft_manager)
     }
 }

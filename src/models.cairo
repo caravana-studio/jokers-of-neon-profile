@@ -78,3 +78,65 @@ pub struct SeasonLevelConfig {
     pub free_rewards: Span<u32>,
     pub premium_rewards: Span<u32>,
 }
+
+#[derive(Drop, Serde)]
+#[dojo::model]
+pub struct Pack {
+    #[key]
+    pub id: u32,
+    pub season_id: u32,
+    pub name: ByteArray,
+    pub probabilities: Span<Span<u32>>,
+}
+
+#[derive(Drop, Copy, IntrospectPacked, Serde)]
+#[dojo::model]
+pub struct Item {
+    #[key]
+    pub id: u32,
+    pub item_type: ItemType,
+    pub content_id: u32,
+    pub rarity: u32,
+    pub skin_id: u32,
+    pub skin_rarity: u32,
+}
+
+#[derive(Drop, Copy, IntrospectPacked, Serde, DojoStore, Default)]
+pub enum ItemType {
+    Traditional,
+    Special,
+    Neon,
+    Skin,
+    #[default]
+    None,
+}
+
+#[derive(Drop, Copy, Serde)]
+#[dojo::model]
+pub struct SeasonContent {
+    #[key]
+    pub season_id: u32,
+    pub initialized: bool,
+    pub items: Span<Span<u32>>,
+}
+
+#[derive(Drop, Copy, Serde)]
+#[dojo::model]
+pub struct NFTManager {
+    #[key]
+    pub key: felt252,
+    pub address: ContractAddress,
+}
+
+#[derive(Drop, Serde)]
+#[dojo::event]
+pub struct CardMintedEvent {
+    #[key]
+    pub recipient: starknet::ContractAddress,
+    pub item: Item,
+    pub marketable: bool,
+    pub rarity: u32,
+    pub skin_id: u32,
+    pub skin_rarity: u32,
+    pub quality: u32,
+}
