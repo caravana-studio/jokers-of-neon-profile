@@ -1,4 +1,5 @@
 use starknet::ContractAddress;
+use crate::models::{LivesConfig, PlayerLives};
 
 #[starknet::interface]
 pub trait ILivesSystem<T> {
@@ -120,37 +121,13 @@ pub trait ILivesSystem<T> {
     fn get_lives_config(self: @T) -> LivesConfig;
 }
 
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct PlayerLives {
-    #[key]
-    pub player: ContractAddress,
-    #[key]
-    pub season_id: u32,
-    pub available_lives: u32,
-    pub max_lives: u32,
-    pub next_life_timestamp: u64,
-}
-
-pub const LIVES_CONFIG_KEY: felt252 = selector!("LIVES_CONFIG_KEY");
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct LivesConfig {
-    #[key]
-    pub key: felt252,
-    pub max_lives: u32,
-    pub max_lives_battle_pass: u32,
-    pub lives_cooldown: u64,
-    pub lives_cooldown_battle_pass: u64,
-}
-
 #[dojo::contract]
 pub mod lives_system {
     use openzeppelin_access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
     use openzeppelin_introspection::src5::SRC5Component;
-    use starknet::{ContractAddress, get_block_timestamp, get_caller_address};
+    use starknet::{ContractAddress, get_block_timestamp};
+    use crate::models::{LivesConfig, PlayerLives};
     use crate::store::{Store, StoreTrait};
-    use crate::systems::lives_system::{LivesConfig, PlayerLives};
 
     component!(path: SRC5Component, storage: src5, event: SRC5Event);
     component!(path: AccessControlComponent, storage: accesscontrol, event: AccessControlEvent);
@@ -192,9 +169,7 @@ pub mod lives_system {
 
             // Get config and check if player has season pass
             let config = store.get_lives_config();
-            let has_season_pass = store
-                .get_season_progress(get_caller_address(), season_id)
-                .has_season_pass;
+            let has_season_pass = store.get_season_progress(player, season_id).has_season_pass;
 
             let max_lives = if has_season_pass {
                 config.max_lives_battle_pass
@@ -218,7 +193,7 @@ pub mod lives_system {
 
             // Get cooldown
             let cooldown = if has_season_pass {
-                config.lives_cooldown_battle_pass
+                config.lives_cooldown_season_pass
             } else {
                 config.lives_cooldown
             };
@@ -238,9 +213,7 @@ pub mod lives_system {
             );
             // Get config and check if player has season pass
             let config = store.get_lives_config();
-            let has_season_pass = store
-                .get_season_progress(get_caller_address(), season_id)
-                .has_season_pass;
+            let has_season_pass = store.get_season_progress(player, season_id).has_season_pass;
 
             let max_lives = if has_season_pass {
                 config.max_lives_battle_pass
@@ -250,7 +223,7 @@ pub mod lives_system {
 
             if player_lives.available_lives == max_lives {
                 let cooldown = if has_season_pass {
-                    config.lives_cooldown_battle_pass
+                    config.lives_cooldown_season_pass
                 } else {
                     config.lives_cooldown
                 };
@@ -289,8 +262,8 @@ pub mod lives_system {
             );
 
             let player_lives = store.get_player_lives(player, season_id);
-            let cooldown = if player_lives.next_life_timestamp > config.lives_cooldown_battle_pass {
-                config.lives_cooldown_battle_pass
+            let cooldown = if player_lives.next_life_timestamp > config.lives_cooldown_season_pass {
+                config.lives_cooldown_season_pass
             } else {
                 player_lives.next_life_timestamp
             };
@@ -300,7 +273,8 @@ pub mod lives_system {
                     PlayerLives {
                         player: player,
                         season_id: season_id,
-                        available_lives: player_lives.available_lives,
+                        available_lives: player_lives.available_lives
+                            + (config.max_lives_battle_pass - config.max_lives),
                         max_lives: config.max_lives_battle_pass,
                         next_life_timestamp: cooldown,
                     },

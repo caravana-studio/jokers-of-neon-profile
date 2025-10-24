@@ -21,5 +21,6 @@ pub mod utils {
 
 #[cfg(test)]
 pub mod tests {
+    pub mod test_lives_system;
     pub mod test_pack_trait;
 }

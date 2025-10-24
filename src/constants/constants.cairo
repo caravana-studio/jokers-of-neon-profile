@@ -15,3 +15,5 @@ pub const PERCENT_SCALE: u32 = 10000;
 pub fn NFT_MANAGER_KEY() -> felt252 {
     'NFT_MANAGER_KEY'
 }
+
+pub const LIVES_CONFIG_KEY: felt252 = selector!("LIVES_CONFIG_KEY");

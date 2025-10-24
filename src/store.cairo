@@ -2,12 +2,11 @@ use dojo::model::ModelStorage;
 use dojo::world::WorldStorage;
 use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, ProfileLevelConfig};
 use starknet::ContractAddress;
-use crate::constants::constants::NFT_MANAGER_KEY;
+use crate::constants::constants::{LIVES_CONFIG_KEY, NFT_MANAGER_KEY};
 use crate::models::{
-    DailyProgress, Item, LevelXPConfig, MissionDifficulty, MissionXPConfig, NFTManager, Pack,
-    SeasonConfig, SeasonContent, SeasonLevelConfig, SeasonProgress,
+    DailyProgress, Item, LevelXPConfig, LivesConfig, MissionDifficulty, MissionXPConfig, NFTManager,
+    Pack, PlayerLives, SeasonConfig, SeasonContent, SeasonLevelConfig, SeasonProgress,
 };
-use crate::systems::lives_system::{LIVES_CONFIG_KEY, LivesConfig, PlayerLives};
 
 #[derive(Drop)]
 pub struct Store {
