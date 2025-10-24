@@ -12,12 +12,21 @@ pub trait IPackMinter<T> {
 
 #[starknet::interface]
 pub trait INFTCardSystem<T> {
-    fn mint(
+    fn mint_special_card(
         ref self: T,
         recipient: starknet::ContractAddress,
         special_id: u32,
         marketable: bool,
         rarity: u32,
+        skin_id: u32,
+        skin_rarity: u32,
+        quality: u32,
+    );
+    fn mint_card(
+        ref self: T,
+        recipient: starknet::ContractAddress,
+        card_id: u32,
+        marketable: bool,
         skin_id: u32,
         skin_rarity: u32,
         quality: u32,
@@ -107,10 +116,36 @@ pub mod pack_system {
                 let item = store.get_item(*item_id);
                 let quality = random.get_random_number(10);
                 match item.item_type {
-                    ItemType::Special | ItemType::Traditional | ItemType::Skin |
+                    ItemType::Traditional |
                     ItemType::Neon => {
                         cards_nfts
-                            .mint(
+                            .mint_card(
+                                recipient,
+                                card_id: item.content_id,
+                                marketable: true,
+                                skin_id: item.skin_id,
+                                skin_rarity: item.skin_rarity,
+                                quality: quality,
+                            );
+
+                        store
+                            .world
+                            .emit_event(
+                                @CardMintedEvent {
+                                    recipient,
+                                    item: item,
+                                    marketable: true,
+                                    rarity: item.rarity,
+                                    skin_id: item.skin_id,
+                                    skin_rarity: item.skin_rarity,
+                                    quality,
+                                },
+                            );
+                    },
+                    ItemType::Special |
+                    ItemType::Skin => {
+                        cards_nfts
+                            .mint_special_card(
                                 recipient,
                                 special_id: item.content_id,
                                 marketable: true,
@@ -134,8 +169,7 @@ pub mod pack_system {
                                 },
                             );
                     },
-                    ItemType::None => {
-                    },
+                    ItemType::None => {},
                 }
             }
         }
