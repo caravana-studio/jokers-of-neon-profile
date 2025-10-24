@@ -84,8 +84,8 @@ mod tests_lives_system {
             player_lives.available_lives,
         );
         assert!(
-            player_lives.next_live_timestamp == 11,
-            "next life timestamp should be 11 ({})",
+            player_lives.next_live_timestamp == 10,
+            "next life timestamp should be 10 ({})",
             player_lives.next_live_timestamp,
         );
     }
@@ -119,8 +119,8 @@ mod tests_lives_system {
             player_lives.available_lives,
         );
         assert!(
-            player_lives.next_live_timestamp == 6,
-            "next life timestamp should be 6 ({})",
+            player_lives.next_live_timestamp == 5,
+            "next life timestamp should be 5 ({})",
             player_lives.next_live_timestamp,
         );
     }
@@ -141,8 +141,8 @@ mod tests_lives_system {
             player_lives.available_lives,
         );
         assert!(
-            player_lives.next_live_timestamp == 11,
-            "next life timestamp should be 11 ({})",
+            player_lives.next_live_timestamp == 10,
+            "next life timestamp should be 10 ({})",
             player_lives.next_live_timestamp,
         );
     }
@@ -165,8 +165,8 @@ mod tests_lives_system {
             player_lives.available_lives,
         );
         assert!(
-            player_lives.next_live_timestamp == 6,
-            "next life timestamp should be 6 ({})",
+            player_lives.next_live_timestamp == 5,
+            "next life timestamp should be 5 ({})",
             player_lives.next_live_timestamp,
         );
     }
@@ -189,8 +189,8 @@ mod tests_lives_system {
             player_lives.available_lives,
         );
         assert!(
-            player_lives.next_live_timestamp == 21,
-            "next life timestamp should be 21 ({})",
+            player_lives.next_live_timestamp == 20,
+            "next life timestamp should be 20 ({})",
             player_lives.next_live_timestamp,
         );
     }
@@ -252,7 +252,6 @@ mod tests_lives_system {
     // UTILS
     // ------------------------------------------------------------
     fn setup() -> (WorldStorage, Store) {
-        set_block_number(1);
         impersonate(OWNER());
         let ndef = namespace_def();
 
