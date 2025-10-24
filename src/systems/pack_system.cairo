@@ -143,10 +143,7 @@ pub mod pack_minter {
                                 },
                             );
                     },
-                    ItemType::None => {
-                        println!("[mint] - Warning - `item_id` {} has `None` as ItemType", item.id)
-                        continue;
-                    },
+                    ItemType::None => {},
                 }
             }
         }
@@ -173,8 +170,7 @@ pub mod pack_minter {
             player_free_pack.next_pack_timestamp = current_timestamp + config.cooldown;
             store.set_player_free_pack(player_free_pack);
 
-            let BASIC_PACK_ID = 1;
-            self.mint(recipient, BASIC_PACK_ID);
+            self.mint(recipient, config.pack_id);
         }
 
         fn set_free_pack_config(ref self: ContractState, config: FreePackConfig) {

@@ -155,4 +155,5 @@ pub struct FreePackConfig {
     #[key]
     pub key: felt252,
     pub cooldown: u64,
+    pub pack_id: u32,
 }
