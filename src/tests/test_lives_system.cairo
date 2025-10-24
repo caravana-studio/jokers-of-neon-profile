@@ -8,7 +8,7 @@ mod tests_lives_system {
     };
     use starknet::ContractAddress;
     use starknet::testing::{
-        set_account_contract_address, set_block_number, set_block_timestamp, set_contract_address,
+        set_account_contract_address, set_block_timestamp, set_contract_address,
     };
     use crate::constants::constants::{DEFAULT_NS_BYTE, LIVES_CONFIG_KEY};
     use crate::models::{
@@ -180,7 +180,7 @@ mod tests_lives_system {
         lives_system.init_account(PLAYER(), SEASON);
 
         lives_system.remove(PLAYER(), SEASON);
-        set_block_timestamp(11);
+        set_block_timestamp(10);
         lives_system.claim(PLAYER(), SEASON);
         let player_lives = store.get_player_lives(PLAYER(), SEASON);
         assert!(
