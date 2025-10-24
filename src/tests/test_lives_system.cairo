@@ -39,7 +39,7 @@ mod tests_lives_system {
         let player_lives = store.get_player_lives(PLAYER(), SEASON);
         assert!(player_lives.available_lives == 2, "initial lives should be 2");
         assert!(player_lives.max_lives == 2, "max lives should be 2");
-        assert!(player_lives.next_life_timestamp == 0, "next life timestamp should be 0");
+        assert!(player_lives.next_live_timestamp == 0, "next life timestamp should be 0");
     }
 
     #[test]
@@ -57,7 +57,7 @@ mod tests_lives_system {
         let player_lives = store.get_player_lives(PLAYER(), SEASON);
         assert!(player_lives.available_lives == 4, "initial lives should be 4");
         assert!(player_lives.max_lives == 4, "max lives should be 4");
-        assert!(player_lives.next_life_timestamp == 0, "next life timestamp should be 0");
+        assert!(player_lives.next_live_timestamp == 0, "next life timestamp should be 0");
     }
 
     #[test]
@@ -84,9 +84,9 @@ mod tests_lives_system {
             player_lives.available_lives,
         );
         assert!(
-            player_lives.next_life_timestamp == 11,
+            player_lives.next_live_timestamp == 11,
             "next life timestamp should be 11 ({})",
-            player_lives.next_life_timestamp,
+            player_lives.next_live_timestamp,
         );
     }
 
@@ -119,9 +119,9 @@ mod tests_lives_system {
             player_lives.available_lives,
         );
         assert!(
-            player_lives.next_life_timestamp == 6,
+            player_lives.next_live_timestamp == 6,
             "next life timestamp should be 6 ({})",
-            player_lives.next_life_timestamp,
+            player_lives.next_live_timestamp,
         );
     }
 
@@ -141,9 +141,9 @@ mod tests_lives_system {
             player_lives.available_lives,
         );
         assert!(
-            player_lives.next_life_timestamp == 11,
+            player_lives.next_live_timestamp == 11,
             "next life timestamp should be 11 ({})",
-            player_lives.next_life_timestamp,
+            player_lives.next_live_timestamp,
         );
     }
 
@@ -165,9 +165,9 @@ mod tests_lives_system {
             player_lives.available_lives,
         );
         assert!(
-            player_lives.next_life_timestamp == 6,
+            player_lives.next_live_timestamp == 6,
             "next life timestamp should be 6 ({})",
-            player_lives.next_life_timestamp,
+            player_lives.next_live_timestamp,
         );
     }
 
@@ -189,9 +189,9 @@ mod tests_lives_system {
             player_lives.available_lives,
         );
         assert!(
-            player_lives.next_life_timestamp == 21,
+            player_lives.next_live_timestamp == 21,
             "next life timestamp should be 21 ({})",
-            player_lives.next_life_timestamp,
+            player_lives.next_live_timestamp,
         );
     }
 
@@ -253,7 +253,6 @@ mod tests_lives_system {
     // ------------------------------------------------------------
     fn setup() -> (WorldStorage, Store) {
         set_block_number(1);
-        set_block_timestamp(1);
         impersonate(OWNER());
         let ndef = namespace_def();
 

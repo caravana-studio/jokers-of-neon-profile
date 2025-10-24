@@ -150,7 +150,7 @@ pub struct PlayerLives {
     pub season_id: u32,
     pub available_lives: u32,
     pub max_lives: u32,
-    pub next_life_timestamp: u64,
+    pub next_live_timestamp: u64,
 }
 
 #[derive(Copy, Drop, Serde)]
