@@ -140,3 +140,19 @@ pub struct CardMintedEvent {
     pub skin_rarity: u32,
     pub quality: u32,
 }
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct PlayerFreePack {
+    #[key]
+    pub player: ContractAddress,
+    pub next_pack_timestamp: u64,
+}
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct FreePackConfig {
+    #[key]
+    pub key: felt252,
+    pub cooldown: u64,
+}

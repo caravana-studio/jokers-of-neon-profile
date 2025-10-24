@@ -1,10 +1,14 @@
-use crate::models::{Item, Pack, SeasonContent};
+use starknet::ContractAddress;
+use crate::models::{FreePackConfig, Item, Pack, SeasonContent};
 
 #[starknet::interface]
 pub trait IPackMinter<T> {
-    fn mint(ref self: T, recipient: starknet::ContractAddress, pack_id: u32);
+    fn mint(ref self: T, recipient: ContractAddress, pack_id: u32);
     fn add_pack(ref self: T, pack: Pack);
     fn init_season_content(ref self: T);
+    fn claim_free_pack(ref self: T, recipient: ContractAddress);
+    fn set_free_pack_config(ref self: T, config: FreePackConfig);
+
     fn get_available_packs(self: @T) -> Array<Pack>;
     fn get_available_items(self: @T) -> Array<Item>;
     fn get_season_content(self: @T) -> SeasonContent;
@@ -40,7 +44,9 @@ pub mod pack_minter {
     use crate::constants::packs::{
         ADVANCED_PACK, BASIC_PACK, COLLECTORS_PACK, COLLECTORS_XL_PACK, EPIC_PACK, LEGENDARY_PACK,
     };
-    use crate::models::{CardMintedEvent, Item, ItemType, NFTManager, Pack, SeasonContent};
+    use crate::models::{
+        CardMintedEvent, FreePackConfig, Item, ItemType, NFTManager, Pack, SeasonContent,
+    };
     use crate::store::StoreTrait;
     use crate::utils::pack::PackTrait;
     use super::{INFTCardSystemDispatcher, INFTCardSystemDispatcherTrait, IPackMinter};
@@ -83,17 +89,16 @@ pub mod pack_minter {
     ) {
         self.accesscontrol.initializer();
         self.accesscontrol._grant_role(DEFAULT_ADMIN_ROLE, owner);
-        self.accesscontrol._grant_role(MINTER_ROLE, minter);
 
         let mut store = StoreTrait::new(self.world_default());
-        store.set_nft_manager(NFTManager { key: NFT_MANAGER_KEY(), address: nft_address });
+        store.set_nft_manager(NFTManager { key: NFT_MANAGER_KEY, address: nft_address });
     }
 
     #[abi(embed_v0)]
     impl PackMinterImpl of IPackMinter<ContractState> {
         fn mint(ref self: ContractState, recipient: ContractAddress, pack_id: u32) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
-            self.accesscontrol.assert_only_role(MINTER_ROLE);
 
             let pack = store.get_pack(pack_id);
             let season_content = store.get_season_content(pack.season_id);
@@ -106,6 +111,10 @@ pub mod pack_minter {
             for item_id in result {
                 let item = store.get_item(*item_id);
                 let quality = random.get_random_number(10);
+                let has_season_pass = store
+                    .get_season_progress(recipient, SEASON_ID)
+                    .has_season_pass;
+
                 match item.item_type {
                     ItemType::Special | ItemType::Traditional | ItemType::Skin |
                     ItemType::Neon => {
@@ -113,7 +122,7 @@ pub mod pack_minter {
                             .mint(
                                 recipient,
                                 special_id: item.content_id,
-                                marketable: true,
+                                marketable: has_season_pass,
                                 rarity: item.rarity,
                                 skin_id: item.skin_id,
                                 skin_rarity: item.skin_rarity,
@@ -126,7 +135,7 @@ pub mod pack_minter {
                                 @CardMintedEvent {
                                     recipient,
                                     item: item,
-                                    marketable: true,
+                                    marketable: has_season_pass,
                                     rarity: item.rarity,
                                     skin_id: item.skin_id,
                                     skin_rarity: item.skin_rarity,
@@ -148,9 +157,35 @@ pub mod pack_minter {
             store.set_pack(pack);
         }
 
-        fn init_season_content(ref self: ContractState) {
+        fn claim_free_pack(ref self: ContractState, recipient: ContractAddress) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
-            self.accesscontrol.assert_only_role(MINTER_ROLE);
+
+            let mut player_free_pack = store.get_player_free_pack(recipient);
+            let current_timestamp = starknet::get_block_timestamp();
+            assert!(
+                player_free_pack.next_pack_timestamp < current_timestamp,
+                "[PackMinter] - You have to wait {} seconds to claim a free pack",
+                player_free_pack.next_pack_timestamp - current_timestamp,
+            );
+
+            let config = store.get_free_pack_config();
+            player_free_pack.next_pack_timestamp = current_timestamp + config.cooldown;
+            store.set_player_free_pack(player_free_pack);
+
+            let BASIC_PACK_ID = 1;
+            self.mint(recipient, BASIC_PACK_ID);
+        }
+
+        fn set_free_pack_config(ref self: ContractState, config: FreePackConfig) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            let mut store = StoreTrait::new(self.world_default());
+            store.set_free_pack_config(config);
+        }
+
+        fn init_season_content(ref self: ContractState) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            let mut store = StoreTrait::new(self.world_default());
 
             let mut season_content = store.get_season_content(SEASON_ID);
             assert!(

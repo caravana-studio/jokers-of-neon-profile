@@ -12,6 +12,7 @@ pub fn MOD_ID() -> felt252 {
 
 pub const PERCENT_SCALE: u32 = 10000;
 
-pub fn NFT_MANAGER_KEY() -> felt252 {
-    'NFT_MANAGER_KEY'
-}
+pub const FREE_PACK_COOLDOWN: u64 = 43200; // 12 hours
+pub const FREE_PACK_CONFIG_KEY: felt252 = selector!("FREE_PACK_CONFIG_KEY");
+
+pub const NFT_MANAGER_KEY: felt252 = selector!("NFT_MANAGER_KEY");
