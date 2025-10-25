@@ -185,12 +185,12 @@ pub mod pack_system {
             self.accesscontrol.assert_only_role(MINTER_ROLE);
 
             let mut season_content = store.get_season_content(SEASON_ID);
-            assert!(
-                season_content.initialized, "[PackMinter] - Season content already initialized",
-            );
+            // assert!(
+            //     !season_content.initialized, "[PackMinter] - Season content already initialized",
+            // );
 
             self.init_season_1_packs();
-            self.init_season_1_items();
+            self.init_season_1_items(ref season_content);
 
             season_content.initialized = true;
             store.set_season_content(season_content);
@@ -228,7 +228,7 @@ pub mod pack_system {
             self.add_pack(COLLECTORS_XL_PACK());
         }
 
-        fn init_season_1_items(ref self: ContractState) {
+        fn init_season_1_items(ref self: ContractState, ref season_content: SeasonContent) {
             let mut store = StoreTrait::new(self.world_default());
 
             let mut traditional = array![];
@@ -287,19 +287,11 @@ pub mod pack_system {
                 skins_category_2.append(*item.id);
             }
 
-            store
-                .set_season_content(
-                    SeasonContent {
-                        season_id: SEASON_ID,
-                        initialized: true,
-                        items: [
+            season_content.items = [
                             traditional.span(), joker.span(), neon.span(), neon_joker.span(),
                             c_items.span(), b_items.span(), a_items.span(), s_items.span(),
                             skins_category_1.span(), skins_category_2.span(),
-                        ]
-                            .span(),
-                    },
-                );
+                        ].span();
         }
     }
 }
