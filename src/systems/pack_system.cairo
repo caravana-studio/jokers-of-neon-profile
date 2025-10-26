@@ -2,7 +2,7 @@ use crate::models::{Item, Pack, SeasonContent};
 
 #[starknet::interface]
 pub trait IPackMinter<T> {
-    fn mint(ref self: T, recipient: starknet::ContractAddress, pack_id: u32);
+    fn mint(ref self: T, recipient: starknet::ContractAddress, pack_id: u32) -> Span<u32>;
     fn add_pack(ref self: T, pack: Pack);
     fn init_season_content(ref self: T);
     fn get_available_packs(self: @T) -> Array<Pack>;
@@ -49,7 +49,9 @@ pub mod pack_system {
     use crate::constants::packs::{
         ADVANCED_PACK, BASIC_PACK, COLLECTORS_PACK, COLLECTORS_XL_PACK, EPIC_PACK, LEGENDARY_PACK,
     };
-    use crate::models::{CardMintedEvent, Item, ItemType, NFTManager, Pack, SeasonContent};
+    use crate::models::{
+        CardMintedEvent, Item, ItemType, NFTManager, Pack, PackOpenedEvent, SeasonContent,
+    };
     use crate::store::StoreTrait;
     use crate::utils::pack::PackTrait;
     use super::{INFTCardSystemDispatcher, INFTCardSystemDispatcherTrait, IPackMinter};
@@ -100,7 +102,7 @@ pub mod pack_system {
 
     #[abi(embed_v0)]
     impl PackMinterImpl of IPackMinter<ContractState> {
-        fn mint(ref self: ContractState, recipient: ContractAddress, pack_id: u32) {
+        fn mint(ref self: ContractState, recipient: ContractAddress, pack_id: u32) -> Span<u32> {
             let mut store = StoreTrait::new(self.world_default());
             self.accesscontrol.assert_only_role(MINTER_ROLE);
 
@@ -172,6 +174,11 @@ pub mod pack_system {
                     ItemType::None => {},
                 }
             }
+
+            // Emit event with all cards obtained from the pack
+            store.world.emit_event(@PackOpenedEvent { recipient, pack_id, item_ids: result });
+
+            result
         }
 
         fn add_pack(ref self: ContractState, pack: Pack) {
@@ -287,11 +294,14 @@ pub mod pack_system {
                 skins_category_2.append(*item.id);
             }
 
-            season_content.items = [
-                            traditional.span(), joker.span(), neon.span(), neon_joker.span(),
-                            c_items.span(), b_items.span(), a_items.span(), s_items.span(),
-                            skins_category_1.span(), skins_category_2.span(),
-                        ].span();
+            season_content
+                .items =
+                    [
+                        traditional.span(), joker.span(), neon.span(), neon_joker.span(),
+                        c_items.span(), b_items.span(), a_items.span(), s_items.span(),
+                        skins_category_1.span(), skins_category_2.span(),
+                    ]
+                .span();
         }
     }
 }

@@ -140,3 +140,12 @@ pub struct CardMintedEvent {
     pub skin_rarity: u32,
     pub quality: u32,
 }
+
+#[derive(Drop, Serde)]
+#[dojo::event]
+pub struct PackOpenedEvent {
+    #[key]
+    pub recipient: starknet::ContractAddress,
+    pub pack_id: u32,
+    pub item_ids: Span<u32>,
+}

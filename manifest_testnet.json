@@ -1480,7 +1480,7 @@
   "contracts": [
     {
       "address": "0x3388b2c64b6e712a4d74832d640df649adb9025b94b64104b6d42774558594",
-      "class_hash": "0x1a752388126aba70ac433fc12664ba4bbd5fa43811a6e277ea1193276bae5a5",
+      "class_hash": "0x5c4b6c63e3bde89dca9108248f18a8ab6aa1e227c0089820f6b60e14774f512",
       "abi": [
         {
           "type": "impl",
@@ -1704,7 +1704,11 @@
                   "type": "core::integer::u32"
                 }
               ],
-              "outputs": [],
+              "outputs": [
+                {
+                  "type": "core::array::Span::<core::integer::u32>"
+                }
+              ],
               "state_mutability": "external"
             },
             {
@@ -3720,6 +3724,12 @@
       "class_hash": "0x5fc6d300550e88212f43ca4e3b532707e0740fa55cb44b3ccebbc0b71b7680b",
       "tag": "jokers_of_neon_profile1-CardMintedEvent",
       "selector": "0x2f357eb367ba8b241211ec16e8a25c2692253f4d5b199b30313f828791e99c7"
+    },
+    {
+      "members": [],
+      "class_hash": "0x7f96c2323df9896433faf8be972902599b9d8d416e05bb3d62a07a6b60fbfda",
+      "tag": "jokers_of_neon_profile1-PackOpenedEvent",
+      "selector": "0x1e050d84def3eacdf470c004f1c85d6397aef7fa1a740fa212a3b6624941fb4"
     }
   ],
   "external_contracts": []
