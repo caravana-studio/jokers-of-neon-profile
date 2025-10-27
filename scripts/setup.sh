@@ -33,7 +33,7 @@ echo -e "\n✅ Deployed!"
 world_address=$(sozo -P ${profile} inspect | awk '/World/ {getline; getline; print $3}')
 
 echo -e "\n🎮 Default config season en profile..."
-sozo -P ${profile} execute xp_system setup_default_season_config \
+sozo -P ${profile} execute season_system setup_default_season_config \
     1 \
     --wait \
     --world $world_address

@@ -1479,8 +1479,8 @@
   },
   "contracts": [
     {
-      "address": "0x5f61a839f6f4940f880175f185e4652f624e45d6289e43fe738986ec82b2772",
-      "class_hash": "0x3489b20f5d7ef50ffb313a3e7e105529c256d89d2cbcaf24ebe4e736ef74909",
+      "address": "0x1c3d4224f4df04c0407b29971939e139fc8fec8ce3e7a9362cffafba0a3b8d2",
+      "class_hash": "0x2abeceb8d9aa9775f47b15009656673d5a1730396838865bbbcf01970e1bdb7",
       "abi": [
         {
           "type": "impl",
@@ -2152,8 +2152,8 @@
       ]
     },
     {
-      "address": "0xee0725065c12fe87054c3592843ebc204c6fae334e21836edaa80675c2d94b",
-      "class_hash": "0x484b2ae4c80b84ec2afc7001f3ddd8c8b2a7298779dc48332d50713f8356909",
+      "address": "0x351a021c3148c011b5057cd3163bdecec3b5071823d49ffd390242c2dbc4bae",
+      "class_hash": "0x2b86ee1029cf5b0232860a49942d6ed9eb05e29ea584233f412905365def8e5",
       "abi": [
         {
           "type": "impl",
@@ -2269,6 +2269,24 @@
             {
               "name": "probabilities",
               "type": "core::array::Span::<core::array::Span::<core::integer::u32>>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "jokers_of_neon_profile::models::FreePackConfig",
+          "members": [
+            {
+              "name": "key",
+              "type": "core::felt252"
+            },
+            {
+              "name": "cooldown",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "pack_id",
+              "type": "core::integer::u32"
             }
           ]
         },
@@ -2396,6 +2414,30 @@
               "type": "function",
               "name": "init_season_content",
               "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "claim_free_pack",
+              "inputs": [
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "set_free_pack_config",
+              "inputs": [
+                {
+                  "name": "config",
+                  "type": "jokers_of_neon_profile::models::FreePackConfig"
+                }
+              ],
               "outputs": [],
               "state_mutability": "external"
             },
@@ -2853,6 +2895,8 @@
         "mint",
         "add_pack",
         "init_season_content",
+        "claim_free_pack",
+        "set_free_pack_config",
         "upgrade",
         "grant_role",
         "revoke_role",
@@ -2863,8 +2907,8 @@
       ]
     },
     {
-      "address": "0xfdfb503dc4e7d75b346e165b5b136fd84f8fcdefbd54f5ae2ecbf96fc3e937",
-      "class_hash": "0x55a280e53f030cfa967755cf8ef8697f2ea6752cef06a290f3457b2b982d3c8",
+      "address": "0x6a115c610c96e6ffc450b6139e054018ea91132d34cad1cd02549e47db399c",
+      "class_hash": "0x48e362c2de6a3f08c3d59dbf229b3ab5977b37906bb015a4151d3e2c494260c",
       "abi": [
         {
           "type": "impl",
@@ -3121,40 +3165,6 @@
         },
         {
           "type": "struct",
-          "name": "jokers_of_neon_profile::models::SeasonProgress",
-          "members": [
-            {
-              "name": "address",
-              "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "season_id",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "season_xp",
-              "type": "core::integer::u256"
-            },
-            {
-              "name": "has_season_pass",
-              "type": "core::bool"
-            },
-            {
-              "name": "claimable_rewards_id",
-              "type": "core::array::Span::<core::integer::u32>"
-            },
-            {
-              "name": "tier",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "level",
-              "type": "core::integer::u32"
-            }
-          ]
-        },
-        {
-          "type": "struct",
           "name": "jokers_of_neon_lib::models::external::profile::ProfileLevelConfig",
           "members": [
             {
@@ -3247,38 +3257,6 @@
               "outputs": [
                 {
                   "type": "jokers_of_neon_lib::models::external::profile::PlayerStats"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_season",
-              "inputs": [
-                {
-                  "name": "season_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_season_progress",
-              "inputs": [
-                {
-                  "name": "player_address",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "season_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "jokers_of_neon_profile::models::SeasonProgress"
                 }
               ],
               "state_mutability": "view"
@@ -3744,8 +3722,900 @@
       ]
     },
     {
-      "address": "0x30c0351a863164f762749145becf8aced5cb67b7e2b81b93d7c44f03ff665a9",
-      "class_hash": "0x665328f9ef26f7c936f8ae8118a7e2a6ed0c890faafa740039e4f429ca148c8",
+      "address": "0x416ebc0295eb676129ab273a09e89b39029881d5218511c323536e64ecd18f4",
+      "class_hash": "0x4806e0b95b16cb54b886e51ff04c89df4fbaf3328f9650aadf869a00b7cc3d1",
+      "abi": [
+        {
+          "type": "impl",
+          "name": "season_system__ContractImpl",
+          "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "DojoDeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::meta::interface::IDeployedResource",
+          "items": [
+            {
+              "type": "function",
+              "name": "dojo_name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "function",
+          "name": "dojo_init",
+          "inputs": [
+            {
+              "name": "owner",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "impl",
+          "name": "SeasonSystemImpl",
+          "interface_name": "jokers_of_neon_profile::systems::season_system::ISeasonSystem"
+        },
+        {
+          "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "jokers_of_neon_profile::models::SeasonConfig",
+          "members": [
+            {
+              "name": "season_id",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "is_active",
+              "type": "core::bool"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::integer::u256",
+          "members": [
+            {
+              "name": "low",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "high",
+              "type": "core::integer::u128"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::integer::u32>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::integer::u32>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "jokers_of_neon_profile::models::SeasonProgress",
+          "members": [
+            {
+              "name": "address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "season_id",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "season_xp",
+              "type": "core::integer::u256"
+            },
+            {
+              "name": "has_season_pass",
+              "type": "core::bool"
+            },
+            {
+              "name": "claimable_rewards_id",
+              "type": "core::array::Span::<core::integer::u32>"
+            },
+            {
+              "name": "tier",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "level",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "jokers_of_neon_profile::models::SeasonLevelConfig",
+          "members": [
+            {
+              "name": "season_id",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "level",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "required_xp",
+              "type": "core::integer::u256"
+            },
+            {
+              "name": "free_rewards",
+              "type": "core::array::Span::<core::integer::u32>"
+            },
+            {
+              "name": "premium_rewards",
+              "type": "core::array::Span::<core::integer::u32>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "jokers_of_neon_profile::models::MissionDifficulty",
+          "variants": [
+            {
+              "name": "Easy",
+              "type": "()"
+            },
+            {
+              "name": "Medium",
+              "type": "()"
+            },
+            {
+              "name": "Hard",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "jokers_of_neon_profile::models::MissionXPConfig",
+          "members": [
+            {
+              "name": "season_id",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "difficulty",
+              "type": "jokers_of_neon_profile::models::MissionDifficulty"
+            },
+            {
+              "name": "completion_count",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "xp_reward",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "jokers_of_neon_profile::models::LevelXPConfig",
+          "members": [
+            {
+              "name": "season_id",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "level",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "completion_count",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "xp_reward",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "jokers_of_neon_profile::systems::season_system::ISeasonSystem",
+          "items": [
+            {
+              "type": "function",
+              "name": "create_season",
+              "inputs": [
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "activate_season",
+              "inputs": [
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "deactivate_season",
+              "inputs": [
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "get_season_config",
+              "inputs": [
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "jokers_of_neon_profile::models::SeasonConfig"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "configure_season_level",
+              "inputs": [
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "level",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "required_xp",
+                  "type": "core::integer::u256"
+                },
+                {
+                  "name": "free_rewards",
+                  "type": "core::array::Span::<core::integer::u32>"
+                },
+                {
+                  "name": "premium_rewards",
+                  "type": "core::array::Span::<core::integer::u32>"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "purchase_season_pass",
+              "inputs": [
+                {
+                  "name": "address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "initialize_user_progress",
+              "inputs": [
+                {
+                  "name": "address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "get_user_progress",
+              "inputs": [
+                {
+                  "name": "address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "(core::integer::u256, core::integer::u32, core::bool)"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_season_progress",
+              "inputs": [
+                {
+                  "name": "player_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "jokers_of_neon_profile::models::SeasonProgress"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "has_season_pass",
+              "inputs": [
+                {
+                  "name": "address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "set_season_level_config",
+              "inputs": [
+                {
+                  "name": "config",
+                  "type": "jokers_of_neon_profile::models::SeasonLevelConfig"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "set_mission_xp_config",
+              "inputs": [
+                {
+                  "name": "config",
+                  "type": "jokers_of_neon_profile::models::MissionXPConfig"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "set_level_xp_config",
+              "inputs": [
+                {
+                  "name": "config",
+                  "type": "jokers_of_neon_profile::models::LevelXPConfig"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "setup_default_season_config",
+              "inputs": [
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "get_season_level_config_by_level",
+              "inputs": [
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "level",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "jokers_of_neon_profile::models::SeasonLevelConfig"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_season_level_config_by_address",
+              "inputs": [
+                {
+                  "name": "address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "jokers_of_neon_profile::models::SeasonLevelConfig"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_pending_packs",
+              "inputs": [
+                {
+                  "name": "address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::array::Span::<core::integer::u32>"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "grant_level_rewards",
+              "inputs": [
+                {
+                  "name": "address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "level",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "open_pack",
+              "inputs": [
+                {
+                  "name": "address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "pack_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "WorldProviderImpl",
+          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
+        },
+        {
+          "type": "struct",
+          "name": "dojo::world::iworld::IWorldDispatcher",
+          "members": [
+            {
+              "name": "contract_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::world_provider::IWorldProvider",
+          "items": [
+            {
+              "type": "function",
+              "name": "world_dispatcher",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "dojo::world::iworld::IWorldDispatcher"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "UpgradeableImpl",
+          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::upgradeable::IUpgradeable",
+          "items": [
+            {
+              "type": "function",
+              "name": "upgrade",
+              "inputs": [
+                {
+                  "name": "new_class_hash",
+                  "type": "core::starknet::class_hash::ClassHash"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "constructor",
+          "name": "constructor",
+          "inputs": []
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "class_hash",
+              "type": "core::starknet::class_hash::ClassHash",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Upgraded",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+              "kind": "nested"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "jokers_of_neon_profile::systems::season_system::season_system::SeasonCreated",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "season_id",
+              "type": "core::integer::u32",
+              "kind": "key"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "jokers_of_neon_profile::systems::season_system::season_system::SeasonActivated",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "season_id",
+              "type": "core::integer::u32",
+              "kind": "key"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "jokers_of_neon_profile::systems::season_system::season_system::SeasonDeactivated",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "season_id",
+              "type": "core::integer::u32",
+              "kind": "key"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "jokers_of_neon_profile::systems::season_system::season_system::SeasonPassPurchased",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "player",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "season_id",
+              "type": "core::integer::u32",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "jokers_of_neon_profile::systems::season_system::season_system::PacksGranted",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "player",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "season_id",
+              "type": "core::integer::u32",
+              "kind": "data"
+            },
+            {
+              "name": "level",
+              "type": "core::integer::u32",
+              "kind": "data"
+            },
+            {
+              "name": "is_premium",
+              "type": "core::bool",
+              "kind": "data"
+            },
+            {
+              "name": "pack_count",
+              "type": "core::integer::u32",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "jokers_of_neon_profile::systems::season_system::season_system::PackOpened",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "player",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "season_id",
+              "type": "core::integer::u32",
+              "kind": "data"
+            },
+            {
+              "name": "pack_id",
+              "type": "core::integer::u32",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "jokers_of_neon_profile::systems::season_system::season_system::SeasonLevelReached",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "player",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "season_id",
+              "type": "core::integer::u32",
+              "kind": "data"
+            },
+            {
+              "name": "level",
+              "type": "core::integer::u32",
+              "kind": "data"
+            },
+            {
+              "name": "xp",
+              "type": "core::integer::u256",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "jokers_of_neon_profile::systems::season_system::season_system::UserProgressInitialized",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "player",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "season_id",
+              "type": "core::integer::u32",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "jokers_of_neon_profile::systems::season_system::season_system::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "UpgradeableEvent",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "WorldProviderEvent",
+              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "SeasonCreated",
+              "type": "jokers_of_neon_profile::systems::season_system::season_system::SeasonCreated",
+              "kind": "nested"
+            },
+            {
+              "name": "SeasonActivated",
+              "type": "jokers_of_neon_profile::systems::season_system::season_system::SeasonActivated",
+              "kind": "nested"
+            },
+            {
+              "name": "SeasonDeactivated",
+              "type": "jokers_of_neon_profile::systems::season_system::season_system::SeasonDeactivated",
+              "kind": "nested"
+            },
+            {
+              "name": "SeasonPassPurchased",
+              "type": "jokers_of_neon_profile::systems::season_system::season_system::SeasonPassPurchased",
+              "kind": "nested"
+            },
+            {
+              "name": "PacksGranted",
+              "type": "jokers_of_neon_profile::systems::season_system::season_system::PacksGranted",
+              "kind": "nested"
+            },
+            {
+              "name": "PackOpened",
+              "type": "jokers_of_neon_profile::systems::season_system::season_system::PackOpened",
+              "kind": "nested"
+            },
+            {
+              "name": "SeasonLevelReached",
+              "type": "jokers_of_neon_profile::systems::season_system::season_system::SeasonLevelReached",
+              "kind": "nested"
+            },
+            {
+              "name": "UserProgressInitialized",
+              "type": "jokers_of_neon_profile::systems::season_system::season_system::UserProgressInitialized",
+              "kind": "nested"
+            }
+          ]
+        }
+      ],
+      "init_calldata": [
+        "0x6677fe62ee39c7b07401f754138502bab7fac99d2d3c5d37df7d1c6fab10819"
+      ],
+      "tag": "jokers_of_neon_profile-season_system",
+      "selector": "0x7df7cf9f501eab36882467db17bacfbf7c4ecd97e23f01529cb7e29113e7f4f",
+      "systems": [
+        "dojo_init",
+        "create_season",
+        "activate_season",
+        "deactivate_season",
+        "configure_season_level",
+        "purchase_season_pass",
+        "initialize_user_progress",
+        "set_season_level_config",
+        "set_mission_xp_config",
+        "set_level_xp_config",
+        "setup_default_season_config",
+        "grant_level_rewards",
+        "open_pack",
+        "upgrade"
+      ]
+    },
+    {
+      "address": "0x55432e24d59683859eed89978e55829fe263435a10d3abfd5db79aa281f3f5",
+      "class_hash": "0x4348f5c182c0f4f00c80ecfac7a0fc2e684924b8d2f92e8b54549fcc3d8f02f",
       "abi": [
         {
           "type": "impl",
@@ -3833,128 +4703,6 @@
           ]
         },
         {
-          "type": "struct",
-          "name": "jokers_of_neon_profile::models::MissionXPConfig",
-          "members": [
-            {
-              "name": "season_id",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "difficulty",
-              "type": "jokers_of_neon_profile::models::MissionDifficulty"
-            },
-            {
-              "name": "completion_count",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "xp_reward",
-              "type": "core::integer::u32"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "jokers_of_neon_profile::models::LevelXPConfig",
-          "members": [
-            {
-              "name": "season_id",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "level",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "completion_count",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "xp_reward",
-              "type": "core::integer::u32"
-            }
-          ]
-        },
-        {
-          "type": "enum",
-          "name": "core::bool",
-          "variants": [
-            {
-              "name": "False",
-              "type": "()"
-            },
-            {
-              "name": "True",
-              "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "jokers_of_neon_profile::models::SeasonConfig",
-          "members": [
-            {
-              "name": "season_id",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "is_active",
-              "type": "core::bool"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "core::integer::u256",
-          "members": [
-            {
-              "name": "low",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "high",
-              "type": "core::integer::u128"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "core::array::Span::<core::integer::u32>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<core::integer::u32>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "jokers_of_neon_profile::models::SeasonLevelConfig",
-          "members": [
-            {
-              "name": "season_id",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "level",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "required_xp",
-              "type": "core::integer::u256"
-            },
-            {
-              "name": "free_rewards",
-              "type": "core::array::Span::<core::integer::u32>"
-            },
-            {
-              "name": "premium_rewards",
-              "type": "core::array::Span::<core::integer::u32>"
-            }
-          ]
-        },
-        {
           "type": "interface",
           "name": "jokers_of_neon_profile::systems::xp_system::IXPSystem",
           "items": [
@@ -3992,110 +4740,10 @@
             },
             {
               "type": "function",
-              "name": "set_mission_xp_config",
-              "inputs": [
-                {
-                  "name": "config",
-                  "type": "jokers_of_neon_profile::models::MissionXPConfig"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "set_level_xp_config",
-              "inputs": [
-                {
-                  "name": "config",
-                  "type": "jokers_of_neon_profile::models::LevelXPConfig"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "set_season_config",
-              "inputs": [
-                {
-                  "name": "config",
-                  "type": "jokers_of_neon_profile::models::SeasonConfig"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "set_season_level_config",
-              "inputs": [
-                {
-                  "name": "config",
-                  "type": "jokers_of_neon_profile::models::SeasonLevelConfig"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "setup_default_season_config",
-              "inputs": [
-                {
-                  "name": "season_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
               "name": "setup_default_profile_config",
               "inputs": [],
               "outputs": [],
               "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "get_season_level_config_by_level",
-              "inputs": [
-                {
-                  "name": "season_id",
-                  "type": "core::integer::u32"
-                },
-                {
-                  "name": "level",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "jokers_of_neon_profile::models::SeasonLevelConfig"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_season_level_config_by_address",
-              "inputs": [
-                {
-                  "name": "address",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "season_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "jokers_of_neon_profile::models::SeasonLevelConfig"
-                }
-              ],
-              "state_mutability": "view"
             }
           ]
         },
@@ -4290,11 +4938,6 @@
         "dojo_init",
         "add_daily_mission_xp",
         "add_level_completion_xp",
-        "set_mission_xp_config",
-        "set_level_xp_config",
-        "set_season_config",
-        "set_season_level_config",
-        "setup_default_season_config",
         "setup_default_profile_config",
         "upgrade"
       ]
@@ -4307,6 +4950,12 @@
       "class_hash": "0x6a3f5e9c1f469a79ff0b306e6e079e5f2b2cb1b075ebfdc55d98560d69a905",
       "tag": "jokers_of_neon_profile-DailyProgress",
       "selector": "0x3eba2b69c1b9d866f898c7e868a32bff7a85d41ca3ea09457a2a8194b4a316c"
+    },
+    {
+      "members": [],
+      "class_hash": "0x402e03bd760e9f70198329baccd01cfeb851c47406d72ffd8c0abcf80b65025",
+      "tag": "jokers_of_neon_profile-FreePackConfig",
+      "selector": "0x3c3c60bc4f605bef554ef7842320de8525e1f79b77c54f29f2db7b00c863856"
     },
     {
       "members": [],
@@ -4343,6 +4992,12 @@
       "class_hash": "0x5ba2801895401253e5733aaca55a44c44e0310c129698bd671c11a78c5839df",
       "tag": "jokers_of_neon_profile-Pack",
       "selector": "0xb4ec59c254368dd92cf661c08f25c66794834eeea589b8c490b48657140696"
+    },
+    {
+      "members": [],
+      "class_hash": "0x7924be5d565422df3681b8b8ff0254c46998d058a1a4c93b40874efb89d8cd0",
+      "tag": "jokers_of_neon_profile-PlayerFreePack",
+      "selector": "0x71e78c11aa1912795c950d6dc6e1b8cc7cdf16f3f71c8545c36bdf3ce04bdd8"
     },
     {
       "members": [],
