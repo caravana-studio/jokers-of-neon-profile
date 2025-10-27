@@ -3,7 +3,7 @@
 set -e
 
 profile="${1:-dev}"
-profile_system_address="${2:-}"
+# profile_system_address="${2:-}"
 
 # Validate profile parameter
 if [ "$profile" != "dev" ] && [ "$profile" != "slot" ] && [ "$profile" != "testnet" ] && [ "$profile" != "mainnet" ]; then
@@ -26,7 +26,7 @@ if [ -f "$manifest_file" ]; then
 fi
 
 echo "sozo build && sozo inspect && sozo migrate"
-sozo -P ${profile} build && sozo -P ${profile} inspect && sozo -P ${profile} migrate
+sozo -P ${profile} build && sozo -P ${profile} inspect && sozo -P ${profile} migrate --gas 5568004213 -vvvvv
 
 echo -e "\n✅ Deployed!"
 
