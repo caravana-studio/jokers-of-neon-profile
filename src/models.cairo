@@ -141,11 +141,42 @@ pub struct CardMintedEvent {
     pub quality: u32,
 }
 
-#[derive(Drop, Serde)]
-#[dojo::event]
-pub struct PackOpenedEvent {
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct PlayerFreePack {
     #[key]
-    pub recipient: starknet::ContractAddress,
+    pub player: ContractAddress,
+    pub next_pack_timestamp: u64,
+}
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct FreePackConfig {
+    #[key]
+    pub key: felt252,
+    pub cooldown: u64,
     pub pack_id: u32,
-    pub item_ids: Span<u32>,
+}
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct PlayerLives {
+    #[key]
+    pub player: ContractAddress,
+    #[key]
+    pub season_id: u32,
+    pub available_lives: u32,
+    pub max_lives: u32,
+    pub next_live_timestamp: u64,
+}
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct LivesConfig {
+    #[key]
+    pub key: felt252,
+    pub max_lives: u32,
+    pub max_lives_battle_pass: u32,
+    pub lives_cooldown: u64,
+    pub lives_cooldown_season_pass: u64,
 }

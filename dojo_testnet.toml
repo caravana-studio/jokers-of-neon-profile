@@ -12,21 +12,25 @@ account_address = "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc6
 private_key = "0x06c3f4d5e62d4b873a1389cec6671a9ef3414af6321d893bdf3967bc9c77fa47"
 
 [writers]
-"jokers_of_neon_profile1" = [
-    "jokers_of_neon_profile1-profile_system",
-    "jokers_of_neon_profile1-xp_system",
-    "jokers_of_neon_profile1-pack_system",
+"jokers_of_neon_profile" = [
+    "jokers_of_neon_profile-profile_system",
+    "jokers_of_neon_profile-pack_system",
+    "jokers_of_neon_profile-lives_system",
+    "jokers_of_neon_profile-xp_system",
 ]
 
 [init_call_args]
-"jokers_of_neon_profile1-profile_system" = [
+"jokers_of_neon_profile-profile_system" = [
     "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245",
 ]
-"jokers_of_neon_profile1-xp_system" = [
+"jokers_of_neon_profile-xp_system" = [
     "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245",
 ]
-"jokers_of_neon_profile1-pack_system" = [
+"jokers_of_neon_profile-pack_system" = [
     "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245",
     "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245",
-    "0x0486096505276458069472576c4f60E1346e0527Af32bB4867FEc5d76aB7ee69",
+    "0x00f0d676b1ec606a761995f1e61d66afb0abb880eb779e8895f4480ba7f9c515",
+]
+"jokers_of_neon_profile-lives_system" = [
+    "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245",
 ]

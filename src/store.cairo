@@ -2,10 +2,11 @@ use dojo::model::ModelStorage;
 use dojo::world::WorldStorage;
 use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, ProfileLevelConfig};
 use starknet::ContractAddress;
-use crate::constants::constants::NFT_MANAGER_KEY;
+use crate::constants::constants::{FREE_PACK_CONFIG_KEY, LIVES_CONFIG_KEY, NFT_MANAGER_KEY};
 use crate::models::{
-    DailyProgress, Item, LevelXPConfig, MissionDifficulty, MissionXPConfig, NFTManager, Pack,
-    SeasonConfig, SeasonContent, SeasonLevelConfig, SeasonProgress,
+    DailyProgress, FreePackConfig, Item, LevelXPConfig, LivesConfig, MissionDifficulty,
+    MissionXPConfig, NFTManager, Pack, PlayerFreePack, PlayerLives, SeasonConfig, SeasonContent,
+    SeasonLevelConfig, SeasonProgress,
 };
 
 #[derive(Drop)]
@@ -98,6 +99,22 @@ pub impl StoreImpl of StoreTrait {
         self.world.write_model(@config)
     }
 
+    fn get_lives_config(ref self: Store) -> LivesConfig {
+        self.world.read_model(LIVES_CONFIG_KEY)
+    }
+
+    fn set_lives_config(ref self: Store, config: LivesConfig) {
+        self.world.write_model(@config)
+    }
+
+    fn get_player_lives(ref self: Store, address: ContractAddress, season_id: u32) -> PlayerLives {
+        self.world.read_model((address, season_id))
+    }
+
+    fn set_player_lives(ref self: Store, lives: PlayerLives) {
+        self.world.write_model(@lives)
+    }
+
     fn get_pack(ref self: Store, id: u32) -> Pack {
         self.world.read_model(id)
     }
@@ -123,10 +140,26 @@ pub impl StoreImpl of StoreTrait {
     }
 
     fn get_nft_manager(ref self: Store) -> NFTManager {
-        self.world.read_model(NFT_MANAGER_KEY())
+        self.world.read_model(NFT_MANAGER_KEY)
     }
 
     fn set_nft_manager(ref self: Store, nft_manager: NFTManager) {
         self.world.write_model(@nft_manager)
+    }
+
+    fn get_free_pack_config(ref self: Store) -> FreePackConfig {
+        self.world.read_model(FREE_PACK_CONFIG_KEY)
+    }
+
+    fn set_free_pack_config(ref self: Store, config: FreePackConfig) {
+        self.world.write_model(@config)
+    }
+
+    fn get_player_free_pack(ref self: Store, address: ContractAddress) -> PlayerFreePack {
+        self.world.read_model(address)
+    }
+
+    fn set_player_free_pack(ref self: Store, player_free_pack: PlayerFreePack) {
+        self.world.write_model(@player_free_pack)
     }
 }
