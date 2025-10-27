@@ -3723,7 +3723,7 @@
     },
     {
       "address": "0x416ebc0295eb676129ab273a09e89b39029881d5218511c323536e64ecd18f4",
-      "class_hash": "0x4806e0b95b16cb54b886e51ff04c89df4fbaf3328f9650aadf869a00b7cc3d1",
+      "class_hash": "0x541cd51358879c2ec9a0651a5623ae25b9792fdda7a8cc790919da971766e6a",
       "abi": [
         {
           "type": "impl",
