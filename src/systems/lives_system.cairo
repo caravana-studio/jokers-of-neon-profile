@@ -311,7 +311,7 @@ pub mod lives_system {
                         max_lives: 2,
                         max_lives_battle_pass: 4,
                         lives_cooldown: 10, // TODO:
-                        lives_cooldown_season_pass: 20, // TODO:
+                        lives_cooldown_season_pass: 20 // TODO:
                     },
                 );
         }
