@@ -1,5 +1,5 @@
 use starknet::ContractAddress;
-use crate::models::{Season, SeasonLevelConfig, MissionXPConfig, LevelXPConfig, SeasonProgress};
+use crate::models::{LevelXPConfig, MissionXPConfig, Season, SeasonLevelConfig, SeasonProgress};
 
 #[starknet::interface]
 pub trait ISeasonSystem<T> {
@@ -60,7 +60,7 @@ pub trait ISeasonSystem<T> {
 pub mod season_system {
     use core::num::traits::Zero;
     use starknet::ContractAddress;
-    use crate::models::{Season, SeasonLevelConfig, SeasonProgress, MissionXPConfig, LevelXPConfig};
+    use crate::models::{LevelXPConfig, MissionXPConfig, Season, SeasonLevelConfig, SeasonProgress};
     use crate::store::{Store, StoreTrait};
     use super::ISeasonSystem;
 
@@ -198,9 +198,7 @@ pub mod season_system {
             store.get_season(season_id)
         }
 
-        fn purchase_season_pass(
-            ref self: ContractState, address: ContractAddress, season_id: u32,
-        ) {
+        fn purchase_season_pass(ref self: ContractState, address: ContractAddress, season_id: u32) {
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
 
@@ -232,9 +230,7 @@ pub mod season_system {
             StoreTrait::get_season_progress(ref store, player_address, season_id)
         }
 
-        fn has_season_pass(
-            self: @ContractState, address: ContractAddress, season_id: u32,
-        ) -> bool {
+        fn has_season_pass(self: @ContractState, address: ContractAddress, season_id: u32) -> bool {
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
             let progress = StoreTrait::get_season_progress(ref store, address, season_id);
@@ -707,10 +703,7 @@ pub mod season_system {
 
             // Grant free rewards if there are any
             if level_config.free_rewards.len() > 0 {
-                self
-                    ._grant_rewards(
-                        ref store, address, season_id, level_config.free_rewards
-                    );
+                self._grant_rewards(ref store, address, season_id, level_config.free_rewards);
                 self
                     .emit(
                         PacksGranted {
@@ -725,10 +718,7 @@ pub mod season_system {
 
             // Grant premium rewards if player has season pass
             if progress.has_season_pass && level_config.premium_rewards.len() > 0 {
-                self
-                    ._grant_rewards(
-                        ref store, address, season_id, level_config.premium_rewards
-                    );
+                self._grant_rewards(ref store, address, season_id, level_config.premium_rewards);
                 self
                     .emit(
                         PacksGranted {
@@ -797,9 +787,8 @@ pub mod season_system {
 
             // Emit event
             self.emit(PackOpened { player: address, season_id, pack_id });
-
             // TODO: Generate pack content and grant items to player
-            // This would integrate with your inventory/items system
+        // This would integrate with your inventory/items system
         }
     }
 

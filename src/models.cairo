@@ -81,3 +81,113 @@ pub struct LevelXPConfig {
     pub completion_count: u32,
     pub xp_reward: u32,
 }
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+pub struct SeasonConfig {
+    #[key]
+    pub season_id: u32,
+    pub is_active: bool,
+}
+
+#[derive(Drop, Serde)]
+#[dojo::model]
+pub struct Pack {
+    #[key]
+    pub id: u32,
+    pub season_id: u32,
+    pub name: ByteArray,
+    pub probabilities: Span<Span<u32>>,
+}
+
+#[derive(Drop, Copy, IntrospectPacked, Serde)]
+#[dojo::model]
+pub struct Item {
+    #[key]
+    pub id: u32,
+    pub item_type: ItemType,
+    pub content_id: u32,
+    pub rarity: u32,
+    pub skin_id: u32,
+    pub skin_rarity: u32,
+}
+
+#[derive(Drop, Copy, IntrospectPacked, Serde, DojoStore, Default)]
+pub enum ItemType {
+    Traditional,
+    Special,
+    Neon,
+    Skin,
+    #[default]
+    None,
+}
+
+#[derive(Drop, Copy, Serde)]
+#[dojo::model]
+pub struct SeasonContent {
+    #[key]
+    pub season_id: u32,
+    pub initialized: bool,
+    pub items: Span<Span<u32>>,
+}
+
+#[derive(Drop, Copy, Serde)]
+#[dojo::model]
+pub struct NFTManager {
+    #[key]
+    pub key: felt252,
+    pub address: ContractAddress,
+}
+
+#[derive(Drop, Serde)]
+#[dojo::event]
+pub struct CardMintedEvent {
+    #[key]
+    pub recipient: starknet::ContractAddress,
+    pub item: Item,
+    pub marketable: bool,
+    pub rarity: u32,
+    pub skin_id: u32,
+    pub skin_rarity: u32,
+    pub quality: u32,
+}
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct PlayerFreePack {
+    #[key]
+    pub player: ContractAddress,
+    pub next_pack_timestamp: u64,
+}
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct FreePackConfig {
+    #[key]
+    pub key: felt252,
+    pub cooldown: u64,
+    pub pack_id: u32,
+}
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct PlayerLives {
+    #[key]
+    pub player: ContractAddress,
+    #[key]
+    pub season_id: u32,
+    pub available_lives: u32,
+    pub max_lives: u32,
+    pub next_live_timestamp: u64,
+}
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct LivesConfig {
+    #[key]
+    pub key: felt252,
+    pub max_lives: u32,
+    pub max_lives_battle_pass: u32,
+    pub lives_cooldown: u64,
+    pub lives_cooldown_season_pass: u64,
+}
