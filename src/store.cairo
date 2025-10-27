@@ -5,7 +5,7 @@ use starknet::ContractAddress;
 use crate::constants::constants::{FREE_PACK_CONFIG_KEY, LIVES_CONFIG_KEY, NFT_MANAGER_KEY};
 use crate::models::{
     DailyProgress, FreePackConfig, Item, LevelXPConfig, LivesConfig, MissionDifficulty,
-    MissionXPConfig, NFTManager, Pack, PlayerFreePack, PlayerLives, Season, SeasonContent,
+    MissionXPConfig, NFTManager, Pack, PlayerFreePack, PlayerLives, SeasonConfig, SeasonContent,
     SeasonLevelConfig, SeasonProgress,
 };
 
@@ -75,6 +75,14 @@ pub impl StoreImpl of StoreTrait {
         self.world.write_model(@config)
     }
 
+    fn get_season_config(ref self: Store, season_id: u32) -> SeasonConfig {
+        self.world.read_model(season_id)
+    }
+
+    fn set_season_config(ref self: Store, config: SeasonConfig) {
+        self.world.write_model(@config)
+    }
+
     fn get_season_level_config(ref self: Store, season_id: u32, level: u32) -> SeasonLevelConfig {
         self.world.read_model((season_id, level))
     }
@@ -89,14 +97,6 @@ pub impl StoreImpl of StoreTrait {
 
     fn set_profile_level_config(ref self: Store, config: ProfileLevelConfig) {
         self.world.write_model(@config)
-    }
-
-    fn get_season(ref self: Store, season_id: u32) -> Season {
-        self.world.read_model(season_id)
-    }
-
-    fn set_season(ref self: Store, season: Season) {
-        self.world.write_model(@season)
     }
 
     fn get_lives_config(ref self: Store) -> LivesConfig {
