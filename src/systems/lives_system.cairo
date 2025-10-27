@@ -126,7 +126,7 @@ pub mod lives_system {
     use openzeppelin_access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
     use openzeppelin_introspection::src5::SRC5Component;
     use starknet::{ContractAddress, get_block_timestamp};
-    use crate::constants::constants::{LIVES_CONFIG_KEY, SIX_HOURS, TWELVE_HOURS};
+    use crate::constants::constants::{DEFAULT_NS_BYTE, LIVES_CONFIG_KEY, SIX_HOURS, TWELVE_HOURS};
     use crate::models::{LivesConfig, PlayerLives};
     use crate::store::{Store, StoreTrait};
 
@@ -317,7 +317,7 @@ pub mod lives_system {
         }
 
         fn default_store(self: @ContractState) -> Store {
-            let world = self.world(@"jokers_of_neon_profile");
+            let world = self.world(@DEFAULT_NS_BYTE());
             StoreTrait::new(world)
         }
     }

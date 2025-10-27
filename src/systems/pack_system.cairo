@@ -58,7 +58,7 @@ pub mod pack_system {
     };
     use crate::store::StoreTrait;
     use crate::utils::pack::PackTrait;
-    use super::{INFTCardSystemDispatcher, IPackSystem};
+    use super::{INFTCardSystemDispatcher, INFTCardSystemDispatcherTrait, IPackSystem};
 
     component!(path: SRC5Component, storage: src5, event: SRC5Event);
     component!(path: AccessControlComponent, storage: accesscontrol, event: AccessControlEvent);

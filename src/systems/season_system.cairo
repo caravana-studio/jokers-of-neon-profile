@@ -49,22 +49,15 @@ pub trait ISeasonSystem<T> {
 #[dojo::contract]
 pub mod season_system {
     use core::num::traits::Zero;
-    use dojo::event::EventStorage;
-    use jokers_of_neon_lib::random::RandomTrait;
+    use dojo::world::{WorldStorage, WorldStorageTrait};
     use starknet::ContractAddress;
-    use crate::constants::constants::MOD_ID;
+    use crate::constants::constants::DEFAULT_NS_BYTE;
     use crate::models::{
-        CardMintedEvent, ItemType, LevelXPConfig, MissionXPConfig, SeasonConfig, SeasonLevelConfig,
-        SeasonProgress,
+        LevelXPConfig, MissionXPConfig, SeasonConfig, SeasonLevelConfig, SeasonProgress,
     };
     use crate::store::StoreTrait;
-    use crate::systems::pack_system::{
-        INFTCardSystemDispatcher, INFTCardSystemDispatcherTrait, IPackSystemDispatcher,
-        IPackSystemDispatcherTrait,
-    };
-    use crate::utils::pack::PackTrait;
+    use crate::systems::pack_system::{IPackSystemDispatcher, IPackSystemDispatcherTrait};
     use super::ISeasonSystem;
-
 
     #[event]
     #[derive(Drop, starknet::Event)]
@@ -353,7 +346,7 @@ pub mod season_system {
             if !claim_record.free_claimed && free_rewards_count > 0 {
                 // Mint each pack in free_rewards
                 for pack_id in free_rewards {
-                    self.mint_pack(address, *pack_id);
+                    self.mint_pack(world, address, *pack_id);
                 }
 
                 claim_record.free_claimed = true;
@@ -374,7 +367,7 @@ pub mod season_system {
             if has_season_pass && !claim_record.premium_claimed && premium_rewards_count > 0 {
                 // Mint each pack in premium_rewards
                 for pack_id in premium_rewards {
-                    self.mint_pack(address, *pack_id);
+                    self.mint_pack(world, address, *pack_id);
                 }
 
                 claim_record.premium_claimed = true;
@@ -753,10 +746,12 @@ pub mod season_system {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn world_default(self: @ContractState) -> dojo::world::WorldStorage {
-            self.world(@"jokers_of_neon_profile")
+            self.world(@DEFAULT_NS_BYTE())
         }
 
-        fn mint_pack(world: WorldStorage, recipient: ContractAddress, pack_id: u32) {
+        fn mint_pack(
+            self: @ContractState, world: WorldStorage, recipient: ContractAddress, pack_id: u32,
+        ) {
             match world.dns(@"pack_system") {
                 Option::Some((
                     contract_address, _,
