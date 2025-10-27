@@ -12,6 +12,9 @@ pub fn MOD_ID() -> felt252 {
 
 pub const PERCENT_SCALE: u32 = 10000;
 
+pub const TWELVE_HOURS: u64 = 12 * 60 * 60;
+pub const SIX_HOURS: u64 = 6 * 60 * 60;
+
 pub fn NFT_MANAGER_KEY() -> felt252 {
     'NFT_MANAGER_KEY'
 }

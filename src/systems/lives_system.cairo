@@ -86,7 +86,7 @@ pub trait ILivesSystem<T> {
     ///
     /// # Behavior
     /// - Updates the global lives configuration with the new values
-    fn set_config(ref self: T, config: LivesConfig);
+    fn init_lives_config(ref self: T);
 
     /// Retrieves the current lives information for a specific player.
     ///
@@ -126,6 +126,7 @@ pub mod lives_system {
     use openzeppelin_access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
     use openzeppelin_introspection::src5::SRC5Component;
     use starknet::{ContractAddress, get_block_timestamp};
+    use crate::constants::constants::{LIVES_CONFIG_KEY, SIX_HOURS, TWELVE_HOURS};
     use crate::models::{LivesConfig, PlayerLives};
     use crate::store::{Store, StoreTrait};
 
@@ -281,11 +282,8 @@ pub mod lives_system {
                 );
         }
 
-
-        fn set_config(ref self: ContractState, config: LivesConfig) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-            let mut store = self.default_store();
-            store.set_lives_config(config);
+        fn init_lives_config(ref self: ContractState) {
+            self.init_default_lives_config();
         }
 
         fn get_player_lives(
@@ -303,6 +301,21 @@ pub mod lives_system {
 
     #[generate_trait]
     impl InternalImpl of InternalTrait {
+        fn init_default_lives_config(ref self: ContractState) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            let mut store = self.default_store();
+            store
+                .set_lives_config(
+                    LivesConfig {
+                        key: LIVES_CONFIG_KEY,
+                        max_lives: 2,
+                        max_lives_battle_pass: 4,
+                        lives_cooldown: TWELVE_HOURS,
+                        lives_cooldown_season_pass: SIX_HOURS,
+                    },
+                );
+        }
+
         fn default_store(self: @ContractState) -> Store {
             let world = self.world(@"jokers_of_neon_profile");
             StoreTrait::new(world)
