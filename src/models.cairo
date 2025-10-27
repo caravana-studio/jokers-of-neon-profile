@@ -1,17 +1,6 @@
 use starknet::ContractAddress;
 
-#[derive(Drop, Serde, Debug)]
-#[dojo::model]
-pub struct Season {
-    #[key]
-    pub id: u32,
-    pub name: ByteArray,
-    pub is_active: bool,
-    pub start_date: u64,
-    pub end_date: u64,
-}
-
-#[derive(Drop, Serde, Debug)]
+#[derive(Copy, Drop, Serde, Debug)]
 #[dojo::model]
 pub struct SeasonProgress {
     #[key]
