@@ -43,9 +43,9 @@ sozo -P ${profile} execute xp_system setup_default_profile_config \
     --wait \
     --world $world_address
 
-echo -e "\n🎮 Register profile system core in profile..."
-sozo -P ${profile} execute profile_system grant_role \
-    0x038f168f361ac1393a163ed4adfa899a87be7b7c71645167bdaddd822ae453c8 \
-    $profile_system_address \
-    --wait \
-    --world $world_address
+# echo -e "\n🎮 Register profile system core in profile..."
+# sozo -P ${profile} execute profile_system grant_role \
+#     0x038f168f361ac1393a163ed4adfa899a87be7b7c71645167bdaddd822ae453c8 \
+#     $profile_system_address \
+#     --wait \
+#     --world $world_address
