@@ -187,7 +187,7 @@ pub mod lives_system {
             // Check if cooldown has passed
             let current_timestamp = get_block_timestamp();
             assert!(
-                !(current_timestamp < player_lives.next_live_timestamp),
+                current_timestamp >= player_lives.next_live_timestamp,
                 "[LivesSystem] - You have to wait {} seconds to claim a new life",
                 player_lives.next_live_timestamp - current_timestamp,
             );
@@ -310,8 +310,8 @@ pub mod lives_system {
                         key: LIVES_CONFIG_KEY,
                         max_lives: 2,
                         max_lives_battle_pass: 4,
-                        lives_cooldown: TWELVE_HOURS,
-                        lives_cooldown_season_pass: SIX_HOURS,
+                        lives_cooldown: 10, // TODO:
+                        lives_cooldown_season_pass: 20, // TODO:
                     },
                 );
         }
