@@ -2,7 +2,7 @@ use starknet::ContractAddress;
 use crate::models::{FreePackConfig, Item, Pack, SeasonContent};
 
 #[starknet::interface]
-pub trait IPackMinter<T> {
+pub trait IPackSystem<T> {
     fn mint(ref self: T, recipient: ContractAddress, pack_id: u32);
     fn add_pack(ref self: T, pack: Pack);
     fn init_season_content(ref self: T);
@@ -16,12 +16,21 @@ pub trait IPackMinter<T> {
 
 #[starknet::interface]
 pub trait INFTCardSystem<T> {
-    fn mint(
+    fn mint_special_card(
         ref self: T,
         recipient: starknet::ContractAddress,
         special_id: u32,
         marketable: bool,
         rarity: u32,
+        skin_id: u32,
+        skin_rarity: u32,
+        quality: u32,
+    );
+    fn mint_card(
+        ref self: T,
+        recipient: starknet::ContractAddress,
+        card_id: u32,
+        marketable: bool,
         skin_id: u32,
         skin_rarity: u32,
         quality: u32,
@@ -49,7 +58,7 @@ pub mod pack_system {
     };
     use crate::store::StoreTrait;
     use crate::utils::pack::PackTrait;
-    use super::{INFTCardSystemDispatcher, INFTCardSystemDispatcherTrait, IPackMinter};
+    use super::{INFTCardSystemDispatcher, IPackSystem};
 
     component!(path: SRC5Component, storage: src5, event: SRC5Event);
     component!(path: AccessControlComponent, storage: accesscontrol, event: AccessControlEvent);
@@ -95,7 +104,7 @@ pub mod pack_system {
     }
 
     #[abi(embed_v0)]
-    impl PackMinterImpl of IPackMinter<ContractState> {
+    impl PackSystemImpl of IPackSystem<ContractState> {
         fn mint(ref self: ContractState, recipient: ContractAddress, pack_id: u32) {
             self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
@@ -116,10 +125,36 @@ pub mod pack_system {
                     .has_season_pass;
 
                 match item.item_type {
-                    ItemType::Special | ItemType::Traditional | ItemType::Skin |
+                    ItemType::Traditional |
                     ItemType::Neon => {
                         cards_nfts
-                            .mint(
+                            .mint_card(
+                                recipient,
+                                card_id: item.content_id,
+                                marketable: has_season_pass,
+                                skin_id: item.skin_id,
+                                skin_rarity: item.skin_rarity,
+                                quality: quality,
+                            );
+
+                        store
+                            .world
+                            .emit_event(
+                                @CardMintedEvent {
+                                    recipient,
+                                    item: item,
+                                    marketable: has_season_pass,
+                                    rarity: item.rarity,
+                                    skin_id: item.skin_id,
+                                    skin_rarity: item.skin_rarity,
+                                    quality,
+                                },
+                            );
+                    },
+                    ItemType::Special |
+                    ItemType::Skin => {
+                        cards_nfts
+                            .mint_special_card(
                                 recipient,
                                 special_id: item.content_id,
                                 marketable: has_season_pass,

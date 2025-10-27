@@ -180,3 +180,16 @@ pub struct LivesConfig {
     pub lives_cooldown: u64,
     pub lives_cooldown_season_pass: u64,
 }
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct SeasonRewardClaim {
+    #[key]
+    pub player: ContractAddress,
+    #[key]
+    pub season_id: u32,
+    #[key]
+    pub level: u32,
+    pub free_claimed: bool,
+    pub premium_claimed: bool,
+}

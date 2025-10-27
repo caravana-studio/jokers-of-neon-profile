@@ -41,17 +41,30 @@ pub trait ISeasonSystem<T> {
     fn get_season_level_config_by_address(
         self: @T, address: ContractAddress, season_id: u32,
     ) -> SeasonLevelConfig;
+
+    // Claim rewards
+    fn claim_season_rewards(ref self: T, address: ContractAddress, season_id: u32, level: u32);
 }
 
 #[dojo::contract]
 pub mod season_system {
     use core::num::traits::Zero;
+    use dojo::event::EventStorage;
+    use jokers_of_neon_lib::random::RandomTrait;
     use starknet::ContractAddress;
+    use crate::constants::constants::MOD_ID;
     use crate::models::{
-        LevelXPConfig, MissionXPConfig, SeasonConfig, SeasonLevelConfig, SeasonProgress,
+        CardMintedEvent, ItemType, LevelXPConfig, MissionXPConfig, SeasonConfig, SeasonLevelConfig,
+        SeasonProgress,
     };
     use crate::store::StoreTrait;
+    use crate::systems::pack_system::{
+        INFTCardSystemDispatcher, INFTCardSystemDispatcherTrait, IPackSystemDispatcher,
+        IPackSystemDispatcherTrait,
+    };
+    use crate::utils::pack::PackTrait;
     use super::ISeasonSystem;
+
 
     #[event]
     #[derive(Drop, starknet::Event)]
@@ -64,6 +77,7 @@ pub mod season_system {
         PackOpened: PackOpened,
         SeasonLevelReached: SeasonLevelReached,
         UserProgressInitialized: UserProgressInitialized,
+        RewardsClaimed: RewardsClaimed,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -123,6 +137,16 @@ pub mod season_system {
         #[key]
         player: ContractAddress,
         season_id: u32,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct RewardsClaimed {
+        #[key]
+        player: ContractAddress,
+        season_id: u32,
+        level: u32,
+        is_premium: bool,
+        pack_count: u32,
     }
 
     const ADMIN_ROLE: felt252 = selector!("ADMIN_ROLE");
@@ -296,6 +320,84 @@ pub mod season_system {
             store.get_season_level_config(season_id, season_progress.level)
         }
 
+        fn claim_season_rewards(
+            ref self: ContractState, address: ContractAddress, season_id: u32, level: u32,
+        ) {
+            let world = self.world_default();
+            let mut store = StoreTrait::new(world);
+
+            // Verify season exists and is active
+            let season_config = store.get_season_config(season_id);
+            assert(season_config.is_active, 'Season not active');
+
+            // Get player's season progress
+            let season_progress = store.get_season_progress(address, season_id);
+            assert(season_progress.level >= level, 'Level not reached');
+
+            // Get level configuration
+            let level_config = store.get_season_level_config(season_id, level);
+
+            // Get or create claim record
+            let mut claim_record = store.get_season_reward_claim(address, season_id, level);
+
+            // Check if has season pass
+            let has_season_pass = season_progress.has_season_pass;
+
+            // Get rewards before they're consumed
+            let free_rewards = level_config.free_rewards;
+            let free_rewards_count = free_rewards.len();
+            let premium_rewards = level_config.premium_rewards;
+            let premium_rewards_count = premium_rewards.len();
+
+            // Claim free rewards if not already claimed
+            if !claim_record.free_claimed && free_rewards_count > 0 {
+                // Mint each pack in free_rewards
+                for pack_id in free_rewards {
+                    self.mint_pack(address, *pack_id);
+                }
+
+                claim_record.free_claimed = true;
+
+                self
+                    .emit(
+                        RewardsClaimed {
+                            player: address,
+                            season_id,
+                            level,
+                            is_premium: false,
+                            pack_count: free_rewards_count,
+                        },
+                    );
+            }
+
+            // Claim premium rewards if has season pass and not already claimed
+            if has_season_pass && !claim_record.premium_claimed && premium_rewards_count > 0 {
+                // Mint each pack in premium_rewards
+                for pack_id in premium_rewards {
+                    self.mint_pack(address, *pack_id);
+                }
+
+                claim_record.premium_claimed = true;
+
+                self
+                    .emit(
+                        RewardsClaimed {
+                            player: address,
+                            season_id,
+                            level,
+                            is_premium: true,
+                            pack_count: premium_rewards_count,
+                        },
+                    );
+            }
+
+            // Update claim record
+            claim_record.player = address;
+            claim_record.season_id = season_id;
+            claim_record.level = level;
+            store.set_season_reward_claim(claim_record);
+        }
+
         fn setup_default_season_config(ref self: ContractState, season_id: u32) {
             // self.accesscontrol.assert_only_role(ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
@@ -309,7 +411,7 @@ pub mod season_system {
                         level: 1,
                         required_xp: 25,
                         free_rewards: [1].span(), // TODO: 
-                        premium_rewards: [2].span(), // TODO:
+                        premium_rewards: [2].span() // TODO:
                     },
                 );
             store
@@ -652,6 +754,20 @@ pub mod season_system {
     impl InternalImpl of InternalTrait {
         fn world_default(self: @ContractState) -> dojo::world::WorldStorage {
             self.world(@"jokers_of_neon_profile")
+        }
+
+        fn mint_pack(world: WorldStorage, recipient: ContractAddress, pack_id: u32) {
+            match world.dns(@"pack_system") {
+                Option::Some((
+                    contract_address, _,
+                )) => { IPackSystemDispatcher { contract_address } },
+                Option::None => {
+                    panic!(
+                        "[SystemsTrait] - dns Season System doesnt exists on world `{}`",
+                        world.namespace_hash,
+                    )
+                },
+            }.mint(recipient, pack_id)
         }
     }
 }
