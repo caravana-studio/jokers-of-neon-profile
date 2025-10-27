@@ -70,8 +70,8 @@ pub mod xp_system {
 
             // TODO: Validate that the season is active
             let season_id = 1;
-            let season = store.get_season(season_id);
-            // assert(season.is_active, 'Season is not active');
+            let season_config = store.get_season_config(season_id);
+            // assert(season_config.is_active, 'Season is not active');
 
             let current_day = get_current_day();
             let mut daily_progress = store.get_daily_progress(address, current_day);
@@ -98,7 +98,7 @@ pub mod xp_system {
 
                 self._add_profile_xp(ref store, address, xp_earned.into());
 
-                if season.is_active {
+                if season_config.is_active {
                     self._add_season_xp(ref store, address, season_id, xp_earned.into());
                 }
 
@@ -119,8 +119,8 @@ pub mod xp_system {
 
             // TODO: Validate that the season is active
             let season_id = 1;
-            let season = store.get_season(season_id);
-            // assert(season.is_active, 'Season is not active');
+            let season_config = store.get_season_config(season_id);
+            // assert(season_config.is_active, 'Season is not active');
 
             let current_day = get_current_day();
             let mut daily_progress = store.get_daily_progress(address, current_day);
@@ -167,7 +167,7 @@ pub mod xp_system {
 
                 self._add_profile_xp(ref store, address, xp_earned.into());
 
-                if season.is_active {
+                if season_config.is_active {
                     self._add_season_xp(ref store, address, season_id, xp_earned.into());
                 }
 

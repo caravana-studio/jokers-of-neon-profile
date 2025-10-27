@@ -1,15 +1,15 @@
 use starknet::ContractAddress;
-use crate::models::{LevelXPConfig, MissionXPConfig, Season, SeasonLevelConfig, SeasonProgress};
+use crate::models::{
+    LevelXPConfig, MissionXPConfig, SeasonConfig, SeasonLevelConfig, SeasonProgress,
+};
 
 #[starknet::interface]
 pub trait ISeasonSystem<T> {
     // Season management
-    fn create_season(
-        ref self: T, id: u32, name: ByteArray, start_date: u64, end_date: u64,
-    ) -> Season;
+    fn create_season(ref self: T, season_id: u32);
     fn activate_season(ref self: T, season_id: u32);
     fn deactivate_season(ref self: T, season_id: u32);
-    fn get_season(self: @T, season_id: u32) -> Season;
+    fn get_season_config(self: @T, season_id: u32) -> SeasonConfig;
 
     // Configuration methods
     fn configure_season_level(
@@ -60,7 +60,9 @@ pub trait ISeasonSystem<T> {
 pub mod season_system {
     use core::num::traits::Zero;
     use starknet::ContractAddress;
-    use crate::models::{LevelXPConfig, MissionXPConfig, Season, SeasonLevelConfig, SeasonProgress};
+    use crate::models::{
+        LevelXPConfig, MissionXPConfig, SeasonConfig, SeasonLevelConfig, SeasonProgress,
+    };
     use crate::store::{Store, StoreTrait};
     use super::ISeasonSystem;
 
@@ -81,9 +83,6 @@ pub mod season_system {
     struct SeasonCreated {
         #[key]
         season_id: u32,
-        name: ByteArray,
-        start_date: u64,
-        end_date: u64,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -145,21 +144,17 @@ pub mod season_system {
 
     #[abi(embed_v0)]
     impl SeasonSystemImpl of ISeasonSystem<ContractState> {
-        fn create_season(
-            ref self: ContractState, id: u32, name: ByteArray, start_date: u64, end_date: u64,
-        ) -> Season {
+        fn create_season(ref self: ContractState, season_id: u32) {
             // self.accesscontrol.assert_only_role(ADMIN_ROLE);
 
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
 
-            let season = Season { id, name: name.clone(), is_active: false, start_date, end_date };
+            let season_config = SeasonConfig { season_id, is_active: false };
 
-            store.set_season(season);
+            store.set_season_config(season_config);
 
-            self.emit(SeasonCreated { season_id: id, name: name.clone(), start_date, end_date });
-
-            Season { id, name, is_active: false, start_date, end_date }
+            self.emit(SeasonCreated { season_id });
         }
 
         fn activate_season(ref self: ContractState, season_id: u32) {
@@ -168,11 +163,11 @@ pub mod season_system {
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
 
-            let mut season = store.get_season(season_id);
-            assert(!season.is_active, 'Season already active');
+            let season_config = StoreTrait::get_season_config(ref store, season_id);
+            assert(!season_config.is_active, 'Season already active');
 
-            season.is_active = true;
-            store.set_season(season);
+            let updated_config = SeasonConfig { season_id, is_active: true };
+            StoreTrait::set_season_config(ref store, updated_config);
 
             self.emit(SeasonActivated { season_id });
         }
@@ -183,27 +178,27 @@ pub mod season_system {
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
 
-            let mut season = store.get_season(season_id);
-            assert(season.is_active, 'Season not active');
+            let season_config = StoreTrait::get_season_config(ref store, season_id);
+            assert(season_config.is_active, 'Season not active');
 
-            season.is_active = false;
-            store.set_season(season);
+            let updated_config = SeasonConfig { season_id, is_active: false };
+            StoreTrait::set_season_config(ref store, updated_config);
 
             self.emit(SeasonDeactivated { season_id });
         }
 
-        fn get_season(self: @ContractState, season_id: u32) -> Season {
+        fn get_season_config(self: @ContractState, season_id: u32) -> SeasonConfig {
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
-            store.get_season(season_id)
+            StoreTrait::get_season_config(ref store, season_id)
         }
 
         fn purchase_season_pass(ref self: ContractState, address: ContractAddress, season_id: u32) {
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
 
-            let season = StoreTrait::get_season(ref store, season_id);
-            assert(season.is_active, 'Season not active');
+            let season_config = StoreTrait::get_season_config(ref store, season_id);
+            assert(season_config.is_active, 'Season not active');
 
             let mut progress = StoreTrait::get_season_progress(ref store, address, season_id);
             assert(!progress.has_season_pass, 'Already has season pass');
@@ -251,8 +246,8 @@ pub mod season_system {
             let mut store = StoreTrait::new(world);
 
             // Verify season exists
-            let season = StoreTrait::get_season(ref store, season_id);
-            assert(season.id == season_id, 'Season does not exist');
+            let season_config = StoreTrait::get_season_config(ref store, season_id);
+            assert(season_config.season_id == season_id, 'Season does not exist');
 
             let config = SeasonLevelConfig {
                 season_id, level, required_xp, free_rewards, premium_rewards,
@@ -268,8 +263,8 @@ pub mod season_system {
             let mut store = StoreTrait::new(world);
 
             // Verify season exists and is active
-            let season = StoreTrait::get_season(ref store, season_id);
-            assert(season.is_active, 'Season not active');
+            let season_config = StoreTrait::get_season_config(ref store, season_id);
+            assert(season_config.is_active, 'Season not active');
 
             // Check if progress already exists
             let progress = StoreTrait::get_season_progress(ref store, address, season_id);
@@ -689,8 +684,8 @@ pub mod season_system {
             let mut store = StoreTrait::new(world);
 
             // Get season and verify it's active
-            let season = StoreTrait::get_season(ref store, season_id);
-            assert(season.is_active, 'Season not active');
+            let season_config = StoreTrait::get_season_config(ref store, season_id);
+            assert(season_config.is_active, 'Season not active');
 
             // Get player progress
             let progress = StoreTrait::get_season_progress(ref store, address, season_id);
