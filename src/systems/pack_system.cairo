@@ -29,7 +29,7 @@ pub trait INFTCardSystem<T> {
 }
 
 #[dojo::contract]
-pub mod pack_minter {
+pub mod pack_system {
     use dojo::event::EventStorage;
     use jokers_of_neon_lib::random::RandomTrait;
     use openzeppelin_access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
