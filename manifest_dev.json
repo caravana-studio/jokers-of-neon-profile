@@ -1,7 +1,7 @@
 {
   "world": {
-    "class_hash": "0x57994b6a75fad550ca18b41ee82e2110e158c59028c4478109a67965a0e5b1e",
-    "address": "0x69fa3647c3a29dfc2b9a0769837b518eac8d69bad58b676029f861ce9e0ed1d",
+    "class_hash": "0x691da17eb9ef169b385eaaf3a303972d187479e30be146d3337423eaec6272d",
+    "address": "0x5fb6704a2b9c69a4325127edbd659400bb9cf48c7041b59827c10e4ee50cc23",
     "seed": "jokers_of_neon_profile",
     "name": "jokers_of_neon_profile",
     "entrypoints": [
@@ -266,6 +266,17 @@
             "outputs": [
               {
                 "type": "dojo::world::resource::Resource"
+              }
+            ],
+            "state_mutability": "view"
+          },
+          {
+            "type": "function",
+            "name": "world_version",
+            "inputs": [],
+            "outputs": [
+              {
+                "type": "core::felt252"
               }
             ],
             "state_mutability": "view"
@@ -1479,8 +1490,8 @@
   },
   "contracts": [
     {
-      "address": "0x26767c05794bdb8dfd6bc9a5e56ecf6d2d1565616a1b46a3b601c6c45fc6d24",
-      "class_hash": "0x2abeceb8d9aa9775f47b15009656673d5a1730396838865bbbcf01970e1bdb7",
+      "address": "0x64110c475408ad2d5d142d072afc25059b2fd3da7d2d361fe92c049e8d8c369",
+      "class_hash": "0x1d05da19f4ece2684e90b98a50b2d392a3a48360fcedbfd65fc7651ad7559f8",
       "abi": [
         {
           "type": "impl",
@@ -2152,8 +2163,8 @@
       ]
     },
     {
-      "address": "0x19173d5d64940b83ed8f9f93e4db752e6caa8288c0b389e5697d5ad3a16a89",
-      "class_hash": "0x7439321f476b72ac1c15a5bc93c6a33a73fa78b761cf4901d648f430d2ffeae",
+      "address": "0x1f918596c1bfce0a07d62118777f865413a844db80ee55bcc79648ae6b7fbe9",
+      "class_hash": "0x5f8be90906901e77fe3f947abf1b5eeab9fbddf8c121fd810e9606c4d31afe7",
       "abi": [
         {
           "type": "impl",
@@ -2440,6 +2451,22 @@
               ],
               "outputs": [],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "get_next_free_pack_timestamp",
+              "inputs": [
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u64"
+                }
+              ],
+              "state_mutability": "view"
             },
             {
               "type": "function",
@@ -2907,7 +2934,7 @@
       ]
     },
     {
-      "address": "0x5a6843eab0f67a8f626de10059bb0a75d88dd9eccbe83e22200cddf9d70520c",
+      "address": "0x659912c3cdfb3353eb2f567e84870ba030589c9be827b201a859dc1431be4b9",
       "class_hash": "0x48e362c2de6a3f08c3d59dbf229b3ab5977b37906bb015a4151d3e2c494260c",
       "abi": [
         {
@@ -3722,8 +3749,8 @@
       ]
     },
     {
-      "address": "0x6db25a68bb6bb5c179f666d791427a9e4c3bc3b655027c77ab2a9ccb775a480",
-      "class_hash": "0x2009aac42a7c20fb3f798be6634b6a62a091d7efd7f3ae2a495561b8d2ba6b8",
+      "address": "0x3ff3fe0ba5379642ea0d3017839fd9ac3025141fbd000199ecbcd5935d38905",
+      "class_hash": "0xfa20296ba0bf71235a3bb471f6c92ad6e6f1f8c726785dcb5e70ef06207d0f",
       "abi": [
         {
           "type": "impl",
@@ -4288,6 +4315,201 @@
           ]
         },
         {
+          "type": "impl",
+          "name": "AccessControlMixinImpl",
+          "interface_name": "openzeppelin_access::accesscontrol::interface::AccessControlABI"
+        },
+        {
+          "type": "interface",
+          "name": "openzeppelin_access::accesscontrol::interface::AccessControlABI",
+          "items": [
+            {
+              "type": "function",
+              "name": "has_role",
+              "inputs": [
+                {
+                  "name": "role",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "account",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_role_admin",
+              "inputs": [
+                {
+                  "name": "role",
+                  "type": "core::felt252"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::felt252"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "grant_role",
+              "inputs": [
+                {
+                  "name": "role",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "account",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "revoke_role",
+              "inputs": [
+                {
+                  "name": "role",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "account",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "renounce_role",
+              "inputs": [
+                {
+                  "name": "role",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "account",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "hasRole",
+              "inputs": [
+                {
+                  "name": "role",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "account",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "getRoleAdmin",
+              "inputs": [
+                {
+                  "name": "role",
+                  "type": "core::felt252"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::felt252"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "grantRole",
+              "inputs": [
+                {
+                  "name": "role",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "account",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "revokeRole",
+              "inputs": [
+                {
+                  "name": "role",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "account",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "renounceRole",
+              "inputs": [
+                {
+                  "name": "role",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "account",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "supports_interface",
+              "inputs": [
+                {
+                  "name": "interface_id",
+                  "type": "core::felt252"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
           "type": "constructor",
           "name": "constructor",
           "inputs": []
@@ -4321,6 +4543,100 @@
           "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
           "kind": "enum",
           "variants": []
+        },
+        {
+          "type": "event",
+          "name": "openzeppelin_introspection::src5::SRC5Component::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleGranted",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "role",
+              "type": "core::felt252",
+              "kind": "data"
+            },
+            {
+              "name": "account",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "data"
+            },
+            {
+              "name": "sender",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleRevoked",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "role",
+              "type": "core::felt252",
+              "kind": "data"
+            },
+            {
+              "name": "account",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "data"
+            },
+            {
+              "name": "sender",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleAdminChanged",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "role",
+              "type": "core::felt252",
+              "kind": "data"
+            },
+            {
+              "name": "previous_admin_role",
+              "type": "core::felt252",
+              "kind": "data"
+            },
+            {
+              "name": "new_admin_role",
+              "type": "core::felt252",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "RoleGranted",
+              "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleGranted",
+              "kind": "nested"
+            },
+            {
+              "name": "RoleRevoked",
+              "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleRevoked",
+              "kind": "nested"
+            },
+            {
+              "name": "RoleAdminChanged",
+              "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleAdminChanged",
+              "kind": "nested"
+            }
+          ]
         },
         {
           "type": "event",
@@ -4521,6 +4837,16 @@
               "kind": "nested"
             },
             {
+              "name": "SRC5Event",
+              "type": "openzeppelin_introspection::src5::SRC5Component::Event",
+              "kind": "flat"
+            },
+            {
+              "name": "AccessControlEvent",
+              "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::Event",
+              "kind": "flat"
+            },
+            {
               "name": "SeasonCreated",
               "type": "jokers_of_neon_profile::systems::season_system::season_system::SeasonCreated",
               "kind": "nested"
@@ -4586,11 +4912,17 @@
         "set_level_xp_config",
         "setup_default_season_config",
         "claim_season_rewards",
-        "upgrade"
+        "upgrade",
+        "grant_role",
+        "revoke_role",
+        "renounce_role",
+        "grantRole",
+        "revokeRole",
+        "renounceRole"
       ]
     },
     {
-      "address": "0x36d76588aca5e74a36d61834d4daf402787dd6d166f1a519235cbcfa2144c75",
+      "address": "0x18e528cb514d645ab2ad543a3d3a51d362bee1cf6b65a3fadffeff45edffd56",
       "class_hash": "0x4348f5c182c0f4f00c80ecfac7a0fc2e684924b8d2f92e8b54549fcc3d8f02f",
       "abi": [
         {
@@ -5039,7 +5371,7 @@
   "events": [
     {
       "members": [],
-      "class_hash": "0x5fc6d300550e88212f43ca4e3b532707e0740fa55cb44b3ccebbc0b71b7680b",
+      "class_hash": "0x613dd96d19fc4cd69ccbfae3798da6bcce6667f41cbcb77c544a95e605e64d2",
       "tag": "jokers_of_neon_profile-CardMintedEvent",
       "selector": "0x23d19ceef5f9cf1c142d9617c7d468ba55b17f84c7ebcfc45638d2e2668575b"
     }
