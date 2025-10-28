@@ -45,7 +45,9 @@ pub mod pack_system {
     use openzeppelin_access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
     use openzeppelin_introspection::src5::SRC5Component;
     use starknet::ContractAddress;
-    use crate::constants::constants::{DEFAULT_NS_BYTE, MOD_ID, NFT_MANAGER_KEY};
+    use crate::constants::constants::{
+        DEFAULT_NS_BYTE, FREE_PACK_CONFIG_KEY, MOD_ID, NFT_MANAGER_KEY,
+    };
     use crate::constants::items::{
         ALL_ITEMS, JOKER_CARD_ITEM, NEON_CARDS_ITEMS_ALL, NEON_JOKER_CARD_ITEM, SPECIAL_A_ITEMS,
         SPECIAL_B_ITEMS, SPECIAL_C_ITEMS, SPECIAL_SKINS_RARITY_A_ITEMS,
@@ -231,6 +233,7 @@ pub mod pack_system {
 
             self.init_season_1_packs();
             self.init_season_1_items(ref season_content);
+            self.init_season_1_free_pack();
 
             season_content.initialized = true;
             store.set_season_content(season_content);
@@ -258,6 +261,13 @@ pub mod pack_system {
     impl InternalImpl of InternalTrait {
         fn world_default(self: @ContractState) -> dojo::world::WorldStorage {
             self.world(@DEFAULT_NS_BYTE())
+        }
+
+        fn init_season_1_free_pack(ref self: ContractState) {
+            self
+                .set_free_pack_config(
+                    FreePackConfig { key: FREE_PACK_CONFIG_KEY, cooldown: 30, pack_id: 1 },
+                );
         }
 
         fn init_season_1_packs(ref self: ContractState) {
