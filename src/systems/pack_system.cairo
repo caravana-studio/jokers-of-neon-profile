@@ -8,6 +8,7 @@ pub trait IPackSystem<T> {
     fn init_season_content(ref self: T);
     fn claim_free_pack(ref self: T, recipient: ContractAddress);
     fn set_free_pack_config(ref self: T, config: FreePackConfig);
+    fn get_next_free_pack_timestamp(self: @T, recipient: ContractAddress) -> u64;
 
     fn get_available_packs(self: @T) -> Array<Pack>;
     fn get_available_items(self: @T) -> Array<Item>;
@@ -214,6 +215,11 @@ pub mod pack_system {
             store.set_free_pack_config(config);
         }
 
+        fn get_next_free_pack_timestamp(self: @ContractState, recipient: ContractAddress) -> u64 {
+            let mut store = StoreTrait::new(self.world_default());
+            store.get_player_free_pack(recipient).next_pack_timestamp
+        }
+
         fn init_season_content(ref self: ContractState) {
             self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
@@ -241,6 +247,7 @@ pub mod pack_system {
             let mut store = StoreTrait::new(self.world_default());
             store.get_season_content(SEASON_ID)
         }
+
 
         fn get_available_items(self: @ContractState) -> Array<Item> {
             ALL_ITEMS()
