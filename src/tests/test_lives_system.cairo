@@ -148,6 +148,43 @@ mod tests_lives_system {
     }
 
     #[test]
+    fn test_remove_and_then_upgrade() {
+        let (mut world, mut store) = setup();
+        default_lives_config(ref store);
+        let lives_system = lives_system_dispatcher(world);
+
+        lives_system.init_account(PLAYER(), SEASON);
+
+        lives_system.remove(PLAYER(), SEASON);
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert!(
+            player_lives.available_lives == 1,
+            "available lives should be 1 ({})",
+            player_lives.available_lives,
+        );
+        assert!(
+            player_lives.next_live_timestamp == 10,
+            "next life timestamp should be 10 ({})",
+            player_lives.next_live_timestamp,
+        );
+
+        set_season_pass(ref store, PLAYER());
+        lives_system.upgrade_account(PLAYER(), SEASON);
+
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert!(
+            player_lives.available_lives == 3,
+            "available lives should be 3 ({})",
+            player_lives.available_lives,
+        );
+        assert!(
+            player_lives.next_live_timestamp == 5,
+            "next life timestamp should be 5 ({})",
+            player_lives.next_live_timestamp,
+        );
+    }
+
+    #[test]
     fn test_remove_with_full_lives_with_season_pass() {
         let (mut world, mut store) = setup();
         default_lives_config(ref store);
