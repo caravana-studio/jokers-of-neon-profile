@@ -2,12 +2,13 @@ use starknet::ContractAddress;
 use crate::models::{FreePackConfig, Item, Pack, SeasonContent};
 
 #[starknet::interface]
-pub trait IPackMinter<T> {
+pub trait IPackSystem<T> {
     fn mint(ref self: T, recipient: ContractAddress, pack_id: u32);
     fn add_pack(ref self: T, pack: Pack);
     fn init_season_content(ref self: T);
     fn claim_free_pack(ref self: T, recipient: ContractAddress);
     fn set_free_pack_config(ref self: T, config: FreePackConfig);
+    fn get_next_free_pack_timestamp(self: @T, recipient: ContractAddress) -> u64;
 
     fn get_available_packs(self: @T) -> Array<Pack>;
     fn get_available_items(self: @T) -> Array<Item>;
@@ -16,12 +17,21 @@ pub trait IPackMinter<T> {
 
 #[starknet::interface]
 pub trait INFTCardSystem<T> {
-    fn mint(
+    fn mint_special_card(
         ref self: T,
         recipient: starknet::ContractAddress,
         special_id: u32,
         marketable: bool,
         rarity: u32,
+        skin_id: u32,
+        skin_rarity: u32,
+        quality: u32,
+    );
+    fn mint_card(
+        ref self: T,
+        recipient: starknet::ContractAddress,
+        card_id: u32,
+        marketable: bool,
         skin_id: u32,
         skin_rarity: u32,
         quality: u32,
@@ -35,7 +45,9 @@ pub mod pack_system {
     use openzeppelin_access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
     use openzeppelin_introspection::src5::SRC5Component;
     use starknet::ContractAddress;
-    use crate::constants::constants::{DEFAULT_NS_BYTE, MOD_ID, NFT_MANAGER_KEY};
+    use crate::constants::constants::{
+        DEFAULT_NS_BYTE, FREE_PACK_CONFIG_KEY, FREE_PACK_COOLDOWN, MOD_ID, NFT_MANAGER_KEY,
+    };
     use crate::constants::items::{
         ALL_ITEMS, JOKER_CARD_ITEM, NEON_CARDS_ITEMS_ALL, NEON_JOKER_CARD_ITEM, SPECIAL_A_ITEMS,
         SPECIAL_B_ITEMS, SPECIAL_C_ITEMS, SPECIAL_SKINS_RARITY_A_ITEMS,
@@ -49,7 +61,7 @@ pub mod pack_system {
     };
     use crate::store::StoreTrait;
     use crate::utils::pack::PackTrait;
-    use super::{INFTCardSystemDispatcher, INFTCardSystemDispatcherTrait, IPackMinter};
+    use super::{INFTCardSystemDispatcher, INFTCardSystemDispatcherTrait, IPackSystem};
 
     component!(path: SRC5Component, storage: src5, event: SRC5Event);
     component!(path: AccessControlComponent, storage: accesscontrol, event: AccessControlEvent);
@@ -95,7 +107,7 @@ pub mod pack_system {
     }
 
     #[abi(embed_v0)]
-    impl PackMinterImpl of IPackMinter<ContractState> {
+    impl PackSystemImpl of IPackSystem<ContractState> {
         fn mint(ref self: ContractState, recipient: ContractAddress, pack_id: u32) {
             self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
@@ -116,10 +128,33 @@ pub mod pack_system {
                     .has_season_pass;
 
                 match item.item_type {
-                    ItemType::Special | ItemType::Traditional | ItemType::Skin |
+                    ItemType::Traditional |
                     ItemType::Neon => {
                         cards_nfts
-                            .mint(
+                            .mint_card(
+                                recipient,
+                                card_id: item.content_id,
+                                marketable: has_season_pass,
+                                skin_id: item.skin_id,
+                                skin_rarity: item.skin_rarity,
+                                quality: quality,
+                            );
+
+                        store
+                            .world
+                            .emit_event(
+                                @CardMintedEvent {
+                                    recipient,
+                                    card_id: item.content_id,
+                                    marketable: has_season_pass,
+                                    skin_id: item.skin_id,
+                                },
+                            );
+                    },
+                    ItemType::Special |
+                    ItemType::Skin => {
+                        cards_nfts
+                            .mint_special_card(
                                 recipient,
                                 special_id: item.content_id,
                                 marketable: has_season_pass,
@@ -134,12 +169,9 @@ pub mod pack_system {
                             .emit_event(
                                 @CardMintedEvent {
                                     recipient,
-                                    item: item,
+                                    card_id: item.content_id,
                                     marketable: has_season_pass,
-                                    rarity: item.rarity,
                                     skin_id: item.skin_id,
-                                    skin_rarity: item.skin_rarity,
-                                    quality,
                                 },
                             );
                     },
@@ -179,17 +211,23 @@ pub mod pack_system {
             store.set_free_pack_config(config);
         }
 
+        fn get_next_free_pack_timestamp(self: @ContractState, recipient: ContractAddress) -> u64 {
+            let mut store = StoreTrait::new(self.world_default());
+            store.get_player_free_pack(recipient).next_pack_timestamp
+        }
+
         fn init_season_content(ref self: ContractState) {
             self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
 
             let mut season_content = store.get_season_content(SEASON_ID);
             assert!(
-                season_content.initialized, "[PackMinter] - Season content already initialized",
+                !season_content.initialized, "[PackMinter] - Season content already initialized",
             );
 
             self.init_season_1_packs();
-            self.init_season_1_items();
+            self.init_season_1_items(ref season_content);
+            self.init_season_1_free_pack();
 
             season_content.initialized = true;
             store.set_season_content(season_content);
@@ -207,6 +245,7 @@ pub mod pack_system {
             store.get_season_content(SEASON_ID)
         }
 
+
         fn get_available_items(self: @ContractState) -> Array<Item> {
             ALL_ITEMS()
         }
@@ -218,6 +257,15 @@ pub mod pack_system {
             self.world(@DEFAULT_NS_BYTE())
         }
 
+        fn init_season_1_free_pack(ref self: ContractState) {
+            self
+                .set_free_pack_config(
+                    FreePackConfig {
+                        key: FREE_PACK_CONFIG_KEY, cooldown: FREE_PACK_COOLDOWN, pack_id: 1,
+                    },
+                );
+        }
+
         fn init_season_1_packs(ref self: ContractState) {
             self.add_pack(BASIC_PACK());
             self.add_pack(ADVANCED_PACK());
@@ -227,7 +275,7 @@ pub mod pack_system {
             self.add_pack(COLLECTORS_XL_PACK());
         }
 
-        fn init_season_1_items(ref self: ContractState) {
+        fn init_season_1_items(ref self: ContractState, ref season_content: SeasonContent) {
             let mut store = StoreTrait::new(self.world_default());
 
             let mut traditional = array![];
@@ -286,19 +334,14 @@ pub mod pack_system {
                 skins_category_2.append(*item.id);
             }
 
-            store
-                .set_season_content(
-                    SeasonContent {
-                        season_id: SEASON_ID,
-                        initialized: true,
-                        items: [
-                            traditional.span(), joker.span(), neon.span(), neon_joker.span(),
-                            c_items.span(), b_items.span(), a_items.span(), s_items.span(),
-                            skins_category_1.span(), skins_category_2.span(),
-                        ]
-                            .span(),
-                    },
-                );
+            season_content
+                .items =
+                    [
+                        traditional.span(), joker.span(), neon.span(), neon_joker.span(),
+                        c_items.span(), b_items.span(), a_items.span(), s_items.span(),
+                        skins_category_1.span(), skins_category_2.span(),
+                    ]
+                .span();
         }
     }
 }

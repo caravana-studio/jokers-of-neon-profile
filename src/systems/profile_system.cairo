@@ -1,6 +1,5 @@
 use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, ProfileLevelConfig};
 use starknet::ContractAddress;
-use crate::models::SeasonProgress;
 
 
 #[starknet::interface]
@@ -10,10 +9,6 @@ pub trait IJokersProfile<T> {
     fn update_avatar(ref self: T, player_address: ContractAddress, avatar_id: u16);
     fn get_profile(self: @T, player_address: ContractAddress) -> Profile;
     fn get_player_stats(self: @T, player_address: ContractAddress) -> PlayerStats;
-    fn get_season(self: @T, season_id: u32);
-    fn get_season_progress(
-        self: @T, player_address: ContractAddress, season_id: u32,
-    ) -> SeasonProgress;
     fn get_profile_level_config_by_level(self: @T, level: u32) -> ProfileLevelConfig;
     fn get_profile_level_config_by_address(
         self: @T, address: ContractAddress,
@@ -26,7 +21,7 @@ pub mod profile_system {
     use openzeppelin_access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
     use openzeppelin_introspection::src5::SRC5Component;
     use starknet::ContractAddress;
-    use crate::models::SeasonProgress;
+    use crate::constants::constants::DEFAULT_NS_BYTE;
     use crate::store::StoreTrait;
     use super::IJokersProfile;
 
@@ -113,17 +108,6 @@ pub mod profile_system {
             store.get_player_stats(player_address)
         }
 
-        fn get_season(self: @ContractState, season_id: u32) {
-            assert!(1 == 0, "Profile: `get_season` not implemented")
-        }
-
-        fn get_season_progress(
-            self: @ContractState, player_address: ContractAddress, season_id: u32,
-        ) -> SeasonProgress {
-            let mut store = StoreTrait::new(self.world_default());
-            store.get_season_progress(player_address, season_id)
-        }
-
         fn get_profile_level_config_by_level(
             self: @ContractState, level: u32,
         ) -> ProfileLevelConfig {
@@ -143,7 +127,7 @@ pub mod profile_system {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn world_default(self: @ContractState) -> dojo::world::WorldStorage {
-            self.world(@"jokers_of_neon_profile")
+            self.world(@DEFAULT_NS_BYTE())
         }
 
         fn _add_stats(self: @ContractState, player_stats: PlayerStats) {

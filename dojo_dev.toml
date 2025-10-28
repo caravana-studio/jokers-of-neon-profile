@@ -18,6 +18,7 @@ private_key = "0x3e3979c1ed728490308054fe357a9f49cf67f80f9721f44cc57235129e090f4
     "jokers_of_neon_profile-pack_system",
     "jokers_of_neon_profile-lives_system",
     "jokers_of_neon_profile-xp_system",
+    "jokers_of_neon_profile-season_system",
 ]
 
 [init_call_args]
@@ -33,5 +34,8 @@ private_key = "0x3e3979c1ed728490308054fe357a9f49cf67f80f9721f44cc57235129e090f4
     "0x00f0d676b1ec606a761995f1e61d66afb0abb880eb779e8895f4480ba7f9c515",
 ]
 "jokers_of_neon_profile-lives_system" = [
+    "0x6677fe62ee39c7b07401f754138502bab7fac99d2d3c5d37df7d1c6fab10819",
+]
+"jokers_of_neon_profile-season_system" = [
     "0x6677fe62ee39c7b07401f754138502bab7fac99d2d3c5d37df7d1c6fab10819",
 ]
