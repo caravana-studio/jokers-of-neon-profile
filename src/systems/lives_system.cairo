@@ -258,14 +258,15 @@ pub mod lives_system {
             let config = store.get_lives_config();
             let has_season_pass = store.get_season_progress(player, season_id).has_season_pass;
             let current_timestamp = get_block_timestamp();
-            
+
             assert!(
                 has_season_pass,
                 "[LivesSystem] - You must have a season pass to upgrade your account",
             );
 
             let player_lives = store.get_player_lives(player, season_id);
-            let cooldown = if player_lives.next_live_timestamp > current_timestamp + config.lives_cooldown_season_pass {
+            let cooldown = if player_lives.next_live_timestamp > current_timestamp
+                + config.lives_cooldown_season_pass {
                 config.lives_cooldown_season_pass
             } else {
                 player_lives.next_live_timestamp
