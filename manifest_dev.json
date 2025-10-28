@@ -1479,7 +1479,7 @@
   },
   "contracts": [
     {
-      "address": "0x1c3d4224f4df04c0407b29971939e139fc8fec8ce3e7a9362cffafba0a3b8d2",
+      "address": "0x26767c05794bdb8dfd6bc9a5e56ecf6d2d1565616a1b46a3b601c6c45fc6d24",
       "class_hash": "0x2abeceb8d9aa9775f47b15009656673d5a1730396838865bbbcf01970e1bdb7",
       "abi": [
         {
@@ -1538,14 +1538,6 @@
           "inputs": [
             {
               "name": "owner",
-              "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "minter",
-              "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "nft_address",
               "type": "core::starknet::contract_address::ContractAddress"
             }
           ],
@@ -1771,11 +1763,6 @@
               "state_mutability": "external"
             }
           ]
-        },
-        {
-          "type": "impl",
-          "name": "AccessControlMixinImpl",
-          "interface_name": "openzeppelin_access::accesscontrol::interface::AccessControlABI"
         },
         {
           "type": "impl",
@@ -2165,8 +2152,8 @@
       ]
     },
     {
-      "address": "0x351a021c3148c011b5057cd3163bdecec3b5071823d49ffd390242c2dbc4bae",
-      "class_hash": "0x2b86ee1029cf5b0232860a49942d6ed9eb05e29ea584233f412905365def8e5",
+      "address": "0x19173d5d64940b83ed8f9f93e4db752e6caa8288c0b389e5697d5ad3a16a89",
+      "class_hash": "0x7439321f476b72ac1c15a5bc93c6a33a73fa78b761cf4901d648f430d2ffeae",
       "abi": [
         {
           "type": "impl",
@@ -2240,8 +2227,8 @@
         },
         {
           "type": "impl",
-          "name": "PackMinterImpl",
-          "interface_name": "jokers_of_neon_profile::systems::pack_system::IPackMinter"
+          "name": "PackSystemImpl",
+          "interface_name": "jokers_of_neon_profile::systems::pack_system::IPackSystem"
         },
         {
           "type": "struct",
@@ -2393,7 +2380,7 @@
         },
         {
           "type": "interface",
-          "name": "jokers_of_neon_profile::systems::pack_system::IPackMinter",
+          "name": "jokers_of_neon_profile::systems::pack_system::IPackSystem",
           "items": [
             {
               "type": "function",
@@ -2920,7 +2907,7 @@
       ]
     },
     {
-      "address": "0x6a115c610c96e6ffc450b6139e054018ea91132d34cad1cd02549e47db399c",
+      "address": "0x5a6843eab0f67a8f626de10059bb0a75d88dd9eccbe83e22200cddf9d70520c",
       "class_hash": "0x48e362c2de6a3f08c3d59dbf229b3ab5977b37906bb015a4151d3e2c494260c",
       "abi": [
         {
@@ -3735,8 +3722,8 @@
       ]
     },
     {
-      "address": "0x416ebc0295eb676129ab273a09e89b39029881d5218511c323536e64ecd18f4",
-      "class_hash": "0x541cd51358879c2ec9a0651a5623ae25b9792fdda7a8cc790919da971766e6a",
+      "address": "0x6db25a68bb6bb5c179f666d791427a9e4c3bc3b655027c77ab2a9ccb775a480",
+      "class_hash": "0x2009aac42a7c20fb3f798be6634b6a62a091d7efd7f3ae2a495561b8d2ba6b8",
       "abi": [
         {
           "type": "impl",
@@ -4097,26 +4084,6 @@
             },
             {
               "type": "function",
-              "name": "get_user_progress",
-              "inputs": [
-                {
-                  "name": "address",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "season_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "(core::integer::u256, core::integer::u32, core::bool)"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
               "name": "get_season_progress",
               "inputs": [
                 {
@@ -4245,27 +4212,7 @@
             },
             {
               "type": "function",
-              "name": "get_pending_packs",
-              "inputs": [
-                {
-                  "name": "address",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "season_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::array::Span::<core::integer::u32>"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "grant_level_rewards",
+              "name": "claim_season_rewards",
               "inputs": [
                 {
                   "name": "address",
@@ -4277,26 +4224,6 @@
                 },
                 {
                   "name": "level",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "open_pack",
-              "inputs": [
-                {
-                  "name": "address",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "season_id",
-                  "type": "core::integer::u32"
-                },
-                {
-                  "name": "pack_id",
                   "type": "core::integer::u32"
                 }
               ],
@@ -4548,6 +4475,38 @@
         },
         {
           "type": "event",
+          "name": "jokers_of_neon_profile::systems::season_system::season_system::RewardsClaimed",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "player",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "season_id",
+              "type": "core::integer::u32",
+              "kind": "data"
+            },
+            {
+              "name": "level",
+              "type": "core::integer::u32",
+              "kind": "data"
+            },
+            {
+              "name": "is_premium",
+              "type": "core::bool",
+              "kind": "data"
+            },
+            {
+              "name": "pack_count",
+              "type": "core::integer::u32",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
           "name": "jokers_of_neon_profile::systems::season_system::season_system::Event",
           "kind": "enum",
           "variants": [
@@ -4600,6 +4559,11 @@
               "name": "UserProgressInitialized",
               "type": "jokers_of_neon_profile::systems::season_system::season_system::UserProgressInitialized",
               "kind": "nested"
+            },
+            {
+              "name": "RewardsClaimed",
+              "type": "jokers_of_neon_profile::systems::season_system::season_system::RewardsClaimed",
+              "kind": "nested"
             }
           ]
         }
@@ -4621,13 +4585,12 @@
         "set_mission_xp_config",
         "set_level_xp_config",
         "setup_default_season_config",
-        "grant_level_rewards",
-        "open_pack",
+        "claim_season_rewards",
         "upgrade"
       ]
     },
     {
-      "address": "0x55432e24d59683859eed89978e55829fe263435a10d3abfd5db79aa281f3f5",
+      "address": "0x36d76588aca5e74a36d61834d4daf402787dd6d166f1a519235cbcfa2144c75",
       "class_hash": "0x4348f5c182c0f4f00c80ecfac7a0fc2e684924b8d2f92e8b54549fcc3d8f02f",
       "abi": [
         {
@@ -5038,6 +5001,12 @@
     },
     {
       "members": [],
+      "class_hash": "0x1a5cce9b2a0965ebe2d5768f0c25abed76ffa299cc8304f049a38030fe6c8d9",
+      "tag": "jokers_of_neon_profile-Random",
+      "selector": "0x675ead35108470f42a55a2293044aa8d6c2eaf28d37597ed2886630544a056d"
+    },
+    {
+      "members": [],
       "class_hash": "0x7b88e083d06ae8ee7bfa5f34a6892ecdbf35a51c51f1b94dc16a09f450bd382",
       "tag": "jokers_of_neon_profile-SeasonConfig",
       "selector": "0x165c694f835f85eb7ac074c24bca7ab5f492b0fdfafc5ce7b08eb27f6271e19"
@@ -5059,6 +5028,12 @@
       "class_hash": "0x571098e2c14d4a9cf65ca43e21cabb0c5ddec40db4f2c7eb801415e1000e33a",
       "tag": "jokers_of_neon_profile-SeasonProgress",
       "selector": "0xc3accb189bcc1e7e75a72ba636c91bd4588be10f4b9a5dc2dbf9717aab9713"
+    },
+    {
+      "members": [],
+      "class_hash": "0x47ad9f039f3fb2b8cc0e5b7b4858c5fa1a262638f7234436d88263eca9f1e2c",
+      "tag": "jokers_of_neon_profile-SeasonRewardClaim",
+      "selector": "0x79d68f69a747b48cd49a3dfcb4a78e7cf6867371a00396dd36f31ec32644608"
     }
   ],
   "events": [
