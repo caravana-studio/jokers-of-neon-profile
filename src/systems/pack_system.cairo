@@ -46,7 +46,7 @@ pub mod pack_system {
     use openzeppelin_introspection::src5::SRC5Component;
     use starknet::ContractAddress;
     use crate::constants::constants::{
-        DEFAULT_NS_BYTE, FREE_PACK_CONFIG_KEY, MOD_ID, NFT_MANAGER_KEY,
+        DEFAULT_NS_BYTE, FREE_PACK_CONFIG_KEY, FREE_PACK_COOLDOWN, MOD_ID, NFT_MANAGER_KEY,
     };
     use crate::constants::items::{
         ALL_ITEMS, JOKER_CARD_ITEM, NEON_CARDS_ITEMS_ALL, NEON_JOKER_CARD_ITEM, SPECIAL_A_ITEMS,
@@ -221,9 +221,9 @@ pub mod pack_system {
             let mut store = StoreTrait::new(self.world_default());
 
             let mut season_content = store.get_season_content(SEASON_ID);
-            // assert!(
-            //     !season_content.initialized, "[PackMinter] - Season content already initialized",
-            // );
+            assert!(
+                !season_content.initialized, "[PackMinter] - Season content already initialized",
+            );
 
             self.init_season_1_packs();
             self.init_season_1_items(ref season_content);
@@ -260,7 +260,9 @@ pub mod pack_system {
         fn init_season_1_free_pack(ref self: ContractState) {
             self
                 .set_free_pack_config(
-                    FreePackConfig { key: FREE_PACK_CONFIG_KEY, cooldown: 30, pack_id: 1 },
+                    FreePackConfig {
+                        key: FREE_PACK_CONFIG_KEY, cooldown: FREE_PACK_COOLDOWN, pack_id: 1,
+                    },
                 );
         }
 

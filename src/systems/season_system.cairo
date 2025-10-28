@@ -50,6 +50,8 @@ pub trait ISeasonSystem<T> {
 pub mod season_system {
     use core::num::traits::Zero;
     use dojo::world::{WorldStorage, WorldStorageTrait};
+    use openzeppelin_access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
+    use openzeppelin_introspection::src5::SRC5Component;
     use starknet::ContractAddress;
     use crate::constants::constants::DEFAULT_NS_BYTE;
     use crate::models::{
@@ -59,9 +61,32 @@ pub mod season_system {
     use crate::systems::pack_system::{IPackSystemDispatcher, IPackSystemDispatcherTrait};
     use super::ISeasonSystem;
 
+    component!(path: SRC5Component, storage: src5, event: SRC5Event);
+    component!(path: AccessControlComponent, storage: accesscontrol, event: AccessControlEvent);
+
+    // External
+    #[abi(embed_v0)]
+    impl AccessControlMixinImpl =
+        AccessControlComponent::AccessControlMixinImpl<ContractState>;
+
+    // Internal
+    impl AccessControlInternalImpl = AccessControlComponent::InternalImpl<ContractState>;
+
+    #[storage]
+    struct Storage {
+        #[substorage(v0)]
+        accesscontrol: AccessControlComponent::Storage,
+        #[substorage(v0)]
+        src5: SRC5Component::Storage,
+    }
+
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
+        #[flat]
+        SRC5Event: SRC5Component::Event,
+        #[flat]
+        AccessControlEvent: AccessControlComponent::Event,
         SeasonCreated: SeasonCreated,
         SeasonActivated: SeasonActivated,
         SeasonDeactivated: SeasonDeactivated,
@@ -142,14 +167,15 @@ pub mod season_system {
         pack_count: u32,
     }
 
-    const ADMIN_ROLE: felt252 = selector!("ADMIN_ROLE");
-
-    fn dojo_init(ref self: ContractState, owner: ContractAddress) {}
+    fn dojo_init(ref self: ContractState, owner: ContractAddress) {
+        self.accesscontrol.initializer();
+        self.accesscontrol._grant_role(DEFAULT_ADMIN_ROLE, owner);
+    }
 
     #[abi(embed_v0)]
     impl SeasonSystemImpl of ISeasonSystem<ContractState> {
         fn create_season(ref self: ContractState, season_id: u32) {
-            // self.accesscontrol.assert_only_role(ADMIN_ROLE);
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
 
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
@@ -162,7 +188,7 @@ pub mod season_system {
         }
 
         fn activate_season(ref self: ContractState, season_id: u32) {
-            // self.accesscontrol.assert_only_role(ADMIN_ROLE);
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
 
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
@@ -177,7 +203,7 @@ pub mod season_system {
         }
 
         fn deactivate_season(ref self: ContractState, season_id: u32) {
-            // self.accesscontrol.assert_only_role(ADMIN_ROLE);
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
 
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
@@ -198,6 +224,7 @@ pub mod season_system {
         }
 
         fn purchase_season_pass(ref self: ContractState, address: ContractAddress, season_id: u32) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
 
@@ -235,7 +262,7 @@ pub mod season_system {
             free_rewards: Span<u32>,
             premium_rewards: Span<u32>,
         ) {
-            // self.accesscontrol.assert_only_role(ADMIN_ROLE);
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
 
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
@@ -254,6 +281,7 @@ pub mod season_system {
         fn initialize_user_progress(
             ref self: ContractState, address: ContractAddress, season_id: u32,
         ) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
 
@@ -281,19 +309,19 @@ pub mod season_system {
         }
 
         fn set_season_level_config(ref self: ContractState, config: SeasonLevelConfig) {
-            // self.accesscontrol.assert_only_role(ADMIN_ROLE);
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
             store.set_season_level_config(config);
         }
 
         fn set_mission_xp_config(ref self: ContractState, config: MissionXPConfig) {
-            // self.accesscontrol.assert_only_role(ADMIN_ROLE);
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
             store.set_mission_xp_config(config);
         }
 
         fn set_level_xp_config(ref self: ContractState, config: LevelXPConfig) {
-            // self.accesscontrol.assert_only_role(ADMIN_ROLE);
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
             store.set_level_xp_config(config);
         }
@@ -316,6 +344,7 @@ pub mod season_system {
         fn claim_season_rewards(
             ref self: ContractState, address: ContractAddress, season_id: u32, level: u32,
         ) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
 
@@ -392,7 +421,7 @@ pub mod season_system {
         }
 
         fn setup_default_season_config(ref self: ContractState, season_id: u32) {
-            // self.accesscontrol.assert_only_role(ADMIN_ROLE);
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
 
             // Set season level configs based on sistema_xp.md
