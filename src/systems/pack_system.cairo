@@ -145,12 +145,9 @@ pub mod pack_system {
                             .emit_event(
                                 @CardMintedEvent {
                                     recipient,
-                                    item: item,
+                                    card_id: item.content_id,
                                     marketable: has_season_pass,
-                                    rarity: item.rarity,
                                     skin_id: item.skin_id,
-                                    skin_rarity: item.skin_rarity,
-                                    quality,
                                 },
                             );
                     },
@@ -172,12 +169,9 @@ pub mod pack_system {
                             .emit_event(
                                 @CardMintedEvent {
                                     recipient,
-                                    item: item,
+                                    card_id: item.content_id,
                                     marketable: has_season_pass,
-                                    rarity: item.rarity,
                                     skin_id: item.skin_id,
-                                    skin_rarity: item.skin_rarity,
-                                    quality,
                                 },
                             );
                     },

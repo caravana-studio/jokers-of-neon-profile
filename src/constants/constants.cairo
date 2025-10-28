@@ -1,9 +1,9 @@
 pub fn DEFAULT_NS() -> felt252 {
-    'jokers_of_neon_profile3'
+    'jokers_of_neon_profile4'
 }
 
 pub fn DEFAULT_NS_BYTE() -> ByteArray {
-    "jokers_of_neon_profile3"
+    "jokers_of_neon_profile4"
 }
 
 pub fn MOD_ID() -> felt252 {

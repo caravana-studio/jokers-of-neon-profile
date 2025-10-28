@@ -133,12 +133,9 @@ pub struct NFTManager {
 pub struct CardMintedEvent {
     #[key]
     pub recipient: starknet::ContractAddress,
-    pub item: Item,
+    pub card_id: u32,
     pub marketable: bool,
-    pub rarity: u32,
     pub skin_id: u32,
-    pub skin_rarity: u32,
-    pub quality: u32,
 }
 
 #[derive(Copy, Drop, Serde)]
