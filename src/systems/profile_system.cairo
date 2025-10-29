@@ -74,7 +74,7 @@ pub mod profile_system {
                         username,
                         total_xp: 0,
                         xp: 0,
-                        level: 1,
+                        level: 0,
                         available_games: 3,
                         max_available_games: 3,
                         daily_streak: 1,
