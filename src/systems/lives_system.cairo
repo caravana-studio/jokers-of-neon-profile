@@ -119,6 +119,19 @@ pub trait ILivesSystem<T> {
     /// - `lives_cooldown`: Cooldown period in seconds for standard players
     /// - `lives_cooldown_battle_pass`: Cooldown period in seconds for battle pass holders
     fn get_lives_config(self: @T) -> LivesConfig;
+
+    /// Checks if the player has lives to claim.
+    ///
+    /// This method checks if the player has lives to claim based on the current timestamp and the
+    /// player's lives configuration.
+    ///
+    /// # Parameters
+    /// * `player` - The contract address of the player to check
+    /// * `season_id` - The ID of the season to check
+    ///
+    /// # Returns
+    /// A boolean indicating if the player has lives to claim
+    fn has_lives_to_claim(self: @T, player: ContractAddress, season_id: u32) -> bool;
 }
 
 #[dojo::contract]
@@ -199,7 +212,18 @@ pub mod lives_system {
                 config.lives_cooldown
             };
 
-            player_lives.available_lives += 1;
+            // calculate how many lives to claim
+            let mut lives_to_claim = 1;
+            let mut i = 2;
+            while i <= max_lives.try_into().unwrap() {
+                let required_time = player_lives.next_live_timestamp + cooldown * i;
+                if current_timestamp >= required_time {
+                    lives_to_claim += 1;
+                }
+                i += 1;
+            }
+
+            player_lives.available_lives += lives_to_claim;
             player_lives.next_live_timestamp = current_timestamp + cooldown;
             store.set_player_lives(player_lives);
         }
@@ -283,6 +307,17 @@ pub mod lives_system {
                         next_live_timestamp: current_timestamp + cooldown,
                     },
                 );
+        }
+
+        fn has_lives_to_claim(
+            self: @ContractState, player: ContractAddress, season_id: u32,
+        ) -> bool {
+            let mut store = self.default_store();
+            let player_lives = store.get_player_lives(player, season_id);
+            let current_timestamp = get_block_timestamp();
+
+            current_timestamp >= player_lives.next_live_timestamp
+                && player_lives.available_lives < player_lives.max_lives
         }
 
         fn init_lives_config(ref self: ContractState) {
