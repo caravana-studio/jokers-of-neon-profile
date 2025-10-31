@@ -337,6 +337,7 @@ pub mod xp_system {
                 season_id: season_progress.season_id,
                 season_xp: new_season_xp,
                 has_season_pass: season_progress.has_season_pass,
+                claimable_rewards_id: array![].span(),
                 season_pass_unlocked_at_level: season_progress.season_pass_unlocked_at_level,
                 level: new_level,
             };

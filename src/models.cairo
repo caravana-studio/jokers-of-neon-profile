@@ -9,6 +9,7 @@ pub struct SeasonProgress {
     pub season_id: u32,
     pub season_xp: u256,
     pub has_season_pass: bool,
+    pub claimable_rewards_id: Span<u32>,
     pub season_pass_unlocked_at_level: u32,
     pub level: u32,
 }
@@ -132,6 +133,7 @@ pub struct NFTManager {
 pub struct CardMintedEvent {
     #[key]
     pub recipient: starknet::ContractAddress,
+    pub pack_id: u32,
     pub card_id: u32,
     pub marketable: bool,
     pub skin_id: u32,

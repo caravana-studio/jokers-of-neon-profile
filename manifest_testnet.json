@@ -1490,8 +1490,8 @@
   },
   "contracts": [
     {
-      "address": "0x1ffdad181df0dd3599a10f6ba014515116b0a240a38de1b2a8fb3684c3c574b",
-      "class_hash": "0x4b013b7b1eaf560792da7c8e764471b5d5ae19c8d8c0e9ebb79feffb255b41d",
+      "address": "0x6db03b605ca2456e26b5d7f461691be85600f9bac437b44788c001cceeeb039",
+      "class_hash": "0x293aee2d3f3e1367b7d4047d75e5cdabeaaf16d3e21a04f5efec11371a650e4",
       "abi": [
         {
           "type": "impl",
@@ -1613,6 +1613,20 @@
           ]
         },
         {
+          "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "interface",
           "name": "jokers_of_neon_profile::systems::lives_system::ILivesSystem",
           "items": [
@@ -1717,6 +1731,26 @@
                 }
               ],
               "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "has_lives_to_claim",
+              "inputs": [
+                {
+                  "name": "player",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
             }
           ]
         },
@@ -1779,20 +1813,6 @@
           "type": "impl",
           "name": "AccessControlMixinImpl",
           "interface_name": "openzeppelin_access::accesscontrol::interface::AccessControlABI"
-        },
-        {
-          "type": "enum",
-          "name": "core::bool",
-          "variants": [
-            {
-              "name": "False",
-              "type": "()"
-            },
-            {
-              "name": "True",
-              "type": "()"
-            }
-          ]
         },
         {
           "type": "interface",
@@ -2144,8 +2164,8 @@
       "init_calldata": [
         "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245"
       ],
-      "tag": "jokers_of_neon_profile5-lives_system",
-      "selector": "0x64c4c00ba069e83065036b564212b4d5c7ce1883d58428370dfd0e5fb6324b9",
+      "tag": "jokers_of_neon_profile6-lives_system",
+      "selector": "0x18ed93d031a24b5da8da9d82b184eafad9c8641af2c02cdc8bd1fab8503378c",
       "systems": [
         "dojo_init",
         "claim",
@@ -2163,8 +2183,8 @@
       ]
     },
     {
-      "address": "0x6173c1fecb7767f3c64f6f27481d56e31857f926eab3a4bca168b216c070fa8",
-      "class_hash": "0x2b3b4d248ccfd41e0040235273989fe50566e0a99641edfcc64883c8b0ca0df",
+      "address": "0x7e78e7a63a7e5826cd45162cb6530e35607cc3c5d952922777d1ff89532c236",
+      "class_hash": "0x40180e3b94615babf16653e301d7d311bc7afd2c43c20039523828b75209764",
       "abi": [
         {
           "type": "impl",
@@ -2915,8 +2935,8 @@
         "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245",
         "0x0486096505276458069472576c4f60E1346e0527Af32bB4867FEc5d76aB7ee69"
       ],
-      "tag": "jokers_of_neon_profile5-pack_system",
-      "selector": "0x23f6be4b6d58284df575db7d1eb5bc47b5ca2082f18e7d7590a737823d2d080",
+      "tag": "jokers_of_neon_profile6-pack_system",
+      "selector": "0xe431fc2e3f7fadf78f370dcaa5ef08e7cbcfa35a53ef2eae5f48561eaeb711",
       "systems": [
         "dojo_init",
         "mint",
@@ -2934,8 +2954,8 @@
       ]
     },
     {
-      "address": "0x2e0d70ead0d3005106e4cb0ad3ed7cb2454bff2e747ee39b67b44043821e417",
-      "class_hash": "0x543479027e09e85b742450eceea40fce6b027f98c192a5573be81d4236276ee",
+      "address": "0x1748673685d016c843a0f4b4497c4d909f49d2ec7d8fb31ae9440a50827073a",
+      "class_hash": "0x15bf5e9de055ec1a06dcdc7baf8ee3e7be072c7f8fb60235873f00aedd3270a",
       "abi": [
         {
           "type": "impl",
@@ -3732,8 +3752,8 @@
       "init_calldata": [
         "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245"
       ],
-      "tag": "jokers_of_neon_profile5-profile_system",
-      "selector": "0x2f9ca07eac0a2c257b4043b98c4b8142ac024597ba89c925e168fedd85ef8d1",
+      "tag": "jokers_of_neon_profile6-profile_system",
+      "selector": "0x15c35515376193c2e389cd9110b254f515eef72af432cf624a6c8704918eccc",
       "systems": [
         "dojo_init",
         "create_profile",
@@ -3749,8 +3769,8 @@
       ]
     },
     {
-      "address": "0xc8027085c6b5ceab3161f49dbe9aea8464b242ba450292b05a073e9126c775",
-      "class_hash": "0x6ffd871214e73d2eaf820cf17ebf81b53bd4f368f3b52af883968c2278e1392",
+      "address": "0x75cde1ce7f631d38cc14cd280ffef8f5660a5287e8c9e0cebe03c9a7a738cda",
+      "class_hash": "0x40f5552a9a8188d09a3e8987db680ea4529f10a7297eb86630b02cc5f8dc29f",
       "abi": [
         {
           "type": "impl",
@@ -3890,6 +3910,10 @@
             {
               "name": "has_season_pass",
               "type": "core::bool"
+            },
+            {
+              "name": "claimable_rewards_id",
+              "type": "core::array::Span::<core::integer::u32>"
             },
             {
               "name": "season_pass_unlocked_at_level",
@@ -4935,8 +4959,8 @@
       "init_calldata": [
         "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245"
       ],
-      "tag": "jokers_of_neon_profile5-season_system",
-      "selector": "0x6a19b76929a2aee7cde10b4e254a2eae8354f2477bfcf32c368d7e5adc64960",
+      "tag": "jokers_of_neon_profile6-season_system",
+      "selector": "0x6f67fa1b1305512eda8c8d2930f6939c8b700b5ce516867eae2374a57f814f",
       "systems": [
         "dojo_init",
         "create_season",
@@ -4959,8 +4983,8 @@
       ]
     },
     {
-      "address": "0x68211da5cfd550fdd2ec418a084c7f7a1a207273b99bd7585bd533223b7323b",
-      "class_hash": "0x2b0814c86cf48f99af491c35e6342d688af615c9c82a77085aabfce0175c244",
+      "address": "0x6e6cc4ae26bbd693212b2f8518347ba7d772550dfb69b7fdc38fca1cda34c51",
+      "class_hash": "0x1d2f05b16afc10ac5d9776ba808655b2a2166194d63fcafbfba34325e264f74",
       "abi": [
         {
           "type": "impl",
@@ -5315,8 +5339,8 @@
       "init_calldata": [
         "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245"
       ],
-      "tag": "jokers_of_neon_profile5-xp_system",
-      "selector": "0x3561653e2fe64a11375c0466e22987fb5e8b77030eda27d296a9052bf20afc7",
+      "tag": "jokers_of_neon_profile6-xp_system",
+      "selector": "0x6a34957d3f88628ec1df8a2a180dd3472e27e3f61ea27ba371f1c7bda39562f",
       "systems": [
         "dojo_init",
         "add_daily_mission_xp",
@@ -5332,124 +5356,124 @@
     {
       "members": [],
       "class_hash": "0x6a3f5e9c1f469a79ff0b306e6e079e5f2b2cb1b075ebfdc55d98560d69a905",
-      "tag": "jokers_of_neon_profile5-DailyProgress",
-      "selector": "0x1333fb3689969dcae5b9b1bf5ad2bc5e035ad087db0a724354f6002bbbec61e"
+      "tag": "jokers_of_neon_profile6-DailyProgress",
+      "selector": "0x60db41f3762dcc778b2e29f6a956ba22ea50b7bea70592d12a79c863b0ac8b7"
     },
     {
       "members": [],
       "class_hash": "0x402e03bd760e9f70198329baccd01cfeb851c47406d72ffd8c0abcf80b65025",
-      "tag": "jokers_of_neon_profile5-FreePackConfig",
-      "selector": "0x33e76278051c0bbdab7caa01946212a2bd5e2108bdddb73861350069bfc8e65"
+      "tag": "jokers_of_neon_profile6-FreePackConfig",
+      "selector": "0x29fe9927bd1924680c9e13665c7113905361ecdd6612d9b691dace023fca953"
     },
     {
       "members": [],
       "class_hash": "0x6b28e98a09c485e6774f5a6c60984aeafa72c6d621dd9abfdb2a55f39fa6b58",
-      "tag": "jokers_of_neon_profile5-Item",
-      "selector": "0x73c7436fbd3f7b3e0c3de6bbb9532a329d4829aceb7e8ff11397520d1aaa4af"
+      "tag": "jokers_of_neon_profile6-Item",
+      "selector": "0x214b7bc0d9ebab8ce08ea88240f61ba75778482815ac5ed71b2c98d98638ac5"
     },
     {
       "members": [],
       "class_hash": "0x4f7da1d85b3c42670cc8c1becb951607e2d63ab1eaf187c72165e2122f563e6",
-      "tag": "jokers_of_neon_profile5-LevelXPConfig",
-      "selector": "0x6c4627dff76f1cfe2c34cf41eaae182c760cd1627f13f90f586754a13184046"
+      "tag": "jokers_of_neon_profile6-LevelXPConfig",
+      "selector": "0x58346d117af38297ca402186bb47fc780d52e7334a575b240cff0526aad60f8"
     },
     {
       "members": [],
       "class_hash": "0x33df092ec6e07250e14df04e0c3b4f3e6c250dc23a01d687e01969af20ce3e9",
-      "tag": "jokers_of_neon_profile5-LivesConfig",
-      "selector": "0x99facdd767bec5fe1accdb8b160e8813e98a9e96552c87bd6e2a590b0fcb7c"
+      "tag": "jokers_of_neon_profile6-LivesConfig",
+      "selector": "0x10d9c95bb98ee673f641143d22e0059e770e0e5f1cebacffa1e00e836830b89"
     },
     {
       "members": [],
       "class_hash": "0x32600332403ffbc49f184dd33313d62f13a1623d1bf601ac5f79c9b07d98fec",
-      "tag": "jokers_of_neon_profile5-MissionXPConfig",
-      "selector": "0x76703001da3fcd87b357964f62022450c15836d1b8de3baa575f63befbfab5a"
+      "tag": "jokers_of_neon_profile6-MissionXPConfig",
+      "selector": "0x798d998df1833386c4c9b4b28a563580188f443473414dfc925c3d03b97dab"
     },
     {
       "members": [],
       "class_hash": "0x2e7dce62b7c43211cf4a0900f38d232e2abb335c8be865a885a683cc8397dd2",
-      "tag": "jokers_of_neon_profile5-NFTManager",
-      "selector": "0x2109831b0dd400635e47cd02fc74db5268459c62d5f3b8afef37a4c19c9557d"
+      "tag": "jokers_of_neon_profile6-NFTManager",
+      "selector": "0x40455338eb7d1323d2b15bdfc9bfddf04f8b18c8313e2a6f5339ae2e89bbde1"
     },
     {
       "members": [],
       "class_hash": "0x5ba2801895401253e5733aaca55a44c44e0310c129698bd671c11a78c5839df",
-      "tag": "jokers_of_neon_profile5-Pack",
-      "selector": "0x5f037f3277cf7cb51b38972cb578225a4004dc1a62f9695f933ab9fc519a8e2"
+      "tag": "jokers_of_neon_profile6-Pack",
+      "selector": "0x6f03daccc2b5c94087006bfa4a9114437a8e09464d7291fda31fef7747cfea3"
     },
     {
       "members": [],
       "class_hash": "0x7924be5d565422df3681b8b8ff0254c46998d058a1a4c93b40874efb89d8cd0",
-      "tag": "jokers_of_neon_profile5-PlayerFreePack",
-      "selector": "0x26369625daf2966b15101aab2cb4075f9dacd7095d60848e057b641ab38de36"
+      "tag": "jokers_of_neon_profile6-PlayerFreePack",
+      "selector": "0x374dd02164af2b89fe7b93d92d87429eb3fe774d552f7402379cfaae643fab8"
     },
     {
       "members": [],
       "class_hash": "0x77cf50126f3f4f6ae3029e62db47c845e72ab3a717cc239eb9e47a3ae224a5e",
-      "tag": "jokers_of_neon_profile5-PlayerLives",
-      "selector": "0x59b672b6e88ea055caf285634818b0e24975b2d02e1b95760e525301f379beb"
+      "tag": "jokers_of_neon_profile6-PlayerLives",
+      "selector": "0x70a758857b671f0d70165fb5a177045c1ed1e7e79064f4295500f23c7f6ace5"
     },
     {
       "members": [],
       "class_hash": "0x200771106b86a0290cd62ca07df3462a232eeeba2897961a0b08e429759bf26",
-      "tag": "jokers_of_neon_profile5-PlayerStats",
-      "selector": "0x6a7229bbb6cf8b81866b544cf5e1d62549664ba21ad5c1bcd5d2490cfc71318"
+      "tag": "jokers_of_neon_profile6-PlayerStats",
+      "selector": "0x310f4ec20d3972ca6ec463f57c8d2b3b3006fd3a43378d3c1e1518736f6392d"
     },
     {
       "members": [],
       "class_hash": "0x781306689f2223991a70b1b47fa337723fd06582623370781bae55cff2a2289",
-      "tag": "jokers_of_neon_profile5-Profile",
-      "selector": "0x4013e74142064485b24db4312668ddb417579205c6b8c5bb1296a2cae0a30b4"
+      "tag": "jokers_of_neon_profile6-Profile",
+      "selector": "0x403a7f65072fc8b76cda841f06266fbdc81a300a7a24e68124dca850b9f5abe"
     },
     {
       "members": [],
       "class_hash": "0x2c1526a36ecb4d3ecf3d5fb064e4dd574c56e10488d17177d1b0bbc9aa0f24c",
-      "tag": "jokers_of_neon_profile5-ProfileLevelConfig",
-      "selector": "0x54369df294342fe76c1128e8aa38111a65e9cb0e1724446fadbbf5453ffe89a"
+      "tag": "jokers_of_neon_profile6-ProfileLevelConfig",
+      "selector": "0x26a3a14f3e386e7be9b6c4899529d97ffef6766132051aed8d356e9217aa2e5"
     },
     {
       "members": [],
       "class_hash": "0x1a5cce9b2a0965ebe2d5768f0c25abed76ffa299cc8304f049a38030fe6c8d9",
-      "tag": "jokers_of_neon_profile5-Random",
-      "selector": "0x364de3143afc48b16739ecb2293aa95667bed79c891696dc49ee882b663be6d"
+      "tag": "jokers_of_neon_profile6-Random",
+      "selector": "0x3eebd835c39b6ce49f8e960c948baf978942ce6cb3e5e09c0bd7a2a356d373a"
     },
     {
       "members": [],
       "class_hash": "0x7b88e083d06ae8ee7bfa5f34a6892ecdbf35a51c51f1b94dc16a09f450bd382",
-      "tag": "jokers_of_neon_profile5-SeasonConfig",
-      "selector": "0x366f21b75f8eeec800fc312629ab805aadc67ba09e8d42e4ecb2a2b1169ea65"
+      "tag": "jokers_of_neon_profile6-SeasonConfig",
+      "selector": "0x133a29161c3fec0adb44d4d6bf6a72688b4f7372a82293358935028e72f74b8"
     },
     {
       "members": [],
       "class_hash": "0x58af0038213cbe9e3dd5eaed940386be3b2f8782b81a04e99e78b6095c04fc1",
-      "tag": "jokers_of_neon_profile5-SeasonContent",
-      "selector": "0x55375b6dac74611af4b2f7697b157c0bdc8fba35b12d47c6e70181cd3bbaac4"
+      "tag": "jokers_of_neon_profile6-SeasonContent",
+      "selector": "0x71cb07a0bb171ffc5264e6e2f8afdcb1036430f24066e3923c51dda3233b8c5"
     },
     {
       "members": [],
       "class_hash": "0x1b762f21c5f59b0254259b4dad7fa97ee5830366a09b7671662ab687b8b2f5d",
-      "tag": "jokers_of_neon_profile5-SeasonLevelConfig",
-      "selector": "0x46dac8c2116a4136558d3f67a0643e812fab0149a9dd1ee7d316186c68b638c"
+      "tag": "jokers_of_neon_profile6-SeasonLevelConfig",
+      "selector": "0x61766e9b58f036da4f64e5d42500dcfbda63dd8f2bd8814f4c7491a69a157fb"
     },
     {
       "members": [],
-      "class_hash": "0x7a58b42dd9da8875a4322bd772de2644751bcd6dbbfbd2d9ba80c04324a0e38",
-      "tag": "jokers_of_neon_profile5-SeasonProgress",
-      "selector": "0x56498b024cda1186955734cda620971754af5c80c2541308237dbc2c1bfc17b"
+      "class_hash": "0x2f3949562234b8495298cc6c16019eba78fd3581b4bc5fabca7e2d1fa32000f",
+      "tag": "jokers_of_neon_profile6-SeasonProgress",
+      "selector": "0x7aca91203c67ce663a684d51b146e6c3c45b6bd0c340fcd4a85a87ec9e85f1c"
     },
     {
       "members": [],
       "class_hash": "0x47ad9f039f3fb2b8cc0e5b7b4858c5fa1a262638f7234436d88263eca9f1e2c",
-      "tag": "jokers_of_neon_profile5-SeasonRewardClaim",
-      "selector": "0xa258388ab41320fbc7e01f36789d4e4fd9eb15e7a569dc4fe90c9396d5d3e1"
+      "tag": "jokers_of_neon_profile6-SeasonRewardClaim",
+      "selector": "0x6137c88f2f64653b96a0f5eb544593e22a5ca50260c1bbfc211addb5320214d"
     }
   ],
   "events": [
     {
       "members": [],
-      "class_hash": "0x613dd96d19fc4cd69ccbfae3798da6bcce6667f41cbcb77c544a95e605e64d2",
-      "tag": "jokers_of_neon_profile5-CardMintedEvent",
-      "selector": "0xa856cc85d7ab131ab7fe5b91cb6e3f1f8497547176bb5c04acd7daec4ea7c5"
+      "class_hash": "0x195bcf9aa9b080936ded5cae161703e2ecf2595d2ce7f8ac4fddfd382b2e7e4",
+      "tag": "jokers_of_neon_profile6-CardMintedEvent",
+      "selector": "0xf61fefc0cd85cd89f096a436113155f6f67b930c22ca25e2f1e8700dc24160"
     }
   ],
   "external_contracts": []
