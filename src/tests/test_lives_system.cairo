@@ -620,6 +620,7 @@ mod tests_lives_system {
                     season_xp: 0,
                     has_season_pass: true,
                     season_pass_unlocked_at_level: 0,
+                    claimable_rewards_id: array![].span(),
                     level: 0,
                 },
             );
