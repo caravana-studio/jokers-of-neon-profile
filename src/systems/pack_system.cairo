@@ -145,6 +145,7 @@ pub mod pack_system {
                             .emit_event(
                                 @CardMintedEvent {
                                     recipient,
+                                    pack_id,
                                     card_id: item.content_id,
                                     marketable: has_season_pass,
                                     skin_id: item.skin_id,
@@ -169,6 +170,7 @@ pub mod pack_system {
                             .emit_event(
                                 @CardMintedEvent {
                                     recipient,
+                                    pack_id,
                                     card_id: item.content_id,
                                     marketable: has_season_pass,
                                     skin_id: item.skin_id,
