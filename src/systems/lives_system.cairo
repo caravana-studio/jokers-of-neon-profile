@@ -40,23 +40,6 @@ pub trait ILivesSystem<T> {
     /// - Cooldown duration depends on player's season pass status
     fn remove(ref self: T, player: ContractAddress, season_id: u32);
 
-    /// Initializes a new player account with default lives configuration.
-    ///
-    /// This method sets up a new player with the maximum number of lives available
-    /// based on the current lives configuration. This is typically called when a
-    /// player first joins a season.
-    ///
-    /// # Parameters
-    /// * `player` - The contract address of the player to initialize
-    /// * `season_id` - The ID of the season to initialize the player for
-    ///
-    /// # Behavior
-    /// - Creates a new `PlayerLives` record for the player
-    /// - Sets available_lives to the maximum allowed (from config)
-    /// - Sets max_lives to the standard maximum (not battle pass maximum)
-    /// - Initializes next_live_timestamp to 0 (no cooldown initially)
-    fn init_account(ref self: T, player: ContractAddress, season_id: u32);
-
     /// Upgrades a player's account to battle pass benefits.
     ///
     /// This method upgrades an existing player account to take advantage of battle pass
@@ -180,51 +163,53 @@ pub mod lives_system {
             self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = self.default_store();
             let mut player_lives = store.get_player_lives(player, season_id);
-
-            // Get config and check if player has season pass
-            let config = store.get_lives_config();
-            let has_season_pass = store.get_season_progress(player, season_id).has_season_pass;
-
-            let max_lives = if has_season_pass {
-                config.max_lives_battle_pass
-            } else {
-                config.max_lives
-            };
-
-            // Check if player has max lives
-            assert!(
-                player_lives.available_lives < max_lives,
-                "[LivesSystem] - You already have the maximum number of lives",
-            );
-
-            // Check if cooldown has passed
             let current_timestamp = get_block_timestamp();
-            assert!(
-                current_timestamp >= player_lives.next_live_timestamp,
-                "[LivesSystem] - You have to wait {} seconds to claim a new life",
-                player_lives.next_live_timestamp - current_timestamp,
-            );
+            let config = store.get_lives_config();
 
-            // Get cooldown
-            let cooldown = if has_season_pass {
-                config.lives_cooldown_season_pass
+            if player_lives.max_lives == 0 {
+                player_lives = self.init_account(player, season_id);
             } else {
-                config.lives_cooldown
-            };
+                // Get config and check if player has season pass
+                let has_season_pass = store.get_season_progress(player, season_id).has_season_pass;
+                let max_lives = if has_season_pass {
+                    config.max_lives_battle_pass
+                } else {
+                    config.max_lives
+                };
 
-            // calculate how many lives to claim
-            let mut lives_to_claim = 1;
-            let mut i = 2;
-            while i <= max_lives.try_into().unwrap() {
-                let required_time = player_lives.next_live_timestamp + cooldown * i;
-                if current_timestamp >= required_time {
-                    lives_to_claim += 1;
+                // Check if player has max lives
+                assert!(
+                    player_lives.available_lives < max_lives,
+                    "[LivesSystem] - You already have the maximum number of lives",
+                );
+
+                // Check if cooldown has passed
+                assert!(
+                    current_timestamp >= player_lives.next_live_timestamp,
+                    "[LivesSystem] - You have to wait {} seconds to claim a new life",
+                    player_lives.next_live_timestamp - current_timestamp,
+                );
+                // Get cooldown
+                let cooldown = if has_season_pass {
+                    config.lives_cooldown_season_pass
+                } else {
+                    config.lives_cooldown
+                };
+
+                // calculate how many lives to claim
+                let mut lives_to_claim = 1;
+                let mut i = 2;
+                while i <= max_lives.try_into().unwrap() {
+                    let required_time = player_lives.next_live_timestamp + cooldown * i;
+                    if current_timestamp >= required_time {
+                        lives_to_claim += 1;
+                    }
+                    i += 1;
                 }
-                i += 1;
-            }
 
-            player_lives.available_lives += lives_to_claim;
-            player_lives.next_live_timestamp = current_timestamp + cooldown;
+                player_lives.available_lives += lives_to_claim;
+                player_lives.next_live_timestamp = current_timestamp + cooldown;
+            }
             store.set_player_lives(player_lives);
         }
 
@@ -259,36 +244,23 @@ pub mod lives_system {
             store.set_player_lives(player_lives);
         }
 
-        fn init_account(ref self: ContractState, player: ContractAddress, season_id: u32) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-            let mut store = self.default_store();
-            let config = store.get_lives_config();
-
-            store
-                .set_player_lives(
-                    PlayerLives {
-                        player: player,
-                        season_id: season_id,
-                        available_lives: config.max_lives,
-                        max_lives: config.max_lives,
-                        next_live_timestamp: 0,
-                    },
-                );
-        }
-
         fn upgrade_account(ref self: ContractState, player: ContractAddress, season_id: u32) {
             self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = self.default_store();
             let config = store.get_lives_config();
             let has_season_pass = store.get_season_progress(player, season_id).has_season_pass;
-            let current_timestamp = get_block_timestamp();
 
             assert!(
                 has_season_pass,
                 "[LivesSystem] - You must have a season pass to upgrade your account",
             );
 
-            let player_lives = store.get_player_lives(player, season_id);
+            let mut player_lives = store.get_player_lives(player, season_id);
+            if player_lives.max_lives == 0 {
+                player_lives = self.init_account(player, season_id);
+            }
+
+            let current_timestamp = get_block_timestamp();
             let cooldown = if player_lives.next_live_timestamp > current_timestamp
                 + config.lives_cooldown_season_pass {
                 config.lives_cooldown_season_pass
@@ -296,17 +268,10 @@ pub mod lives_system {
                 player_lives.next_live_timestamp
             };
 
-            store
-                .set_player_lives(
-                    PlayerLives {
-                        player: player,
-                        season_id: season_id,
-                        available_lives: player_lives.available_lives
-                            + (config.max_lives_battle_pass - config.max_lives),
-                        max_lives: config.max_lives_battle_pass,
-                        next_live_timestamp: current_timestamp + cooldown,
-                    },
-                );
+            player_lives.available_lives += config.max_lives_battle_pass - player_lives.max_lives;
+            player_lives.max_lives = config.max_lives_battle_pass;
+            player_lives.next_live_timestamp = current_timestamp + cooldown;
+            store.set_player_lives(player_lives);
         }
 
         fn has_lives_to_claim(
@@ -339,6 +304,39 @@ pub mod lives_system {
 
     #[generate_trait]
     impl InternalImpl of InternalTrait {
+        fn init_account(
+            ref self: ContractState, player: ContractAddress, season_id: u32,
+        ) -> PlayerLives {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            let mut store = self.default_store();
+            let config = store.get_lives_config();
+            let current_timestamp = get_block_timestamp();
+            let has_season_pass = store.get_season_progress(player, season_id).has_season_pass;
+
+            let max_lives = if has_season_pass {
+                config.max_lives_battle_pass
+            } else {
+                config.max_lives
+            };
+
+            let cooldown = if has_season_pass {
+                config.lives_cooldown_season_pass
+            } else {
+                config.lives_cooldown
+            };
+
+            let player_lives = PlayerLives {
+                player: player,
+                season_id: season_id,
+                available_lives: max_lives,
+                max_lives: max_lives,
+                next_live_timestamp: current_timestamp + cooldown,
+            };
+
+            store.set_player_lives(player_lives);
+            player_lives
+        }
+
         fn init_default_lives_config(ref self: ContractState) {
             self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = self.default_store();

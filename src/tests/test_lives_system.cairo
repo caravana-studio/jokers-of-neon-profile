@@ -29,78 +29,47 @@ mod tests_lives_system {
 
     const SEASON: u32 = 1;
 
-    #[test]
-    fn test_init_account_no_season_pass() {
-        let (world, mut store) = setup();
-        default_lives_config(ref store);
-        let lives_system = lives_system_dispatcher(world);
-
-        lives_system.init_account(PLAYER(), SEASON);
-        let player_lives = store.get_player_lives(PLAYER(), SEASON);
-        assert!(player_lives.available_lives == 2, "initial lives should be 2");
-        assert!(player_lives.max_lives == 2, "max lives should be 2");
-        assert!(player_lives.next_live_timestamp == 0, "next life timestamp should be 0");
-    }
+    // ------------------------------------------------------------
+    // SEASON PASS TESTS
+    // ------------------------------------------------------------
 
     #[test]
-    fn test_upgrade_account_with_season_pass() {
+    fn test_season_pass_upgrade_account() {
         let (world, mut store) = setup();
         default_lives_config(ref store);
         let lives_system = lives_system_dispatcher(world);
 
         // Set season pass on true for PLAYER()
         set_season_pass(ref store, PLAYER());
-
-        lives_system.init_account(PLAYER(), SEASON);
         lives_system.upgrade_account(PLAYER(), SEASON);
 
         let player_lives = store.get_player_lives(PLAYER(), SEASON);
-        assert!(player_lives.available_lives == 4, "initial lives should be 4");
-        assert!(player_lives.max_lives == 4, "max lives should be 4");
-        assert!(player_lives.next_live_timestamp == 0, "next life timestamp should be 0");
+        assert_available_lives(player_lives, 4);
+        assert_current_cooldown(player_lives, 5);
     }
 
     #[test]
-    fn test_claim_with_no_lives_no_season_pass() {
+    fn test_season_pass_first_claim() {
         let (mut world, mut store) = setup();
         default_lives_config(ref store);
         let lives_system = lives_system_dispatcher(world);
 
-        lives_system.init_account(PLAYER(), SEASON);
-
-        // Set available lives to 0
-        world
-            .write_member(
-                Model::<PlayerLives>::ptr_from_keys((PLAYER(), SEASON)),
-                selector!("available_lives"),
-                0,
-            );
-
-        assert!(lives_system.has_lives_to_claim(PLAYER(), SEASON), "should have lives to claim");
+        set_season_pass(ref store, PLAYER());
         lives_system.claim(PLAYER(), SEASON);
+
         let player_lives = store.get_player_lives(PLAYER(), SEASON);
-        assert!(
-            player_lives.available_lives == 1,
-            "available lives should be 1 ({})",
-            player_lives.available_lives,
-        );
-        assert!(
-            player_lives.next_live_timestamp == 10,
-            "next life timestamp should be 10 ({})",
-            player_lives.next_live_timestamp,
-        );
+        assert_available_lives(player_lives, 4);
+        assert_current_cooldown(player_lives, 5);
     }
 
     #[test]
-    fn test_claim_with_no_lives_with_season_pass() {
+    fn test_season_pass_claim_1_live() {
         let (mut world, mut store) = setup();
         default_lives_config(ref store);
         let lives_system = lives_system_dispatcher(world);
 
         // Set season pass on true for PLAYER()
         set_season_pass(ref store, PLAYER());
-
-        lives_system.init_account(PLAYER(), SEASON);
         lives_system.upgrade_account(PLAYER(), SEASON);
 
         // Set available lives to 0
@@ -111,110 +80,22 @@ mod tests_lives_system {
                 0,
             );
 
-        lives_system.claim(PLAYER(), SEASON);
-        let player_lives = store.get_player_lives(PLAYER(), SEASON);
-        assert!(
-            player_lives.available_lives == 1,
-            "available lives should be 1 ({})",
-            player_lives.available_lives,
-        );
-        assert!(
-            player_lives.next_live_timestamp == 5,
-            "next life timestamp should be 5 ({})",
-            player_lives.next_live_timestamp,
-        );
-    }
-
-    #[test]
-    fn test_claim_with_no_lives_season_pass_full_lives() {
-        let (mut world, mut store) = setup();
-        default_lives_config(ref store);
-        let lives_system = lives_system_dispatcher(world);
-
-        // Set season pass on true for PLAYER()
-        set_season_pass(ref store, PLAYER());
-
-        lives_system.init_account(PLAYER(), SEASON);
-        lives_system.upgrade_account(PLAYER(), SEASON);
-
-        // Set available lives to 0
-        world
-            .write_member(
-                Model::<PlayerLives>::ptr_from_keys((PLAYER(), SEASON)),
-                selector!("available_lives"),
-                0,
-            );
-
-        // season_pass_cooldown: 5
-        // so with timestamp: 20 should be able to claim 4 lives
-        set_block_timestamp(20);
-        assert!(lives_system.has_lives_to_claim(PLAYER(), SEASON), "should have lives to claim");
-
-        lives_system.claim(PLAYER(), SEASON);
-        let player_lives = store.get_player_lives(PLAYER(), SEASON);
-        assert!(
-            player_lives.available_lives == 4,
-            "available lives should be 4 ({})",
-            player_lives.available_lives,
-        );
-        assert!(
-            player_lives.next_live_timestamp == 25,
-            "next life timestamp should be 25 ({})",
-            player_lives.next_live_timestamp,
-        );
-        assert!(
-            !lives_system.has_lives_to_claim(PLAYER(), SEASON), "should not have lives to claim",
-        );
-    }
-
-    #[test]
-    fn test_claim_with_no_lives_season_pass_2_lives() {
-        let (mut world, mut store) = setup();
-        default_lives_config(ref store);
-        let lives_system = lives_system_dispatcher(world);
-
-        // Set season pass on true for PLAYER()
-        set_season_pass(ref store, PLAYER());
-
-        lives_system.init_account(PLAYER(), SEASON);
-        lives_system.upgrade_account(PLAYER(), SEASON);
-
-        // Set available lives to 0
-        world
-            .write_member(
-                Model::<PlayerLives>::ptr_from_keys((PLAYER(), SEASON)),
-                selector!("available_lives"),
-                0,
-            );
-
-        // season_pass_cooldown: 5
-        // so with timestamp: 10 should be able to claim 2 lives
+        // season_pass_cooldown: 10
         set_block_timestamp(10);
-        assert!(lives_system.has_lives_to_claim(PLAYER(), SEASON), "should have lives to claim");
         lives_system.claim(PLAYER(), SEASON);
         let player_lives = store.get_player_lives(PLAYER(), SEASON);
-        assert!(
-            player_lives.available_lives == 2,
-            "available lives should be 2 ({})",
-            player_lives.available_lives,
-        );
-        assert!(
-            player_lives.next_live_timestamp == 15,
-            "next life timestamp should be 15 ({})",
-            player_lives.next_live_timestamp,
-        );
+        assert_available_lives(player_lives, 1);
+        assert_current_cooldown(player_lives, 10 + 5);
     }
 
     #[test]
-    fn test_claim_with_no_lives_season_pass_3_lives() {
+    fn test_season_pass_claim_2_lives() {
         let (mut world, mut store) = setup();
         default_lives_config(ref store);
         let lives_system = lives_system_dispatcher(world);
 
         // Set season pass on true for PLAYER()
         set_season_pass(ref store, PLAYER());
-
-        lives_system.init_account(PLAYER(), SEASON);
         lives_system.upgrade_account(PLAYER(), SEASON);
 
         // Set available lives to 0
@@ -226,43 +107,356 @@ mod tests_lives_system {
             );
 
         // season_pass_cooldown: 5
-        // so with timestamp: 15 should be able to claim 3 lives
+        // so with timestamp: 15 should be able to claim 2 lives
         set_block_timestamp(15);
         assert!(lives_system.has_lives_to_claim(PLAYER(), SEASON), "should have lives to claim");
         lives_system.claim(PLAYER(), SEASON);
         let player_lives = store.get_player_lives(PLAYER(), SEASON);
-        assert!(
-            player_lives.available_lives == 3,
-            "available lives should be 3 ({})",
-            player_lives.available_lives,
-        );
-        assert!(
-            player_lives.next_live_timestamp == 20,
-            "next life timestamp should be 20 ({})",
-            player_lives.next_live_timestamp,
-        );
+        assert_available_lives(player_lives, 2);
+        assert_current_cooldown(player_lives, 15 + 5);
     }
 
     #[test]
-    fn test_remove_with_full_lives_no_season_pass() {
+    fn test_season_pass_claim_3_lives() {
         let (mut world, mut store) = setup();
         default_lives_config(ref store);
         let lives_system = lives_system_dispatcher(world);
 
-        lives_system.init_account(PLAYER(), SEASON);
+        // Set season pass on true for PLAYER()
+        set_season_pass(ref store, PLAYER());
+        lives_system.upgrade_account(PLAYER(), SEASON);
+
+        // Set available lives to 0
+        world
+            .write_member(
+                Model::<PlayerLives>::ptr_from_keys((PLAYER(), SEASON)),
+                selector!("available_lives"),
+                0,
+            );
+
+        // season_pass_cooldown: 5
+        // so with timestamp: 20 should be able to claim 3 lives
+        set_block_timestamp(20);
+        assert!(lives_system.has_lives_to_claim(PLAYER(), SEASON), "should have lives to claim");
+        lives_system.claim(PLAYER(), SEASON);
+
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 3);
+        assert_current_cooldown(player_lives, 20 + 5);
+    }
+
+    #[test]
+    fn test_season_pass_claim_4_lives() {
+        let (mut world, mut store) = setup();
+        default_lives_config(ref store);
+        let lives_system = lives_system_dispatcher(world);
+
+        // Set season pass on true for PLAYER()
+        set_season_pass(ref store, PLAYER());
+        lives_system.upgrade_account(PLAYER(), SEASON);
+
+        // Set available lives to 0
+        world
+            .write_member(
+                Model::<PlayerLives>::ptr_from_keys((PLAYER(), SEASON)),
+                selector!("available_lives"),
+                0,
+            );
+
+        // season_pass_cooldown: 5
+        // so with timestamp: 25 should be able to claim 3 lives
+        set_block_timestamp(25);
+        assert!(lives_system.has_lives_to_claim(PLAYER(), SEASON), "should have lives to claim");
+        lives_system.claim(PLAYER(), SEASON);
+
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 4);
+        assert_current_cooldown(player_lives, 25 + 5);
+    }
+
+    #[test]
+    fn test_season_pass_claim_4_lives_when_times_higher() {
+        let (mut world, mut store) = setup();
+        default_lives_config(ref store);
+        let lives_system = lives_system_dispatcher(world);
+
+        // Set season pass on true for PLAYER()
+        set_season_pass(ref store, PLAYER());
+        lives_system.upgrade_account(PLAYER(), SEASON);
+
+        // Set available lives to 0
+        world
+            .write_member(
+                Model::<PlayerLives>::ptr_from_keys((PLAYER(), SEASON)),
+                selector!("available_lives"),
+                0,
+            );
+
+        // season_pass_cooldown: 5
+        // so with timestamp: 1000 should be able to claim full lives
+        set_block_timestamp(1000);
+        assert!(lives_system.has_lives_to_claim(PLAYER(), SEASON), "should have lives to claim");
+        lives_system.claim(PLAYER(), SEASON);
+
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 4);
+        assert_current_cooldown(player_lives, 1000 + 5);
+    }
+
+    #[test]
+    fn test_season_pass_claim() {
+        let (mut world, mut store) = setup();
+        default_lives_config(ref store);
+        let lives_system = lives_system_dispatcher(world);
+
+        // Set season pass on true for PLAYER()
+        set_season_pass(ref store, PLAYER());
+
+        lives_system.upgrade_account(PLAYER(), SEASON);
+
+        // Set available lives to 1
+        world
+            .write_member(
+                Model::<PlayerLives>::ptr_from_keys((PLAYER(), SEASON)),
+                selector!("available_lives"),
+                1,
+            );
+
+        // season_pass_cooldown: 5
+        set_block_timestamp(5);
+        assert!(lives_system.has_lives_to_claim(PLAYER(), SEASON), "should have lives to claim");
+        lives_system.claim(PLAYER(), SEASON);
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 2);
+        assert_current_cooldown(player_lives, 5 + 5);
+    }
+
+    #[test]
+    fn test_season_pass_remove_all() {
+        let (mut world, mut store) = setup();
+        default_lives_config(ref store);
+        let lives_system = lives_system_dispatcher(world);
+
+        // Set season pass on true for PLAYER()
+        set_season_pass(ref store, PLAYER());
+        lives_system.upgrade_account(PLAYER(), SEASON);
 
         lives_system.remove(PLAYER(), SEASON);
         let player_lives = store.get_player_lives(PLAYER(), SEASON);
-        assert!(
-            player_lives.available_lives == 1,
-            "available lives should be 1 ({})",
-            player_lives.available_lives,
-        );
-        assert!(
-            player_lives.next_live_timestamp == 10,
-            "next life timestamp should be 10 ({})",
-            player_lives.next_live_timestamp,
-        );
+        assert_available_lives(player_lives, 3);
+        assert_current_cooldown(player_lives, 5);
+
+        lives_system.remove(PLAYER(), SEASON);
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 2);
+        assert_current_cooldown(player_lives, 5);
+
+        lives_system.remove(PLAYER(), SEASON);
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 1);
+        assert_current_cooldown(player_lives, 5);
+
+        lives_system.remove(PLAYER(), SEASON);
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 0);
+        assert_current_cooldown(player_lives, 5);
+    }
+
+    #[test]
+    fn test_season_pass_remove_and_claim() {
+        let (mut world, mut store) = setup();
+        default_lives_config(ref store);
+        let lives_system = lives_system_dispatcher(world);
+
+        // Set season pass on true for PLAYER()
+        set_season_pass(ref store, PLAYER());
+        lives_system.upgrade_account(PLAYER(), SEASON);
+
+        lives_system.remove(PLAYER(), SEASON);
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 3);
+        assert_current_cooldown(player_lives, 5);
+
+        lives_system.remove(PLAYER(), SEASON);
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 2);
+        assert_current_cooldown(player_lives, 5);
+
+        lives_system.remove(PLAYER(), SEASON);
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 1);
+        assert_current_cooldown(player_lives, 5);
+
+        lives_system.remove(PLAYER(), SEASON);
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 0);
+        assert_current_cooldown(player_lives, 5);
+
+        // Wait 5 seconds to claim a new life
+        set_block_timestamp(5);
+        lives_system.claim(PLAYER(), SEASON);
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 1);
+        assert_current_cooldown(player_lives, 5 + 5);
+    }
+
+    // ------------------------------------------------------------
+    // NO SEASON PASS TESTS
+    // ------------------------------------------------------------
+
+    #[test]
+    fn test_first_claim() {
+        let (mut world, mut store) = setup();
+        default_lives_config(ref store);
+        let lives_system = lives_system_dispatcher(world);
+
+        lives_system.claim(PLAYER(), SEASON);
+
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 2);
+        assert_current_cooldown(player_lives, 10);
+    }
+
+    #[test]
+    fn test_claim_1_live() {
+        let (mut world, mut store) = setup();
+        default_lives_config(ref store);
+        let lives_system = lives_system_dispatcher(world);
+        simulate_init_account(ref store, PLAYER());
+
+        // Set available lives to 0
+        world
+            .write_member(
+                Model::<PlayerLives>::ptr_from_keys((PLAYER(), SEASON)),
+                selector!("available_lives"),
+                0,
+            );
+
+        // cooldown: 10
+        set_block_timestamp(10);
+        lives_system.claim(PLAYER(), SEASON);
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 1);
+        assert_current_cooldown(player_lives, 10 + 10);
+    }
+
+    #[test]
+    fn test_claim_2_lives() {
+        let (mut world, mut store) = setup();
+        default_lives_config(ref store);
+        let lives_system = lives_system_dispatcher(world);
+        simulate_init_account(ref store, PLAYER());
+
+        // Set available lives to 0
+        world
+            .write_member(
+                Model::<PlayerLives>::ptr_from_keys((PLAYER(), SEASON)),
+                selector!("available_lives"),
+                0,
+            );
+
+        // cooldown: 10
+        // so with timestamp: 20 should be able to claim 2 lives
+        set_block_timestamp(20);
+        assert!(lives_system.has_lives_to_claim(PLAYER(), SEASON), "should have lives to claim");
+        lives_system.claim(PLAYER(), SEASON);
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 2);
+        assert_current_cooldown(player_lives, 20 + 10);
+    }
+
+
+    #[test]
+    fn test_claim_2_lives_when_times_higher() {
+        let (mut world, mut store) = setup();
+        default_lives_config(ref store);
+        let lives_system = lives_system_dispatcher(world);
+        simulate_init_account(ref store, PLAYER());
+
+        // Set available lives to 0
+        world
+            .write_member(
+                Model::<PlayerLives>::ptr_from_keys((PLAYER(), SEASON)),
+                selector!("available_lives"),
+                0,
+            );
+
+        // cooldown: 10
+        // so with timestamp: 1000 should be able to claim full lives
+        set_block_timestamp(1000);
+        assert!(lives_system.has_lives_to_claim(PLAYER(), SEASON), "should have lives to claim");
+        lives_system.claim(PLAYER(), SEASON);
+
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 2);
+        assert_current_cooldown(player_lives, 1000 + 10);
+    }
+
+    #[test]
+    fn test_claim() {
+        let (mut world, mut store) = setup();
+        default_lives_config(ref store);
+        let lives_system = lives_system_dispatcher(world);
+        simulate_init_account(ref store, PLAYER());
+
+        // Set available lives to 1
+        world
+            .write_member(
+                Model::<PlayerLives>::ptr_from_keys((PLAYER(), SEASON)),
+                selector!("available_lives"),
+                1,
+            );
+
+        // cooldown: 10
+        set_block_timestamp(10);
+        assert!(lives_system.has_lives_to_claim(PLAYER(), SEASON), "should have lives to claim");
+        lives_system.claim(PLAYER(), SEASON);
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 2);
+        assert_current_cooldown(player_lives, 10 + 10);
+    }
+
+    #[test]
+    fn test_remove_all() {
+        let (mut world, mut store) = setup();
+        default_lives_config(ref store);
+        let lives_system = lives_system_dispatcher(world);
+        simulate_init_account(ref store, PLAYER());
+
+        lives_system.remove(PLAYER(), SEASON);
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 1);
+        assert_current_cooldown(player_lives, 10);
+
+        lives_system.remove(PLAYER(), SEASON);
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 0);
+        assert_current_cooldown(player_lives, 10);
+    }
+
+    #[test]
+    fn test_remove_and_claim() {
+        let (mut world, mut store) = setup();
+        default_lives_config(ref store);
+        let lives_system = lives_system_dispatcher(world);
+        simulate_init_account(ref store, PLAYER());
+
+        lives_system.remove(PLAYER(), SEASON);
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 1);
+        assert_current_cooldown(player_lives, 10);
+
+        lives_system.remove(PLAYER(), SEASON);
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 0);
+        assert_current_cooldown(player_lives, 10);
+
+        // Wait 10 seconds to claim a new life
+        set_block_timestamp(10);
+        lives_system.claim(PLAYER(), SEASON);
+        let player_lives = store.get_player_lives(PLAYER(), SEASON);
+        assert_available_lives(player_lives, 1);
+        assert_current_cooldown(player_lives, 10 + 10);
     }
 
     #[test]
@@ -270,8 +464,7 @@ mod tests_lives_system {
         let (mut world, mut store) = setup();
         default_lives_config(ref store);
         let lives_system = lives_system_dispatcher(world);
-
-        lives_system.init_account(PLAYER(), SEASON);
+        simulate_init_account(ref store, PLAYER());
 
         lives_system.remove(PLAYER(), SEASON);
         let player_lives = store.get_player_lives(PLAYER(), SEASON);
@@ -298,55 +491,6 @@ mod tests_lives_system {
         assert!(
             player_lives.next_live_timestamp == 5,
             "next life timestamp should be 5 ({})",
-            player_lives.next_live_timestamp,
-        );
-    }
-
-    #[test]
-    fn test_remove_with_full_lives_with_season_pass() {
-        let (mut world, mut store) = setup();
-        default_lives_config(ref store);
-        let lives_system = lives_system_dispatcher(world);
-
-        set_season_pass(ref store, PLAYER());
-        lives_system.init_account(PLAYER(), SEASON);
-        lives_system.upgrade_account(PLAYER(), SEASON);
-
-        lives_system.remove(PLAYER(), SEASON);
-        let player_lives = store.get_player_lives(PLAYER(), SEASON);
-        assert!(
-            player_lives.available_lives == 3,
-            "available lives should be 3 ({})",
-            player_lives.available_lives,
-        );
-        assert!(
-            player_lives.next_live_timestamp == 5,
-            "next life timestamp should be 5 ({})",
-            player_lives.next_live_timestamp,
-        );
-    }
-
-    #[test]
-    fn test_remove_and_claim_full_lives_no_season_pass() {
-        let (mut world, mut store) = setup();
-        default_lives_config(ref store);
-        let lives_system = lives_system_dispatcher(world);
-
-        lives_system.init_account(PLAYER(), SEASON);
-
-        lives_system.remove(PLAYER(), SEASON);
-        set_block_timestamp(10);
-        assert!(lives_system.has_lives_to_claim(PLAYER(), SEASON), "should have lives to claim");
-        lives_system.claim(PLAYER(), SEASON);
-        let player_lives = store.get_player_lives(PLAYER(), SEASON);
-        assert!(
-            player_lives.available_lives == 2,
-            "available lives should be 2 ({})",
-            player_lives.available_lives,
-        );
-        assert!(
-            player_lives.next_live_timestamp == 20,
-            "next life timestamp should be 20 ({})",
             player_lives.next_live_timestamp,
         );
     }
@@ -363,7 +507,6 @@ mod tests_lives_system {
         default_lives_config(ref store);
         let lives_system = lives_system_dispatcher(world);
 
-        lives_system.init_account(PLAYER(), SEASON);
         lives_system.upgrade_account(PLAYER(), SEASON);
     }
 
@@ -377,8 +520,8 @@ mod tests_lives_system {
         let (world, mut store) = setup();
         default_lives_config(ref store);
         let lives_system = lives_system_dispatcher(world);
+        simulate_init_account(ref store, PLAYER());
 
-        lives_system.init_account(PLAYER(), SEASON);
         assert!(
             !lives_system.has_lives_to_claim(PLAYER(), SEASON), "should not have lives to claim",
         );
@@ -393,8 +536,7 @@ mod tests_lives_system {
         let (mut world, mut store) = setup();
         default_lives_config(ref store);
         let lives_system = lives_system_dispatcher(world);
-
-        lives_system.init_account(PLAYER(), SEASON);
+        simulate_init_account(ref store, PLAYER());
 
         // Set available lives to 0
         world
@@ -482,4 +624,37 @@ mod tests_lives_system {
                 },
             );
     }
+
+    fn simulate_init_account(ref store: Store, player: ContractAddress) {
+        let lives_config = store.get_lives_config();
+        store
+            .set_player_lives(
+                PlayerLives {
+                    player: player,
+                    season_id: SEASON,
+                    available_lives: lives_config.max_lives,
+                    max_lives: lives_config.max_lives,
+                    next_live_timestamp: 0,
+                },
+            );
+    }
+
+    fn assert_available_lives(player_lives: PlayerLives, expected: u32) {
+        assert!(
+            player_lives.available_lives == expected,
+            "available lives should be {} (actual: {})",
+            expected,
+            player_lives.available_lives,
+        );
+    }
+
+    fn assert_current_cooldown(player_lives: PlayerLives, expected: u64) {
+        assert!(
+            player_lives.next_live_timestamp == expected,
+            "next life timestamp should be {} (actual: {})",
+            expected,
+            player_lives.next_live_timestamp,
+        );
+    }
 }
+
