@@ -120,7 +120,7 @@ pub mod profile_system {
         ) -> ProfileLevelConfig {
             let mut store = StoreTrait::new(self.world_default());
             let profile = store.get_profile(address);
-            store.get_profile_level_config(profile.level+1)
+            store.get_profile_level_config(profile.level + 1)
         }
     }
 

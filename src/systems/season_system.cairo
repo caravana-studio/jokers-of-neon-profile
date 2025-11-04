@@ -1,6 +1,7 @@
 use starknet::ContractAddress;
 use crate::models::{
     LevelXPConfig, MissionXPConfig, SeasonConfig, SeasonData, SeasonLevelConfig, SeasonProgress,
+    TournamentConfig, TournamentTicketReward,
 };
 
 #[starknet::interface]
@@ -48,6 +49,15 @@ pub trait ISeasonSystem<T> {
     fn get_season_line(
         self: @T, player: ContractAddress, season_id: u32, max_level: u32,
     ) -> Array<SeasonData>;
+
+    // Tournament configuration methods
+    fn set_tournament_ticket_reward(ref self: T, reward: TournamentTicketReward);
+    fn set_tournament_config(ref self: T, config: TournamentConfig);
+    fn get_tournament_ticket_reward(self: @T, season_id: u32, level: u32) -> TournamentTicketReward;
+    fn get_tournament_config(
+        self: @T, season_id: u32, tournament_id: u32, ranking_position: u32,
+    ) -> TournamentConfig;
+    fn setup_default_tournament_ticket_rewards(ref self: T, season_id: u32);
 }
 
 #[dojo::contract]
@@ -60,6 +70,7 @@ pub mod season_system {
     use crate::constants::packs::{ADVANCED_PACK_ID, EPIC_PACK_ID, LEGENDARY_PACK_ID};
     use crate::models::{
         LevelXPConfig, MissionXPConfig, SeasonConfig, SeasonData, SeasonLevelConfig, SeasonProgress,
+        TournamentConfig, TournamentTicketReward,
     };
     use crate::store::StoreTrait;
     use crate::systems::lives_system::{ILivesSystemDispatcher, ILivesSystemDispatcherTrait};
@@ -811,6 +822,70 @@ pub mod season_system {
             }
 
             result
+        }
+
+        fn set_tournament_ticket_reward(ref self: ContractState, reward: TournamentTicketReward) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            let world: WorldStorage = self.world_default();
+            let mut store = StoreTrait::new(world);
+            store.set_tournament_ticket_reward(reward);
+        }
+
+        fn set_tournament_config(ref self: ContractState, config: TournamentConfig) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            let world: WorldStorage = self.world_default();
+            let mut store = StoreTrait::new(world);
+            store.set_tournament_config(config);
+        }
+
+        fn get_tournament_ticket_reward(
+            self: @ContractState, season_id: u32, level: u32,
+        ) -> TournamentTicketReward {
+            let world: WorldStorage = self.world_default();
+            let mut store = StoreTrait::new(world);
+            store.get_tournament_ticket_reward(season_id, level)
+        }
+
+        fn get_tournament_config(
+            self: @ContractState, season_id: u32, tournament_id: u32, ranking_position: u32,
+        ) -> TournamentConfig {
+            let world: WorldStorage = self.world_default();
+            let mut store = StoreTrait::new(world);
+            store.get_tournament_config(
+                season_id, tournament_id, ranking_position,
+            )
+        }
+
+        fn setup_default_tournament_ticket_rewards(ref self: ContractState, season_id: u32) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            let world = self.world_default();
+            let mut store = StoreTrait::new(world);
+
+            // Configure tournament tickets for specific levels
+            // Level 14: 1 ticket
+            store.set_tournament_ticket_reward(
+                TournamentTicketReward { season_id, level: 14, ticket_amount: 1 },
+            );
+
+            // Level 18: 1 ticket
+            store.set_tournament_ticket_reward(
+                TournamentTicketReward { season_id, level: 18, ticket_amount: 1 },
+            );
+
+            // Level 22: 1 ticket
+            store.set_tournament_ticket_reward(
+                TournamentTicketReward { season_id, level: 22, ticket_amount: 1 },
+            );
+
+            // Level 25: 1 ticket
+            store.set_tournament_ticket_reward(
+                TournamentTicketReward { season_id, level: 25, ticket_amount: 1 },
+            );
+
+            // Level 30: 1 ticket
+            store.set_tournament_ticket_reward(
+                TournamentTicketReward { season_id, level: 30, ticket_amount: 1 },
+            );
         }
     }
 
