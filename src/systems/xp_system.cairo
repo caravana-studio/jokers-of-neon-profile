@@ -325,9 +325,20 @@ pub mod xp_system {
                 }
             }
 
-            // Update level if changed
+            // Update level if changed and check for tournament tickets
+            let mut tournament_tickets = season_progress.tournament_ticket;
             if new_level > old_level {
                 season_progress.level = new_level;
+
+                // Check and award tournament tickets for levels reached
+                let mut check_level = old_level + 1;
+                while check_level <= new_level {
+                    let ticket_reward = store.get_tournament_ticket_reward(season_id, check_level);
+                    if ticket_reward.ticket_amount > 0 {
+                        tournament_tickets += ticket_reward.ticket_amount;
+                    }
+                    check_level += 1;
+                }
             }
 
             // Create updated season progress
@@ -339,6 +350,7 @@ pub mod xp_system {
                 claimable_rewards_id: array![].span(),
                 season_pass_unlocked_at_level: season_progress.season_pass_unlocked_at_level,
                 level: new_level,
+                tournament_ticket: tournament_tickets,
             };
 
             store.set_season_progress(updated_progress);

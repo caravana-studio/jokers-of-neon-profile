@@ -12,6 +12,7 @@ pub struct SeasonProgress {
     pub claimable_rewards_id: Span<u32>,
     pub season_pass_unlocked_at_level: u32,
     pub level: u32,
+    pub tournament_ticket: u32,
 }
 
 #[derive(Copy, Drop, Serde, Debug, PartialEq, Introspect)]
@@ -201,4 +202,28 @@ pub struct SeasonData {
     pub premium_rewards: Span<u32>,
     pub free_claimed: bool,
     pub premium_claimed: bool,
+}
+
+// Tournament ticket rewards based on season level
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct TournamentTicketReward {
+    #[key]
+    pub season_id: u32,
+    #[key]
+    pub level: u32,
+    pub ticket_amount: u32,
+}
+
+// Tournament rewards configuration by ranking position
+#[derive(Drop, Serde)]
+#[dojo::model]
+pub struct TournamentConfig {
+    #[key]
+    pub season_id: u32,
+    #[key]
+    pub tournament_id: u32,
+    #[key]
+    pub ranking_position: u32,
+    pub rewards: Span<u32>,
 }
