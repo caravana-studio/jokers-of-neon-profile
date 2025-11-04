@@ -279,16 +279,9 @@ pub mod xp_system {
                 profile.level = new_level;
 
                 // Calculate current XP for new level
-                // Get the required XP for the previous level (or 0 if level 1)
-                let prev_level_required_xp = if new_level > 1 {
-                    let prev_level_config = store.get_profile_level_config(new_level - 1);
-                    prev_level_config.required_xp
-                } else {
-                    0
-                };
-
-                // Current XP = total XP - required XP for previous level
-                profile.xp = profile.total_xp - prev_level_required_xp;
+                // Current XP = total XP - required XP for current level
+                let current_level_config = store.get_profile_level_config(new_level);
+                profile.xp = profile.total_xp - current_level_config.required_xp;
             }
 
             store.set_profile(profile);
@@ -301,10 +294,11 @@ pub mod xp_system {
             season_id: u32,
             xp: u256,
         ) {
-            let season_progress = store.get_season_progress(address, season_id);
+            let mut season_progress = store.get_season_progress(address, season_id);
             let old_level = season_progress.level;
 
-            let new_season_xp = season_progress.season_xp + xp;
+            // Add to season XP
+            season_progress.season_xp += xp;
 
             // Check if player leveled up in the season
             let mut new_level = old_level;
@@ -318,7 +312,7 @@ pub mod xp_system {
                     break;
                 }
 
-                if new_season_xp >= level_config.required_xp {
+                if season_progress.season_xp >= level_config.required_xp {
                     new_level = level_to_check;
                     level_to_check += 1;
                 } else {
@@ -331,11 +325,16 @@ pub mod xp_system {
                 }
             }
 
+            // Update level if changed
+            if new_level > old_level {
+                season_progress.level = new_level;
+            }
+
             // Create updated season progress
             let updated_progress = SeasonProgress {
                 address: season_progress.address,
                 season_id: season_progress.season_id,
-                season_xp: new_season_xp,
+                season_xp: season_progress.season_xp,
                 has_season_pass: season_progress.has_season_pass,
                 claimable_rewards_id: array![].span(),
                 season_pass_unlocked_at_level: season_progress.season_pass_unlocked_at_level,
