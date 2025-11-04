@@ -10,7 +10,7 @@ pub struct SeasonProgress {
     pub season_xp: u256,
     pub has_season_pass: bool,
     pub claimable_rewards_id: Span<u32>,
-    pub tier: u32,
+    pub season_pass_unlocked_at_level: u32,
     pub level: u32,
 }
 
@@ -133,6 +133,7 @@ pub struct NFTManager {
 pub struct CardMintedEvent {
     #[key]
     pub recipient: starknet::ContractAddress,
+    pub pack_id: u32,
     pub card_id: u32,
     pub marketable: bool,
     pub skin_id: u32,
@@ -187,6 +188,17 @@ pub struct SeasonRewardClaim {
     pub season_id: u32,
     #[key]
     pub level: u32,
+    pub free_claimed: bool,
+    pub premium_claimed: bool,
+}
+
+// View-only struct for frontend season line display
+#[derive(Drop, Serde)]
+pub struct SeasonData {
+    pub level: u32,
+    pub required_xp: u256,
+    pub free_rewards: Span<u32>,
+    pub premium_rewards: Span<u32>,
     pub free_claimed: bool,
     pub premium_claimed: bool,
 }

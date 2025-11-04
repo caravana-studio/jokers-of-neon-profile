@@ -8,6 +8,11 @@ pub trait IXPSystem<T> {
 
     // Configuration methods
     fn setup_default_profile_config(ref self: T);
+
+    // Test method to add XP directly
+    fn test_xp(
+        ref self: T, address: ContractAddress, season_id: u32, season_xp: u256, profile_xp: u256,
+    );
 }
 
 #[dojo::contract]
@@ -15,11 +20,10 @@ pub mod xp_system {
     use jokers_of_neon_lib::models::external::profile::ProfileLevelConfig;
     use starknet::ContractAddress;
     use crate::constants::constants::DEFAULT_NS_BYTE;
-    use crate::models::MissionDifficulty;
+    use crate::models::{MissionDifficulty, SeasonProgress};
     use crate::store::{Store, StoreTrait};
     use crate::utils::utils::{
         get_current_day, get_level_xp_configurable, get_mission_xp_configurable,
-        get_tier_from_level,
     };
     use super::IXPSystem;
 
@@ -212,6 +216,28 @@ pub mod xp_system {
                 level += 1;
             }
         }
+
+        fn test_xp(
+            ref self: ContractState,
+            address: ContractAddress,
+            season_id: u32,
+            season_xp: u256,
+            profile_xp: u256,
+        ) {
+            // self.accesscontrol.assert_only_role(WRITER_ROLE);
+            let world = self.world_default();
+            let mut store = StoreTrait::new(world);
+
+            // Add profile XP if provided
+            if profile_xp > 0 {
+                self._add_profile_xp(ref store, address, profile_xp);
+            }
+
+            // Add season XP if provided
+            if season_xp > 0 {
+                self._add_season_xp(ref store, address, season_id, season_xp);
+            }
+        }
     }
 
     #[generate_trait]
@@ -253,16 +279,9 @@ pub mod xp_system {
                 profile.level = new_level;
 
                 // Calculate current XP for new level
-                // Get the required XP for the previous level (or 0 if level 1)
-                let prev_level_required_xp = if new_level > 1 {
-                    let prev_level_config = store.get_profile_level_config(new_level - 1);
-                    prev_level_config.required_xp
-                } else {
-                    0
-                };
-
-                // Current XP = total XP - required XP for previous level
-                profile.xp = profile.total_xp - prev_level_required_xp;
+                // Current XP = total XP - required XP for current level
+                let current_level_config = store.get_profile_level_config(new_level);
+                profile.xp = profile.total_xp - current_level_config.required_xp;
             }
 
             store.set_profile(profile);
@@ -278,6 +297,7 @@ pub mod xp_system {
             let mut season_progress = store.get_season_progress(address, season_id);
             let old_level = season_progress.level;
 
+            // Add to season XP
             season_progress.season_xp += xp;
 
             // Check if player leveled up in the season
@@ -310,12 +330,18 @@ pub mod xp_system {
                 season_progress.level = new_level;
             }
 
-            let new_tier = get_tier_from_level(season_progress.level);
-            if new_tier > season_progress.tier {
-                season_progress.tier = new_tier;
-            }
+            // Create updated season progress
+            let updated_progress = SeasonProgress {
+                address: season_progress.address,
+                season_id: season_progress.season_id,
+                season_xp: season_progress.season_xp,
+                has_season_pass: season_progress.has_season_pass,
+                claimable_rewards_id: array![].span(),
+                season_pass_unlocked_at_level: season_progress.season_pass_unlocked_at_level,
+                level: new_level,
+            };
 
-            store.set_season_progress(season_progress);
+            store.set_season_progress(updated_progress);
         }
     }
 }
