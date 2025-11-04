@@ -1491,7 +1491,7 @@
   "contracts": [
     {
       "address": "0x6db03b605ca2456e26b5d7f461691be85600f9bac437b44788c001cceeeb039",
-      "class_hash": "0x293aee2d3f3e1367b7d4047d75e5cdabeaaf16d3e21a04f5efec11371a650e4",
+      "class_hash": "0x35ae204f896308006cded9be71c20cf262eda4c65eafa705924b6c633b574c3",
       "abi": [
         {
           "type": "impl",
@@ -1649,22 +1649,6 @@
             {
               "type": "function",
               "name": "remove",
-              "inputs": [
-                {
-                  "name": "player",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "season_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "init_account",
               "inputs": [
                 {
                   "name": "player",
@@ -2170,7 +2154,6 @@
         "dojo_init",
         "claim",
         "remove",
-        "init_account",
         "upgrade_account",
         "init_lives_config",
         "upgrade",
@@ -3770,7 +3753,7 @@
     },
     {
       "address": "0x75cde1ce7f631d38cc14cd280ffef8f5660a5287e8c9e0cebe03c9a7a738cda",
-      "class_hash": "0x40f5552a9a8188d09a3e8987db680ea4529f10a7297eb86630b02cc5f8dc29f",
+      "class_hash": "0x6c1e4d5f4ed2e7736e42e0405f0fb3c9e3d770b1f3b2fd0da640fa8c7d10202",
       "abi": [
         {
           "type": "impl",

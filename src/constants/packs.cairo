@@ -1,6 +1,13 @@
 use crate::constants::constants::PERCENT_SCALE;
 use crate::models::Pack;
 
+pub const BASIC_PACK_ID: u32 = 1;
+pub const ADVANCED_PACK_ID: u32 = 2;
+pub const EPIC_PACK_ID: u32 = 3;
+pub const LEGENDARY_PACK_ID: u32 = 4;
+pub const COLLECTORS_PACK_ID: u32 = 5;
+pub const COLLECTORS_XL_PACK_ID: u32 = 6;
+
 pub fn BASIC_PACK() -> Pack {
     //       Traditional	Joker		Neon	Neon Joker	C	   B	  A	      S     Skin 1   Skin 2
     // Item 1	96,0%	    2,0%	    2,0%	   0,0%	   0,0%	  0,0%	 0,0%	 0,0%   0,0%    0,0%
@@ -28,7 +35,7 @@ pub fn BASIC_PACK() -> Pack {
             sum,
         );
     }
-    Pack { id: 1, season_id: 1, name: "Basic", probabilities }
+    Pack { id: BASIC_PACK_ID, season_id: 1, name: "Basic", probabilities }
 }
 
 pub fn ADVANCED_PACK() -> Pack {
@@ -58,7 +65,7 @@ pub fn ADVANCED_PACK() -> Pack {
             sum,
         );
     }
-    Pack { id: 2, season_id: 1, name: "Advanced", probabilities }
+    Pack { id: ADVANCED_PACK_ID, season_id: 1, name: "Advanced", probabilities }
 }
 
 pub fn EPIC_PACK() -> Pack {
@@ -93,7 +100,7 @@ pub fn EPIC_PACK() -> Pack {
             sum,
         );
     }
-    Pack { id: 3, season_id: 1, name: "Epic", probabilities }
+    Pack { id: EPIC_PACK_ID, season_id: 1, name: "Epic", probabilities }
 }
 
 pub fn LEGENDARY_PACK() -> Pack {
@@ -127,7 +134,7 @@ pub fn LEGENDARY_PACK() -> Pack {
             sum,
         );
     }
-    Pack { id: 4, season_id: 1, name: "Legendary", probabilities }
+    Pack { id: LEGENDARY_PACK_ID, season_id: 1, name: "Legendary", probabilities }
 }
 
 pub fn COLLECTORS_PACK() -> Pack {
@@ -164,7 +171,7 @@ pub fn COLLECTORS_PACK() -> Pack {
             sum,
         );
     }
-    Pack { id: 5, season_id: 1, name: "Collectors", probabilities }
+    Pack { id: COLLECTORS_PACK_ID, season_id: 1, name: "Collectors", probabilities }
 }
 
 pub fn COLLECTORS_XL_PACK() -> Pack {
@@ -221,5 +228,5 @@ pub fn COLLECTORS_XL_PACK() -> Pack {
             sum,
         );
     }
-    Pack { id: 6, season_id: 1, name: "Collectors XL", probabilities }
+    Pack { id: COLLECTORS_XL_PACK_ID, season_id: 1, name: "Collectors XL", probabilities }
 }
