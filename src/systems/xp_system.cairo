@@ -284,7 +284,7 @@ pub mod xp_system {
                 profile.xp = profile.total_xp - current_level_config.required_xp;
             }
 
-            store.set_profile(profile);
+            store.set_profile(@profile);
         }
 
         fn _add_season_xp(
@@ -341,7 +341,7 @@ pub mod xp_system {
                 level: new_level,
             };
 
-            store.set_season_progress(updated_progress);
+            store.set_season_progress(@updated_progress);
         }
     }
 }

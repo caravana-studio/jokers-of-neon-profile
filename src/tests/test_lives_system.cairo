@@ -614,7 +614,7 @@ mod tests_lives_system {
     fn set_season_pass(ref store: Store, player: ContractAddress) {
         store
             .set_season_progress(
-                SeasonProgress {
+                @SeasonProgress {
                     address: player,
                     season_id: SEASON,
                     season_xp: 0,

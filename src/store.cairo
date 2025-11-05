@@ -25,8 +25,8 @@ pub impl StoreImpl of StoreTrait {
         self.world.read_model(address)
     }
 
-    fn set_profile(ref self: Store, profile: Profile) {
-        self.world.write_model(@profile)
+    fn set_profile(ref self: Store, profile: @Profile) {
+        self.world.write_model(profile)
     }
 
     fn get_player_stats(ref self: Store, address: ContractAddress) -> PlayerStats {
@@ -43,8 +43,8 @@ pub impl StoreImpl of StoreTrait {
         self.world.read_model((address, season_id))
     }
 
-    fn set_season_progress(ref self: Store, season_progress: SeasonProgress) {
-        self.world.write_model(@season_progress)
+    fn set_season_progress(ref self: Store, season_progress: @SeasonProgress) {
+        self.world.write_model(season_progress)
     }
 
     fn get_daily_progress(ref self: Store, address: ContractAddress, day: u64) -> DailyProgress {

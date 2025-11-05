@@ -241,7 +241,7 @@ pub mod season_system {
 
             progress.has_season_pass = true;
             progress.season_pass_unlocked_at_level = progress.level;
-            store.set_season_progress(progress);
+            store.set_season_progress(@progress);
 
             self.emit(SeasonPassPurchased { player: address, season_id });
         }
