@@ -3753,7 +3753,7 @@
     },
     {
       "address": "0x641a5f87d5d66ad1ace3d04e325523a123578c6881f534ffa4915dcd00bb2d5",
-      "class_hash": "0x2f63fcbc8bd778ef223f4ca832839c48b1f77e3fc0111876abf8bb67ffe48d6",
+      "class_hash": "0xf51c8ccf8a3f9f3e970c12b6d887b2dda7d5e8b68cc21e755a6983497b8caf",
       "abi": [
         {
           "type": "impl",
@@ -4317,6 +4317,66 @@
                 {
                   "name": "is_premium",
                   "type": "core::bool"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "add_claimable_reward",
+              "inputs": [
+                {
+                  "name": "address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "reward_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "remove_claimable_reward",
+              "inputs": [
+                {
+                  "name": "address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "reward_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "claim_claimable_reward",
+              "inputs": [
+                {
+                  "name": "address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "idx",
+                  "type": "core::integer::u32"
                 }
               ],
               "outputs": [],
@@ -5096,6 +5156,9 @@
         "set_level_xp_config",
         "setup_default_season_config",
         "claim_season_rewards",
+        "add_claimable_reward",
+        "remove_claimable_reward",
+        "claim_claimable_reward",
         "set_tournament_ticket_reward",
         "set_tournament_config",
         "setup_default_tournament_ticket_rewards",
