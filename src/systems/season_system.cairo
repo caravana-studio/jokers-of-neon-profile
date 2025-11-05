@@ -58,6 +58,7 @@ pub trait ISeasonSystem<T> {
         self: @T, season_id: u32, tournament_id: u32, ranking_position: u32,
     ) -> TournamentConfig;
     fn setup_default_tournament_ticket_rewards(ref self: T, season_id: u32);
+    fn remove_tournament_ticket(ref self: T, address: ContractAddress, season_id: u32);
 }
 
 #[dojo::contract]
@@ -886,6 +887,26 @@ pub mod season_system {
             store.set_tournament_ticket_reward(
                 TournamentTicketReward { season_id, level: 30, ticket_amount: 1 },
             );
+        }
+
+        fn remove_tournament_ticket(
+            ref self: ContractState, address: ContractAddress, season_id: u32,
+        ) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            let world = self.world_default();
+            let mut store = StoreTrait::new(world);
+
+            // Get current season progress
+            let mut progress = store.get_season_progress(address, season_id);
+
+            // Check if player has tournament tickets
+            assert(progress.tournament_ticket > 0, 'No tournament tickets available');
+
+            // Decrease tournament ticket by 1
+            progress.tournament_ticket -= 1;
+
+            // Save updated progress
+            store.set_season_progress(progress);
         }
     }
 

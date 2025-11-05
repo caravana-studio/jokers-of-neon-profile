@@ -3753,7 +3753,7 @@
     },
     {
       "address": "0x641a5f87d5d66ad1ace3d04e325523a123578c6881f534ffa4915dcd00bb2d5",
-      "class_hash": "0x7df7e01289dc616a2d28891d1790a2ff44d75249130564ce18a41f195d12e0",
+      "class_hash": "0x2f63fcbc8bd778ef223f4ca832839c48b1f77e3fc0111876abf8bb67ffe48d6",
       "abi": [
         {
           "type": "impl",
@@ -4425,6 +4425,22 @@
               ],
               "outputs": [],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "remove_tournament_ticket",
+              "inputs": [
+                {
+                  "name": "address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -5083,6 +5099,7 @@
         "set_tournament_ticket_reward",
         "set_tournament_config",
         "setup_default_tournament_ticket_rewards",
+        "remove_tournament_ticket",
         "upgrade",
         "grant_role",
         "revoke_role",
