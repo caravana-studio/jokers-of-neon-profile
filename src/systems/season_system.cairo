@@ -45,6 +45,12 @@ pub trait ISeasonSystem<T> {
         ref self: T, address: ContractAddress, season_id: u32, level: u32, is_premium: bool,
     );
 
+    fn add_claimable_reward(ref self: T, address: ContractAddress, season_id: u32, reward_id: u32);
+    fn remove_claimable_reward(
+        ref self: T, address: ContractAddress, season_id: u32, reward_id: u32,
+    );
+    fn claim_claimable_reward(ref self: T, address: ContractAddress, season_id: u32, idx: u32);
+
     // Get season line data for frontend
     fn get_season_line(
         self: @T, player: ContractAddress, season_id: u32, max_level: u32,
@@ -852,9 +858,7 @@ pub mod season_system {
         ) -> TournamentConfig {
             let world: WorldStorage = self.world_default();
             let mut store = StoreTrait::new(world);
-            store.get_tournament_config(
-                season_id, tournament_id, ranking_position,
-            )
+            store.get_tournament_config(season_id, tournament_id, ranking_position)
         }
 
         fn setup_default_tournament_ticket_rewards(ref self: ContractState, season_id: u32) {
@@ -864,29 +868,34 @@ pub mod season_system {
 
             // Configure tournament tickets for specific levels
             // Level 14: 1 ticket
-            store.set_tournament_ticket_reward(
-                TournamentTicketReward { season_id, level: 14, ticket_amount: 1 },
-            );
+            store
+                .set_tournament_ticket_reward(
+                    TournamentTicketReward { season_id, level: 14, ticket_amount: 1 },
+                );
 
             // Level 18: 1 ticket
-            store.set_tournament_ticket_reward(
-                TournamentTicketReward { season_id, level: 18, ticket_amount: 1 },
-            );
+            store
+                .set_tournament_ticket_reward(
+                    TournamentTicketReward { season_id, level: 18, ticket_amount: 1 },
+                );
 
             // Level 22: 1 ticket
-            store.set_tournament_ticket_reward(
-                TournamentTicketReward { season_id, level: 22, ticket_amount: 1 },
-            );
+            store
+                .set_tournament_ticket_reward(
+                    TournamentTicketReward { season_id, level: 22, ticket_amount: 1 },
+                );
 
             // Level 25: 1 ticket
-            store.set_tournament_ticket_reward(
-                TournamentTicketReward { season_id, level: 25, ticket_amount: 1 },
-            );
+            store
+                .set_tournament_ticket_reward(
+                    TournamentTicketReward { season_id, level: 25, ticket_amount: 1 },
+                );
 
             // Level 30: 1 ticket
-            store.set_tournament_ticket_reward(
-                TournamentTicketReward { season_id, level: 30, ticket_amount: 1 },
-            );
+            store
+                .set_tournament_ticket_reward(
+                    TournamentTicketReward { season_id, level: 30, ticket_amount: 1 },
+                );
         }
 
         fn remove_tournament_ticket(
@@ -907,6 +916,83 @@ pub mod season_system {
 
             // Save updated progress
             store.set_season_progress(progress);
+        }
+
+        fn add_claimable_reward(
+            ref self: ContractState, address: ContractAddress, season_id: u32, reward_id: u32,
+        ) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            let world = self.world_default();
+            let mut store = StoreTrait::new(world);
+
+            let mut progress = store.get_season_progress(address, season_id);
+
+            let mut new_rewards: Array<u32> = array![];
+            for reward in progress.claimable_rewards_id {
+                new_rewards.append(*reward);
+            }
+            new_rewards.append(reward_id);
+
+            progress.claimable_rewards_id = new_rewards.span();
+
+            store.set_season_progress(progress);
+        }
+
+        fn remove_claimable_reward(
+            ref self: ContractState, address: ContractAddress, season_id: u32, reward_id: u32,
+        ) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            let world = self.world_default();
+            let mut store = StoreTrait::new(world);
+
+            let mut progress = store.get_season_progress(address, season_id);
+
+            let mut new_rewards: Array<u32> = array![];
+            let mut found = false;
+            for reward in progress.claimable_rewards_id {
+                if *reward == reward_id && !found {
+                    found = true;
+                } else {
+                    new_rewards.append(*reward);
+                }
+            }
+
+            assert(found, 'Reward not found');
+
+            progress.claimable_rewards_id = new_rewards.span();
+
+            store.set_season_progress(progress);
+        }
+
+        fn claim_claimable_reward(
+            ref self: ContractState, address: ContractAddress, season_id: u32, idx: u32,
+        ) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            let world = self.world_default();
+            let mut store = StoreTrait::new(world);
+
+            let mut progress = store.get_season_progress(address, season_id);
+
+            let rewards_span = progress.claimable_rewards_id;
+            let span_len = rewards_span.len();
+            assert(idx < span_len, 'Invalid reward index');
+
+            let pack_id = *rewards_span.at(idx);
+
+            let mut new_rewards: Array<u32> = array![];
+            let mut current_idx: u32 = 0;
+            for reward in rewards_span {
+                if current_idx != idx {
+                    new_rewards.append(*reward);
+                }
+                current_idx += 1;
+            }
+
+            progress.claimable_rewards_id = new_rewards.span();
+
+            store.set_season_progress(progress);
+
+            self.mint_pack(world, address, pack_id);
         }
     }
 
