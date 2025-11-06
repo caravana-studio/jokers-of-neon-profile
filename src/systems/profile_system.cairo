@@ -13,8 +13,10 @@ pub trait IJokersProfile<T> {
     fn get_profile_level_config_by_address(
         self: @T, address: ContractAddress,
     ) -> ProfileLevelConfig;
-
-    fn migrate(ref self: T, profiles: Span<Profile>, season_progresses: Span<SeasonProgress>);
+    fn migrate(ref self: T, 
+        profiles: Array<Profile>,
+        season_progresses: Array<SeasonProgress>
+    );
 }
 
 #[dojo::contract]
@@ -128,23 +130,23 @@ pub mod profile_system {
 
         fn migrate(
             ref self: ContractState,
-            profiles: Span<Profile>,
-            season_progresses: Span<SeasonProgress>,
+            // profiles: Array<Profile>,
+            // season_progresses: Array<SeasonProgress>,
         ) {
-            assert!(
-                profiles.len() == season_progresses.len(),
-                "[ProfileSystem] Profiles and season progresses must have the same length",
-            );
+            // assert!(
+            //     profiles.len() == season_progresses.len(),
+            //     "[ProfileSystem] Profiles and season progresses must have the same length",
+            // );
             self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
 
-            for profile in profiles {
-                store.set_profile(profile);
-            }
+            // for profile in profiles {
+            //     store.set_profile(profile);
+            // }
 
-            for season_progress in season_progresses {
-                store.set_season_progress(season_progress);
-            }
+            // for season_progress in season_progresses {
+            //     store.set_season_progress(season_progress);
+            // }
         }
     }
 
