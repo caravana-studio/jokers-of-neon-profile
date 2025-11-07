@@ -14,8 +14,8 @@ pub trait IJokersProfile<T> {
         self: @T, address: ContractAddress,
     ) -> ProfileLevelConfig;
     fn migrate(ref self: T, 
-        profiles: Array<Profile>,
-        season_progresses: Array<SeasonProgress>
+        profiles: Span<Profile>,
+        season_progresses: Span<SeasonProgress>
     );
 }
 
@@ -130,23 +130,27 @@ pub mod profile_system {
 
         fn migrate(
             ref self: ContractState,
-            // profiles: Array<Profile>,
-            // season_progresses: Array<SeasonProgress>,
+            profiles: Span<Profile>,
+            season_progresses: Span<SeasonProgress>,
         ) {
-            // assert!(
-            //     profiles.len() == season_progresses.len(),
-            //     "[ProfileSystem] Profiles and season progresses must have the same length",
-            // );
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            assert!(
+                profiles.len() == season_progresses.len(),
+                "[ProfileSystem] Profiles and season progresses must have the same length",
+            );
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
 
-            // for profile in profiles {
-            //     store.set_profile(profile);
-            // }
+            println!("Profiles length: {}", profiles.len());
+            for profile in profiles {
+                println!("Profile: {:?}", profile);
+                store.set_profile(profile);
+            }
 
-            // for season_progress in season_progresses {
-            //     store.set_season_progress(season_progress);
-            // }
+            println!("Season progresses length: {}", season_progresses.len());
+            for season_progress in season_progresses {
+                println!("Season progress: {:?}", season_progress);
+                store.set_season_progress(season_progress);
+            }
         }
     }
 
