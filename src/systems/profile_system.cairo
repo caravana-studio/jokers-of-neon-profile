@@ -13,10 +13,7 @@ pub trait IJokersProfile<T> {
     fn get_profile_level_config_by_address(
         self: @T, address: ContractAddress,
     ) -> ProfileLevelConfig;
-    fn migrate(ref self: T, 
-        profiles: Span<Profile>,
-        season_progresses: Span<SeasonProgress>
-    );
+    fn migrate(ref self: T, profiles: Span<Profile>, season_progresses: Span<SeasonProgress>);
 }
 
 #[dojo::contract]
