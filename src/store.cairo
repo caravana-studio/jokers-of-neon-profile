@@ -6,7 +6,7 @@ use crate::constants::constants::{FREE_PACK_CONFIG_KEY, LIVES_CONFIG_KEY, NFT_MA
 use crate::models::{
     DailyProgress, FreePackConfig, Item, LevelXPConfig, LivesConfig, MissionDifficulty,
     MissionXPConfig, NFTManager, Pack, PlayerFreePack, PlayerLives, SeasonConfig, SeasonContent,
-    SeasonLevelConfig, SeasonProgress, SeasonRewardClaim, TournamentConfig, TournamentTicketReward,
+    SeasonLevelConfig, SeasonProgress, SeasonRewardClaim,
 };
 
 #[derive(Drop)]
@@ -171,25 +171,5 @@ pub impl StoreImpl of StoreTrait {
 
     fn set_season_reward_claim(ref self: Store, claim: SeasonRewardClaim) {
         self.world.write_model(@claim)
-    }
-
-    fn get_tournament_ticket_reward(
-        ref self: Store, season_id: u32, level: u32,
-    ) -> TournamentTicketReward {
-        self.world.read_model((season_id, level))
-    }
-
-    fn set_tournament_ticket_reward(ref self: Store, reward: TournamentTicketReward) {
-        self.world.write_model(@reward)
-    }
-
-    fn get_tournament_config(
-        ref self: Store, season_id: u32, tournament_id: u32, ranking_position: u32,
-    ) -> TournamentConfig {
-        self.world.read_model((season_id, tournament_id, ranking_position))
-    }
-
-    fn set_tournament_config(ref self: Store, config: TournamentConfig) {
-        self.world.write_model(@config)
     }
 }

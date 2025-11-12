@@ -203,27 +203,3 @@ pub struct SeasonData {
     pub free_claimed: bool,
     pub premium_claimed: bool,
 }
-
-// Tournament ticket rewards based on season level
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct TournamentTicketReward {
-    #[key]
-    pub season_id: u32,
-    #[key]
-    pub level: u32,
-    pub ticket_amount: u32,
-}
-
-// Tournament rewards configuration by ranking position
-#[derive(Drop, Serde)]
-#[dojo::model]
-pub struct TournamentConfig {
-    #[key]
-    pub season_id: u32,
-    #[key]
-    pub tournament_id: u32,
-    #[key]
-    pub ranking_position: u32,
-    pub rewards: Span<u32>,
-}
