@@ -10,7 +10,7 @@ pub trait IJokersProfile<T> {
     fn get_profile(self: @T, player_address: ContractAddress) -> Profile;
     fn get_player_stats(self: @T, player_address: ContractAddress) -> PlayerStats;
     fn get_profile_level_config_by_level(self: @T, level: u32) -> ProfileLevelConfig;
-    fn get_profile_level_config_by_address(
+    fn get_next_level_profile_config_by_address(
         self: @T, address: ContractAddress,
     ) -> ProfileLevelConfig;
 }
@@ -115,7 +115,7 @@ pub mod profile_system {
             store.get_profile_level_config(level)
         }
 
-        fn get_profile_level_config_by_address(
+        fn get_next_level_profile_config_by_address(
             self: @ContractState, address: ContractAddress,
         ) -> ProfileLevelConfig {
             let mut store = StoreTrait::new(self.world_default());
