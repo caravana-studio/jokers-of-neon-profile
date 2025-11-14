@@ -1,6 +1,6 @@
 use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, ProfileLevelConfig};
 use starknet::ContractAddress;
-
+use crate::models::SeasonProgress;
 
 #[starknet::interface]
 pub trait IJokersProfile<T> {
@@ -13,6 +13,7 @@ pub trait IJokersProfile<T> {
     fn get_next_level_profile_config_by_address(
         self: @T, address: ContractAddress,
     ) -> ProfileLevelConfig;
+    fn migrate(ref self: T, profiles: Span<Profile>, season_progresses: Span<SeasonProgress>);
 }
 
 #[dojo::contract]
@@ -22,6 +23,7 @@ pub mod profile_system {
     use openzeppelin_introspection::src5::SRC5Component;
     use starknet::ContractAddress;
     use crate::constants::constants::DEFAULT_NS_BYTE;
+    use crate::models::SeasonProgress;
     use crate::store::StoreTrait;
     use super::IJokersProfile;
 
@@ -69,7 +71,7 @@ pub mod profile_system {
 
             store
                 .set_profile(
-                    Profile {
+                    @Profile {
                         address,
                         username,
                         total_xp: 0,
@@ -95,7 +97,7 @@ pub mod profile_system {
             let mut store = StoreTrait::new(self.world_default());
             let mut profile = store.get_profile(player_address);
             profile.avatar_id = avatar_id;
-            store.set_profile(profile);
+            store.set_profile(@profile);
         }
 
         fn get_profile(self: @ContractState, player_address: ContractAddress) -> Profile {
@@ -121,6 +123,31 @@ pub mod profile_system {
             let mut store = StoreTrait::new(self.world_default());
             let profile = store.get_profile(address);
             store.get_profile_level_config(profile.level + 1)
+        }
+
+        fn migrate(
+            ref self: ContractState,
+            profiles: Span<Profile>,
+            season_progresses: Span<SeasonProgress>,
+        ) {
+            assert!(
+                profiles.len() == season_progresses.len(),
+                "[ProfileSystem] Profiles and season progresses must have the same length",
+            );
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            let mut store = StoreTrait::new(self.world_default());
+
+            println!("Profiles length: {}", profiles.len());
+            for profile in profiles {
+                println!("Profile: {:?}", profile);
+                store.set_profile(profile);
+            }
+
+            println!("Season progresses length: {}", season_progresses.len());
+            for season_progress in season_progresses {
+                println!("Season progress: {:?}", season_progress);
+                store.set_season_progress(season_progress);
+            }
         }
     }
 
