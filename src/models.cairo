@@ -12,6 +12,7 @@ pub struct SeasonProgress {
     pub claimable_rewards_id: Span<u32>,
     pub season_pass_unlocked_at_level: u32,
     pub level: u32,
+    pub tournament_ticket: u32,
 }
 
 #[derive(Copy, Drop, Serde, Debug, PartialEq, Introspect)]

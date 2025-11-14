@@ -21,3 +21,5 @@ pub const FREE_PACK_CONFIG_KEY: felt252 = selector!("FREE_PACK_CONFIG_KEY");
 pub const NFT_MANAGER_KEY: felt252 = selector!("NFT_MANAGER_KEY");
 
 pub const LIVES_CONFIG_KEY: felt252 = selector!("LIVES_CONFIG_KEY");
+
+pub const TOURNAMENT_TICKET_REWARD_ID: u32 = 99;

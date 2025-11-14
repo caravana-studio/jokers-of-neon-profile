@@ -48,6 +48,8 @@ pub trait ISeasonSystem<T> {
     fn get_season_line(
         self: @T, player: ContractAddress, season_id: u32, max_level: u32,
     ) -> Array<SeasonData>;
+
+    fn remove_tournament_ticket(ref self: T, address: ContractAddress, season_id: u32);
 }
 
 #[dojo::contract]
@@ -56,7 +58,7 @@ pub mod season_system {
     use openzeppelin_access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
     use openzeppelin_introspection::src5::SRC5Component;
     use starknet::ContractAddress;
-    use crate::constants::constants::DEFAULT_NS_BYTE;
+    use crate::constants::constants::{DEFAULT_NS_BYTE, TOURNAMENT_TICKET_REWARD_ID};
     use crate::constants::packs::{ADVANCED_PACK_ID, EPIC_PACK_ID, LEGENDARY_PACK_ID};
     use crate::models::{
         LevelXPConfig, MissionXPConfig, SeasonConfig, SeasonData, SeasonLevelConfig, SeasonProgress,
@@ -358,9 +360,19 @@ pub mod season_system {
                 assert(!claim_record.premium_claimed, 'Premium already claimed');
                 assert(premium_rewards_count > 0, 'No premium rewards');
 
-                // Mint each pack in premium_rewards
-                for pack_id in premium_rewards {
-                    self.mint_pack(world, address, *pack_id);
+                let mut tournament_tickets_earned = 0;
+                for reward_id in premium_rewards {
+                    if *reward_id == TOURNAMENT_TICKET_REWARD_ID {
+                        tournament_tickets_earned += 1;
+                    } else {
+                        self.mint_pack(world, address, *reward_id);
+                    }
+                }
+
+                if tournament_tickets_earned > 0 {
+                    let mut progress = store.get_season_progress(address, season_id);
+                    progress.tournament_ticket += tournament_tickets_earned;
+                    store.set_season_progress(progress);
                 }
 
                 claim_record.premium_claimed = true;
@@ -376,13 +388,22 @@ pub mod season_system {
                         },
                     );
             } else {
-                // Claim free rewards
                 assert(!claim_record.free_claimed, 'Free already claimed');
                 assert(free_rewards_count > 0, 'No free rewards');
 
-                // Mint each pack in free_rewards
-                for pack_id in free_rewards {
-                    self.mint_pack(world, address, *pack_id);
+                let mut tournament_tickets_earned = 0;
+                for reward_id in free_rewards {
+                    if *reward_id == TOURNAMENT_TICKET_REWARD_ID {
+                        tournament_tickets_earned += 1;
+                    } else {
+                        self.mint_pack(world, address, *reward_id);
+                    }
+                }
+
+                if tournament_tickets_earned > 0 {
+                    let mut progress = store.get_season_progress(address, season_id);
+                    progress.tournament_ticket += tournament_tickets_earned;
+                    store.set_season_progress(progress);
                 }
 
                 claim_record.free_claimed = true;
@@ -429,7 +450,7 @@ pub mod season_system {
                         level: 2,
                         required_xp: 50,
                         free_rewards: [].span(),
-                        premium_rewards: [LEGENDARY_PACK_ID].span(),
+                        premium_rewards: [EPIC_PACK_ID].span(),
                     },
                 );
             store
@@ -469,7 +490,7 @@ pub mod season_system {
                         level: 6,
                         required_xp: 200,
                         free_rewards: [].span(),
-                        premium_rewards: [LEGENDARY_PACK_ID].span(),
+                        premium_rewards: [EPIC_PACK_ID].span(),
                     },
                 );
             store
@@ -479,7 +500,7 @@ pub mod season_system {
                         level: 7,
                         required_xp: 300,
                         free_rewards: [].span(),
-                        premium_rewards: [EPIC_PACK_ID].span(),
+                        premium_rewards: [ADVANCED_PACK_ID].span(),
                     },
                 );
             store
@@ -499,7 +520,7 @@ pub mod season_system {
                         level: 9,
                         required_xp: 500,
                         free_rewards: [].span(),
-                        premium_rewards: [LEGENDARY_PACK_ID].span(),
+                        premium_rewards: [EPIC_PACK_ID].span(),
                     },
                 );
             store
@@ -508,7 +529,7 @@ pub mod season_system {
                         season_id,
                         level: 10,
                         required_xp: 600,
-                        free_rewards: [EPIC_PACK_ID].span(),
+                        free_rewards: [LEGENDARY_PACK_ID].span(),
                         premium_rewards: [].span(),
                     },
                 );
@@ -518,7 +539,7 @@ pub mod season_system {
                         season_id,
                         level: 11,
                         required_xp: 700,
-                        free_rewards: [EPIC_PACK_ID, LEGENDARY_PACK_ID].span(),
+                        free_rewards: [ADVANCED_PACK_ID].span(),
                         premium_rewards: [].span(),
                     },
                 );
@@ -530,7 +551,7 @@ pub mod season_system {
                         level: 12,
                         required_xp: 800,
                         free_rewards: [].span(),
-                        premium_rewards: [LEGENDARY_PACK_ID].span(),
+                        premium_rewards: [EPIC_PACK_ID].span(),
                     },
                 );
             store
@@ -570,7 +591,7 @@ pub mod season_system {
                         level: 16,
                         required_xp: 1200,
                         free_rewards: [].span(),
-                        premium_rewards: [EPIC_PACK_ID].span(),
+                        premium_rewards: [ADVANCED_PACK_ID].span(),
                     },
                 );
             store
@@ -580,7 +601,7 @@ pub mod season_system {
                         level: 17,
                         required_xp: 1300,
                         free_rewards: [].span(),
-                        premium_rewards: [LEGENDARY_PACK_ID].span(),
+                        premium_rewards: [EPIC_PACK_ID].span(),
                     },
                 );
             store
@@ -600,7 +621,7 @@ pub mod season_system {
                         level: 19,
                         required_xp: 1500,
                         free_rewards: [].span(),
-                        premium_rewards: [EPIC_PACK_ID].span(),
+                        premium_rewards: [ADVANCED_PACK_ID].span(),
                     },
                 );
             store
@@ -620,7 +641,7 @@ pub mod season_system {
                         level: 21,
                         required_xp: 1700,
                         free_rewards: [].span(),
-                        premium_rewards: [EPIC_PACK_ID].span(),
+                        premium_rewards: [ADVANCED_PACK_ID].span(),
                     },
                 );
             store
@@ -630,7 +651,7 @@ pub mod season_system {
                         level: 22,
                         required_xp: 1800,
                         free_rewards: [].span(),
-                        premium_rewards: [LEGENDARY_PACK_ID].span(),
+                        premium_rewards: [EPIC_PACK_ID].span(),
                     },
                 );
             store
@@ -640,7 +661,7 @@ pub mod season_system {
                         level: 23,
                         required_xp: 1900,
                         free_rewards: [].span(),
-                        premium_rewards: [EPIC_PACK_ID].span(),
+                        premium_rewards: [ADVANCED_PACK_ID].span(),
                     },
                 );
             store
@@ -649,7 +670,7 @@ pub mod season_system {
                         season_id,
                         level: 24,
                         required_xp: 2000,
-                        free_rewards: [EPIC_PACK_ID].span(),
+                        free_rewards: [LEGENDARY_PACK_ID].span(),
                         premium_rewards: [].span(),
                     },
                 );
@@ -681,7 +702,7 @@ pub mod season_system {
                         level: 27,
                         required_xp: 2300,
                         free_rewards: [].span(),
-                        premium_rewards: [EPIC_PACK_ID, LEGENDARY_PACK_ID].span(),
+                        premium_rewards: [ADVANCED_PACK_ID, EPIC_PACK_ID].span(),
                     },
                 );
             store
@@ -720,7 +741,7 @@ pub mod season_system {
                         season_id,
                         level: 31,
                         required_xp: 3000,
-                        free_rewards: [EPIC_PACK_ID].span(),
+                        free_rewards: [LEGENDARY_PACK_ID].span(),
                         premium_rewards: [].span(),
                     },
                 );
@@ -731,7 +752,7 @@ pub mod season_system {
                         level: 32,
                         required_xp: 3500,
                         free_rewards: [EPIC_PACK_ID].span(),
-                        premium_rewards: [ADVANCED_PACK_ID].span(),
+                        premium_rewards: [LEGENDARY_PACK_ID].span(),
                     },
                 );
             // Leveles 33+ - Legend (Tier 4)
@@ -742,7 +763,7 @@ pub mod season_system {
                         level: 33,
                         required_xp: 4000,
                         free_rewards: [EPIC_PACK_ID].span(),
-                        premium_rewards: [EPIC_PACK_ID, EPIC_PACK_ID].span(),
+                        premium_rewards: [LEGENDARY_PACK_ID, LEGENDARY_PACK_ID].span(),
                     },
                 );
             store
@@ -751,8 +772,8 @@ pub mod season_system {
                         season_id,
                         level: 34,
                         required_xp: 5000,
-                        free_rewards: [EPIC_PACK_ID].span(),
-                        premium_rewards: [EPIC_PACK_ID, EPIC_PACK_ID].span(),
+                        free_rewards: [LEGENDARY_PACK_ID].span(),
+                        premium_rewards: [LEGENDARY_PACK_ID, LEGENDARY_PACK_ID].span(),
                     },
                 );
             store
@@ -762,7 +783,7 @@ pub mod season_system {
                         level: 35,
                         required_xp: 7500,
                         free_rewards: [EPIC_PACK_ID, EPIC_PACK_ID].span(),
-                        premium_rewards: [EPIC_PACK_ID, EPIC_PACK_ID].span(),
+                        premium_rewards: [LEGENDARY_PACK_ID, LEGENDARY_PACK_ID].span(),
                     },
                 );
             store
@@ -771,8 +792,8 @@ pub mod season_system {
                         season_id,
                         level: 36,
                         required_xp: 10000,
-                        free_rewards: [EPIC_PACK_ID, EPIC_PACK_ID].span(),
-                        premium_rewards: [EPIC_PACK_ID, EPIC_PACK_ID, EPIC_PACK_ID].span(),
+                        free_rewards: [LEGENDARY_PACK_ID, LEGENDARY_PACK_ID].span(),
+                        premium_rewards: [LEGENDARY_PACK_ID, LEGENDARY_PACK_ID, LEGENDARY_PACK_ID].span(),
                     },
                 );
         }
@@ -811,6 +832,26 @@ pub mod season_system {
             }
 
             result
+        }
+
+        fn remove_tournament_ticket(
+            ref self: ContractState, address: ContractAddress, season_id: u32,
+        ) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            let world = self.world_default();
+            let mut store = StoreTrait::new(world);
+
+            // Get current season progress
+            let mut progress = store.get_season_progress(address, season_id);
+
+            // Check if player has tournament tickets
+            assert(progress.tournament_ticket > 0, 'No tournament tickets available');
+
+            // Decrease tournament ticket by 1
+            progress.tournament_ticket -= 1;
+
+            // Save updated progress
+            store.set_season_progress(progress);
         }
     }
 

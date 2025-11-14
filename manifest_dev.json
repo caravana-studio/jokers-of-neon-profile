@@ -1490,8 +1490,8 @@
   },
   "contracts": [
     {
-      "address": "0x3ff0b564de9d0164086e840acbe172779eecfec5e099e2b68c4320da53c231f",
-      "class_hash": "0xa73d90fa723df8d56d9bd19e2ad2cc8486cd7c2b404be09a24b0857fdfdfff",
+      "address": "0x608400d4bfe09541c7093893a7a636b651e78278161188d8323a46d20b6ca40",
+      "class_hash": "0x281a46dffdaedaca4153cd33922bddfd49307fc33a2e9d1f47d951dd01d1719",
       "abi": [
         {
           "type": "impl",
@@ -2166,8 +2166,8 @@
       ]
     },
     {
-      "address": "0x62beeb26c3f1a7bf82cc3540fb3a5ac869fab90d009dbbc3f51e76297833e78",
-      "class_hash": "0x7d2ef92e5064c9e2d2e755887e221f0b303ae7d26c6af567f78137fb6151d52",
+      "address": "0x66e2c9dd38a06190b1f290015733d3e251607011ef5b8deb7c926680894b42f",
+      "class_hash": "0x1b8eb424efa6f778b9746277ac574087790ef1fe1cf5d22a0d1d60ff97db862",
       "abi": [
         {
           "type": "impl",
@@ -2937,8 +2937,8 @@
       ]
     },
     {
-      "address": "0x5b26f398056aef6f2fe2cafd287bcccf1331887c435d53b4653d241c81fadcc",
-      "class_hash": "0x1480fa9b0e12e116fe6a3330bafd9da7e68e7f0249f6ee5ced0f52a9cbd664",
+      "address": "0x75513603f167b654961836bd1f8b9c9c2af0f0762f3bb856ce9467984eb41c5",
+      "class_hash": "0x680f9559aa0de608e15b371effff52e7a2ddf9204947a1ab1c411194867ea5d",
       "abi": [
         {
           "type": "impl",
@@ -3208,60 +3208,6 @@
           ]
         },
         {
-          "type": "struct",
-          "name": "core::array::Span::<jokers_of_neon_lib::models::external::profile::Profile>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<jokers_of_neon_lib::models::external::profile::Profile>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "jokers_of_neon_profile::models::SeasonProgress",
-          "members": [
-            {
-              "name": "address",
-              "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "season_id",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "season_xp",
-              "type": "core::integer::u256"
-            },
-            {
-              "name": "has_season_pass",
-              "type": "core::bool"
-            },
-            {
-              "name": "claimable_rewards_id",
-              "type": "core::array::Span::<core::integer::u32>"
-            },
-            {
-              "name": "season_pass_unlocked_at_level",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "level",
-              "type": "core::integer::u32"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "core::array::Span::<jokers_of_neon_profile::models::SeasonProgress>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<jokers_of_neon_profile::models::SeasonProgress>"
-            }
-          ]
-        },
-        {
           "type": "interface",
           "name": "jokers_of_neon_profile::systems::profile_system::IJokersProfile",
           "items": [
@@ -3376,22 +3322,6 @@
                 }
               ],
               "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "migrate",
-              "inputs": [
-                {
-                  "name": "profiles",
-                  "type": "core::array::Span::<jokers_of_neon_lib::models::external::profile::Profile>"
-                },
-                {
-                  "name": "season_progresses",
-                  "type": "core::array::Span::<jokers_of_neon_profile::models::SeasonProgress>"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
             }
           ]
         },
@@ -3812,7 +3742,6 @@
         "create_profile",
         "add_stats",
         "update_avatar",
-        "migrate",
         "upgrade",
         "grant_role",
         "revoke_role",
@@ -3823,8 +3752,8 @@
       ]
     },
     {
-      "address": "0x443e1c439f9aefbf9b633789b30ccd8b9508376faefeb527490608b15298109",
-      "class_hash": "0xf7731738572fb84fcbb192fb4dbcb814c7a075a2fd905e6c9ba498d100af7c",
+      "address": "0x5e66519fed49e6083eae39901fe0ab23b72aa2fa6dcc1169f96d92271914cce",
+      "class_hash": "0x1ac5e9e02fbf4cc77d59bc7473f246a1a08cf72d1a71ec32f3fe852c7ba1479",
       "abi": [
         {
           "type": "impl",
@@ -3976,6 +3905,10 @@
             {
               "name": "level",
               "type": "core::integer::u32"
+            },
+            {
+              "name": "tournament_ticket",
+              "type": "core::integer::u32"
             }
           ]
         },
@@ -4094,6 +4027,46 @@
             {
               "name": "premium_claimed",
               "type": "core::bool"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "jokers_of_neon_profile::models::TournamentTicketReward",
+          "members": [
+            {
+              "name": "season_id",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "level",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "ticket_amount",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "jokers_of_neon_profile::models::TournamentConfig",
+          "members": [
+            {
+              "name": "season_id",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "tournament_id",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "ranking_position",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "rewards",
+              "type": "core::array::Span::<core::integer::u32>"
             }
           ]
         },
@@ -4372,6 +4345,86 @@
                 }
               ],
               "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "set_tournament_ticket_reward",
+              "inputs": [
+                {
+                  "name": "reward",
+                  "type": "jokers_of_neon_profile::models::TournamentTicketReward"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "set_tournament_config",
+              "inputs": [
+                {
+                  "name": "config",
+                  "type": "jokers_of_neon_profile::models::TournamentConfig"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "get_tournament_ticket_reward",
+              "inputs": [
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "level",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "jokers_of_neon_profile::models::TournamentTicketReward"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_tournament_config",
+              "inputs": [
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "tournament_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "ranking_position",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "jokers_of_neon_profile::models::TournamentConfig"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "setup_default_tournament_ticket_rewards",
+              "inputs": [
+                {
+                  "name": "season_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -5027,6 +5080,9 @@
         "set_level_xp_config",
         "setup_default_season_config",
         "claim_season_rewards",
+        "set_tournament_ticket_reward",
+        "set_tournament_config",
+        "setup_default_tournament_ticket_rewards",
         "upgrade",
         "grant_role",
         "revoke_role",
@@ -5037,8 +5093,8 @@
       ]
     },
     {
-      "address": "0xca17b36aef1869d31623dce8b16e420f4b296148461b9978f752a2ec86db0a",
-      "class_hash": "0x372ac9da57e6dfa2dd642d41d0ec9196db551f8822e7a468cca32d645d6cc15",
+      "address": "0x17e6bdfd8a714b988d692823aa6118125c55d3277cb8cb43629a644e7e082c8",
+      "class_hash": "0x582b5f9817ccea142b4d5989f538ccf838d6afdf15b387d103365336818b41e",
       "abi": [
         {
           "type": "impl",
@@ -5511,7 +5567,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x2f3949562234b8495298cc6c16019eba78fd3581b4bc5fabca7e2d1fa32000f",
+      "class_hash": "0x7406059a98e3ba101bbffbfd0ea49a90fe1689504cdbc8f444e9fd936c21386",
       "tag": "jokers_of_neon_profile-SeasonProgress",
       "selector": "0xc3accb189bcc1e7e75a72ba636c91bd4588be10f4b9a5dc2dbf9717aab9713"
     },
@@ -5520,6 +5576,18 @@
       "class_hash": "0x47ad9f039f3fb2b8cc0e5b7b4858c5fa1a262638f7234436d88263eca9f1e2c",
       "tag": "jokers_of_neon_profile-SeasonRewardClaim",
       "selector": "0x79d68f69a747b48cd49a3dfcb4a78e7cf6867371a00396dd36f31ec32644608"
+    },
+    {
+      "members": [],
+      "class_hash": "0x3c09a442a0d2c23df6ec5b9faea52585e924ebd934e70bbdf2594fc4e5945e6",
+      "tag": "jokers_of_neon_profile-TournamentConfig",
+      "selector": "0x6d9698b14f9524a41f1dd013c46caf6ff577e8a1b2a9b5c4a6f477e760a04da"
+    },
+    {
+      "members": [],
+      "class_hash": "0x1a596c4521c70dfdae2e32774a216f453d5a1c7f586f33a5309884c6a174103",
+      "tag": "jokers_of_neon_profile-TournamentTicketReward",
+      "selector": "0x6f0b0889719ce1bfa379ae6dba4a4c02845b41dfc4e7bb4f134c77703d946ec"
     }
   ],
   "events": [

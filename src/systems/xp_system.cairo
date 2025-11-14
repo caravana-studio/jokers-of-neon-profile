@@ -339,6 +339,7 @@ pub mod xp_system {
                 claimable_rewards_id: array![].span(),
                 season_pass_unlocked_at_level: season_progress.season_pass_unlocked_at_level,
                 level: new_level,
+                tournament_ticket: season_progress.tournament_ticket,
             };
 
             store.set_season_progress(@updated_progress);
