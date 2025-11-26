@@ -80,47 +80,6 @@ pub struct SeasonLevelConfig {
     pub premium_rewards: Span<u32>,
 }
 
-#[derive(Drop, Serde)]
-#[dojo::model]
-pub struct Pack {
-    #[key]
-    pub id: u32,
-    pub season_id: u32,
-    pub name: ByteArray,
-    pub probabilities: Span<Span<u32>>,
-}
-
-#[derive(Drop, Copy, IntrospectPacked, Serde)]
-#[dojo::model]
-pub struct Item {
-    #[key]
-    pub id: u32,
-    pub item_type: ItemType,
-    pub content_id: u32,
-    pub rarity: u32,
-    pub skin_id: u32,
-    pub skin_rarity: u32,
-}
-
-#[derive(Drop, Copy, IntrospectPacked, Serde, DojoStore, Default)]
-pub enum ItemType {
-    Traditional,
-    Special,
-    Neon,
-    Skin,
-    #[default]
-    None,
-}
-
-#[derive(Drop, Copy, Serde)]
-#[dojo::model]
-pub struct SeasonContent {
-    #[key]
-    pub season_id: u32,
-    pub initialized: bool,
-    pub items: Span<Span<u32>>,
-}
-
 #[derive(Drop, Copy, Serde)]
 #[dojo::model]
 pub struct NFTManager {
@@ -138,23 +97,6 @@ pub struct CardMintedEvent {
     pub card_id: u32,
     pub marketable: bool,
     pub skin_id: u32,
-}
-
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct PlayerFreePack {
-    #[key]
-    pub player: ContractAddress,
-    pub next_pack_timestamp: u64,
-}
-
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct FreePackConfig {
-    #[key]
-    pub key: felt252,
-    pub cooldown: u64,
-    pub pack_id: u32,
 }
 
 #[derive(Copy, Drop, Serde)]

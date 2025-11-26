@@ -622,6 +622,7 @@ mod tests_lives_system {
                     season_pass_unlocked_at_level: 0,
                     claimable_rewards_id: array![].span(),
                     level: 0,
+                    tournament_ticket: 0,
                 },
             );
     }
