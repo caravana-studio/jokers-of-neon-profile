@@ -64,7 +64,6 @@ pub mod season_system {
         LevelXPConfig, MissionXPConfig, SeasonConfig, SeasonData, SeasonLevelConfig, SeasonProgress,
     };
     use crate::store::StoreTrait;
-    use crate::systems::lives_system::{ILivesSystemDispatcher, ILivesSystemDispatcherTrait};
     use crate::systems::pack_system::{IPackSystemDispatcher, IPackSystemDispatcherTrait};
     use super::ISeasonSystem;
 
@@ -372,7 +371,7 @@ pub mod season_system {
                 if tournament_tickets_earned > 0 {
                     let mut progress = store.get_season_progress(address, season_id);
                     progress.tournament_ticket += tournament_tickets_earned;
-                    store.set_season_progress(progress);
+                    store.set_season_progress(@progress);
                 }
 
                 claim_record.premium_claimed = true;
@@ -403,7 +402,7 @@ pub mod season_system {
                 if tournament_tickets_earned > 0 {
                     let mut progress = store.get_season_progress(address, season_id);
                     progress.tournament_ticket += tournament_tickets_earned;
-                    store.set_season_progress(progress);
+                    store.set_season_progress(@progress);
                 }
 
                 claim_record.free_claimed = true;
@@ -793,7 +792,8 @@ pub mod season_system {
                         level: 36,
                         required_xp: 10000,
                         free_rewards: [LEGENDARY_PACK_ID, LEGENDARY_PACK_ID].span(),
-                        premium_rewards: [LEGENDARY_PACK_ID, LEGENDARY_PACK_ID, LEGENDARY_PACK_ID].span(),
+                        premium_rewards: [LEGENDARY_PACK_ID, LEGENDARY_PACK_ID, LEGENDARY_PACK_ID]
+                            .span(),
                     },
                 );
         }
@@ -851,7 +851,7 @@ pub mod season_system {
             progress.tournament_ticket -= 1;
 
             // Save updated progress
-            store.set_season_progress(progress);
+            store.set_season_progress(@progress);
         }
     }
 
@@ -875,22 +875,6 @@ pub mod season_system {
                     )
                 },
             }.mint(recipient, pack_id)
-        }
-
-        fn upgrade_account(
-            self: @ContractState, world: WorldStorage, player: ContractAddress, season_id: u32,
-        ) {
-            match world.dns(@"lives_system") {
-                Option::Some((
-                    contract_address, _,
-                )) => { ILivesSystemDispatcher { contract_address } },
-                Option::None => {
-                    panic!(
-                        "[SystemsTrait] - dns Season System doesnt exists on world `{}`",
-                        world.namespace_hash,
-                    )
-                },
-            }.upgrade_account(player, season_id)
         }
     }
 }
