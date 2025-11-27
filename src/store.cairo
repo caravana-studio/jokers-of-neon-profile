@@ -2,10 +2,10 @@ use dojo::model::ModelStorage;
 use dojo::world::WorldStorage;
 use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, ProfileLevelConfig};
 use starknet::ContractAddress;
-use crate::constants::constants::{LIVES_CONFIG_KEY, NFT_MANAGER_KEY};
+use crate::constants::constants::NFT_MANAGER_KEY;
 use crate::models::{
-    DailyProgress, LevelXPConfig, LivesConfig, MissionDifficulty, MissionXPConfig, NFTManager,
-    PlayerLives, SeasonConfig, SeasonLevelConfig, SeasonProgress, SeasonRewardClaim,
+    DailyProgress, LevelXPConfig, MissionDifficulty, MissionXPConfig, NFTManager, SeasonConfig,
+    SeasonLevelConfig, SeasonProgress, SeasonRewardClaim,
 };
 
 #[derive(Drop)]
@@ -97,23 +97,6 @@ pub impl StoreImpl of StoreTrait {
     fn set_profile_level_config(ref self: Store, config: ProfileLevelConfig) {
         self.world.write_model(@config)
     }
-
-    fn get_lives_config(ref self: Store) -> LivesConfig {
-        self.world.read_model(LIVES_CONFIG_KEY)
-    }
-
-    fn set_lives_config(ref self: Store, config: LivesConfig) {
-        self.world.write_model(@config)
-    }
-
-    fn get_player_lives(ref self: Store, address: ContractAddress, season_id: u32) -> PlayerLives {
-        self.world.read_model((address, season_id))
-    }
-
-    fn set_player_lives(ref self: Store, lives: PlayerLives) {
-        self.world.write_model(@lives)
-    }
-
 
     fn get_nft_manager(ref self: Store) -> NFTManager {
         self.world.read_model(NFT_MANAGER_KEY)

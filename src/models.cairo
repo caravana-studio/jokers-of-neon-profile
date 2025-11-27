@@ -88,40 +88,6 @@ pub struct NFTManager {
     pub address: ContractAddress,
 }
 
-#[derive(Drop, Serde)]
-#[dojo::event]
-pub struct CardMintedEvent {
-    #[key]
-    pub recipient: starknet::ContractAddress,
-    pub pack_id: u32,
-    pub card_id: u32,
-    pub marketable: bool,
-    pub skin_id: u32,
-}
-
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct PlayerLives {
-    #[key]
-    pub player: ContractAddress,
-    #[key]
-    pub season_id: u32,
-    pub available_lives: u32,
-    pub max_lives: u32,
-    pub next_live_timestamp: u64,
-}
-
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct LivesConfig {
-    #[key]
-    pub key: felt252,
-    pub max_lives: u32,
-    pub max_lives_battle_pass: u32,
-    pub lives_cooldown: u64,
-    pub lives_cooldown_season_pass: u64,
-}
-
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
 pub struct SeasonRewardClaim {

@@ -15,7 +15,6 @@ private_key = "0x06c3f4d5e62d4b873a1389cec6671a9ef3414af6321d893bdf3967bc9c77fa4
 "jokers_of_neon_profile7" = [
     "jokers_of_neon_profile7-profile_system",
     "jokers_of_neon_profile7-pack_system",
-    "jokers_of_neon_profile7-lives_system",
     "jokers_of_neon_profile7-xp_system",
     "jokers_of_neon_profile7-season_system",
 ]
@@ -25,14 +24,6 @@ private_key = "0x06c3f4d5e62d4b873a1389cec6671a9ef3414af6321d893bdf3967bc9c77fa4
     "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245",
 ]
 "jokers_of_neon_profile7-xp_system" = [
-    "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245",
-]
-"jokers_of_neon_profile7-pack_system" = [
-    "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245",
-    "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245",
-    "0x0486096505276458069472576c4f60E1346e0527Af32bB4867FEc5d76aB7ee69",
-]
-"jokers_of_neon_profile7-lives_system" = [
     "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245",
 ]
 "jokers_of_neon_profile7-season_system" = [
