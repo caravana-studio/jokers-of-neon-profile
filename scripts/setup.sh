@@ -47,8 +47,3 @@ echo -e "\n🎮 Default config xp profile en profile..."
 sozo -P ${profile} execute xp_system setup_default_profile_config \
     --wait \
     --world $world_address
-
-echo -e "\n🎮 Init season content in profile..."
-sozo -P ${profile} execute pack_system init_season_content \
-    --wait \
-    --world $world_address

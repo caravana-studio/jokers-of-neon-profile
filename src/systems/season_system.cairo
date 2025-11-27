@@ -54,7 +54,6 @@ pub trait ISeasonSystem<T> {
 
 #[dojo::contract]
 pub mod season_system {
-    use dojo::world::{WorldStorage, WorldStorageTrait};
     use openzeppelin_access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
     use openzeppelin_introspection::src5::SRC5Component;
     use starknet::ContractAddress;
@@ -64,7 +63,6 @@ pub mod season_system {
         LevelXPConfig, MissionXPConfig, SeasonConfig, SeasonData, SeasonLevelConfig, SeasonProgress,
     };
     use crate::store::StoreTrait;
-    use crate::systems::pack_system::{IPackSystemDispatcher, IPackSystemDispatcherTrait};
     use super::ISeasonSystem;
 
     component!(path: SRC5Component, storage: src5, event: SRC5Event);
@@ -98,7 +96,6 @@ pub mod season_system {
         SeasonDeactivated: SeasonDeactivated,
         SeasonPassPurchased: SeasonPassPurchased,
         PacksGranted: PacksGranted,
-        PackOpened: PackOpened,
         SeasonLevelReached: SeasonLevelReached,
         UserProgressInitialized: UserProgressInitialized,
         RewardsClaimed: RewardsClaimed,
@@ -137,14 +134,6 @@ pub mod season_system {
         level: u32,
         is_premium: bool,
         pack_count: u32,
-    }
-
-    #[derive(Drop, starknet::Event)]
-    struct PackOpened {
-        #[key]
-        player: ContractAddress,
-        season_id: u32,
-        pack_id: u32,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -363,8 +352,7 @@ pub mod season_system {
                 for reward_id in premium_rewards {
                     if *reward_id == TOURNAMENT_TICKET_REWARD_ID {
                         tournament_tickets_earned += 1;
-                    } else {
-                        self.mint_pack(world, address, *reward_id);
+                    } else { // self.mint_pack(world, address, *reward_id);
                     }
                 }
 
@@ -394,8 +382,7 @@ pub mod season_system {
                 for reward_id in free_rewards {
                     if *reward_id == TOURNAMENT_TICKET_REWARD_ID {
                         tournament_tickets_earned += 1;
-                    } else {
-                        self.mint_pack(world, address, *reward_id);
+                    } else { // self.mint_pack(world, address, *reward_id);
                     }
                 }
 
@@ -830,7 +817,6 @@ pub mod season_system {
                 result.append(season_data);
                 current_level += 1;
             }
-
             result
         }
 
@@ -859,22 +845,6 @@ pub mod season_system {
     impl InternalImpl of InternalTrait {
         fn world_default(self: @ContractState) -> dojo::world::WorldStorage {
             self.world(@DEFAULT_NS_BYTE())
-        }
-
-        fn mint_pack(
-            self: @ContractState, world: WorldStorage, recipient: ContractAddress, pack_id: u32,
-        ) {
-            match world.dns(@"pack_system") {
-                Option::Some((
-                    contract_address, _,
-                )) => { IPackSystemDispatcher { contract_address } },
-                Option::None => {
-                    panic!(
-                        "[SystemsTrait] - dns Season System doesnt exists on world `{}`",
-                        world.namespace_hash,
-                    )
-                },
-            }.mint(recipient, pack_id)
         }
     }
 }

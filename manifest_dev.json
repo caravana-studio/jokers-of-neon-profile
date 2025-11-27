@@ -1490,1455 +1490,8 @@
   },
   "contracts": [
     {
-      "address": "0x608400d4bfe09541c7093893a7a636b651e78278161188d8323a46d20b6ca40",
-      "class_hash": "0x281a46dffdaedaca4153cd33922bddfd49307fc33a2e9d1f47d951dd01d1719",
-      "abi": [
-        {
-          "type": "impl",
-          "name": "lives_system__ContractImpl",
-          "interface_name": "dojo::contract::interface::IContract"
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::interface::IContract",
-          "items": []
-        },
-        {
-          "type": "impl",
-          "name": "DojoDeployedContractImpl",
-          "interface_name": "dojo::meta::interface::IDeployedResource"
-        },
-        {
-          "type": "struct",
-          "name": "core::byte_array::ByteArray",
-          "members": [
-            {
-              "name": "data",
-              "type": "core::array::Array::<core::bytes_31::bytes31>"
-            },
-            {
-              "name": "pending_word",
-              "type": "core::felt252"
-            },
-            {
-              "name": "pending_word_len",
-              "type": "core::integer::u32"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "dojo::meta::interface::IDeployedResource",
-          "items": [
-            {
-              "type": "function",
-              "name": "dojo_name",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "function",
-          "name": "dojo_init",
-          "inputs": [
-            {
-              "name": "owner",
-              "type": "core::starknet::contract_address::ContractAddress"
-            }
-          ],
-          "outputs": [],
-          "state_mutability": "external"
-        },
-        {
-          "type": "impl",
-          "name": "LivesSystem",
-          "interface_name": "jokers_of_neon_profile::systems::lives_system::ILivesSystem"
-        },
-        {
-          "type": "struct",
-          "name": "jokers_of_neon_profile::models::PlayerLives",
-          "members": [
-            {
-              "name": "player",
-              "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "season_id",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "available_lives",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "max_lives",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "next_live_timestamp",
-              "type": "core::integer::u64"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "jokers_of_neon_profile::models::LivesConfig",
-          "members": [
-            {
-              "name": "key",
-              "type": "core::felt252"
-            },
-            {
-              "name": "max_lives",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "max_lives_battle_pass",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "lives_cooldown",
-              "type": "core::integer::u64"
-            },
-            {
-              "name": "lives_cooldown_season_pass",
-              "type": "core::integer::u64"
-            }
-          ]
-        },
-        {
-          "type": "enum",
-          "name": "core::bool",
-          "variants": [
-            {
-              "name": "False",
-              "type": "()"
-            },
-            {
-              "name": "True",
-              "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "jokers_of_neon_profile::systems::lives_system::ILivesSystem",
-          "items": [
-            {
-              "type": "function",
-              "name": "claim",
-              "inputs": [
-                {
-                  "name": "player",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "season_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "remove",
-              "inputs": [
-                {
-                  "name": "player",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "season_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "upgrade_account",
-              "inputs": [
-                {
-                  "name": "player",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "season_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "init_lives_config",
-              "inputs": [],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "get_player_lives",
-              "inputs": [
-                {
-                  "name": "player",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "season_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "jokers_of_neon_profile::models::PlayerLives"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_lives_config",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "jokers_of_neon_profile::models::LivesConfig"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "has_lives_to_claim",
-              "inputs": [
-                {
-                  "name": "player",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "season_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "WorldProviderImpl",
-          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
-        },
-        {
-          "type": "struct",
-          "name": "dojo::world::iworld::IWorldDispatcher",
-          "members": [
-            {
-              "name": "contract_address",
-              "type": "core::starknet::contract_address::ContractAddress"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::components::world_provider::IWorldProvider",
-          "items": [
-            {
-              "type": "function",
-              "name": "world_dispatcher",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "dojo::world::iworld::IWorldDispatcher"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "UpgradeableImpl",
-          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::components::upgradeable::IUpgradeable",
-          "items": [
-            {
-              "type": "function",
-              "name": "upgrade",
-              "inputs": [
-                {
-                  "name": "new_class_hash",
-                  "type": "core::starknet::class_hash::ClassHash"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "AccessControlMixinImpl",
-          "interface_name": "openzeppelin_access::accesscontrol::interface::AccessControlABI"
-        },
-        {
-          "type": "interface",
-          "name": "openzeppelin_access::accesscontrol::interface::AccessControlABI",
-          "items": [
-            {
-              "type": "function",
-              "name": "has_role",
-              "inputs": [
-                {
-                  "name": "role",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "account",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_role_admin",
-              "inputs": [
-                {
-                  "name": "role",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::felt252"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "grant_role",
-              "inputs": [
-                {
-                  "name": "role",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "account",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "revoke_role",
-              "inputs": [
-                {
-                  "name": "role",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "account",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "renounce_role",
-              "inputs": [
-                {
-                  "name": "role",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "account",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "hasRole",
-              "inputs": [
-                {
-                  "name": "role",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "account",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "getRoleAdmin",
-              "inputs": [
-                {
-                  "name": "role",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::felt252"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "grantRole",
-              "inputs": [
-                {
-                  "name": "role",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "account",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "revokeRole",
-              "inputs": [
-                {
-                  "name": "role",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "account",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "renounceRole",
-              "inputs": [
-                {
-                  "name": "role",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "account",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "supports_interface",
-              "inputs": [
-                {
-                  "name": "interface_id",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "constructor",
-          "name": "constructor",
-          "inputs": []
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "class_hash",
-              "type": "core::starknet::class_hash::ClassHash",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
-          "kind": "enum",
-          "variants": [
-            {
-              "name": "Upgraded",
-              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
-              "kind": "nested"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
-          "kind": "enum",
-          "variants": []
-        },
-        {
-          "type": "event",
-          "name": "openzeppelin_introspection::src5::SRC5Component::Event",
-          "kind": "enum",
-          "variants": []
-        },
-        {
-          "type": "event",
-          "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleGranted",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "role",
-              "type": "core::felt252",
-              "kind": "data"
-            },
-            {
-              "name": "account",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            },
-            {
-              "name": "sender",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleRevoked",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "role",
-              "type": "core::felt252",
-              "kind": "data"
-            },
-            {
-              "name": "account",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            },
-            {
-              "name": "sender",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleAdminChanged",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "role",
-              "type": "core::felt252",
-              "kind": "data"
-            },
-            {
-              "name": "previous_admin_role",
-              "type": "core::felt252",
-              "kind": "data"
-            },
-            {
-              "name": "new_admin_role",
-              "type": "core::felt252",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::Event",
-          "kind": "enum",
-          "variants": [
-            {
-              "name": "RoleGranted",
-              "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleGranted",
-              "kind": "nested"
-            },
-            {
-              "name": "RoleRevoked",
-              "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleRevoked",
-              "kind": "nested"
-            },
-            {
-              "name": "RoleAdminChanged",
-              "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleAdminChanged",
-              "kind": "nested"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "jokers_of_neon_profile::systems::lives_system::lives_system::Event",
-          "kind": "enum",
-          "variants": [
-            {
-              "name": "UpgradeableEvent",
-              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
-              "kind": "nested"
-            },
-            {
-              "name": "WorldProviderEvent",
-              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
-              "kind": "nested"
-            },
-            {
-              "name": "SRC5Event",
-              "type": "openzeppelin_introspection::src5::SRC5Component::Event",
-              "kind": "flat"
-            },
-            {
-              "name": "AccessControlEvent",
-              "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::Event",
-              "kind": "flat"
-            }
-          ]
-        }
-      ],
-      "init_calldata": [
-        "0x6677fe62ee39c7b07401f754138502bab7fac99d2d3c5d37df7d1c6fab10819"
-      ],
-      "tag": "jokers_of_neon_profile-lives_system",
-      "selector": "0x7abf096e618f3ce7bf05d21f054d6633453939b4bffd68a6f0bc7c9baf82bb7",
-      "systems": [
-        "dojo_init",
-        "claim",
-        "remove",
-        "upgrade_account",
-        "init_lives_config",
-        "upgrade",
-        "grant_role",
-        "revoke_role",
-        "renounce_role",
-        "grantRole",
-        "revokeRole",
-        "renounceRole"
-      ]
-    },
-    {
-      "address": "0x66e2c9dd38a06190b1f290015733d3e251607011ef5b8deb7c926680894b42f",
-      "class_hash": "0x1b8eb424efa6f778b9746277ac574087790ef1fe1cf5d22a0d1d60ff97db862",
-      "abi": [
-        {
-          "type": "impl",
-          "name": "pack_system__ContractImpl",
-          "interface_name": "dojo::contract::interface::IContract"
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::interface::IContract",
-          "items": []
-        },
-        {
-          "type": "impl",
-          "name": "DojoDeployedContractImpl",
-          "interface_name": "dojo::meta::interface::IDeployedResource"
-        },
-        {
-          "type": "struct",
-          "name": "core::byte_array::ByteArray",
-          "members": [
-            {
-              "name": "data",
-              "type": "core::array::Array::<core::bytes_31::bytes31>"
-            },
-            {
-              "name": "pending_word",
-              "type": "core::felt252"
-            },
-            {
-              "name": "pending_word_len",
-              "type": "core::integer::u32"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "dojo::meta::interface::IDeployedResource",
-          "items": [
-            {
-              "type": "function",
-              "name": "dojo_name",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "function",
-          "name": "dojo_init",
-          "inputs": [
-            {
-              "name": "owner",
-              "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "minter",
-              "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "nft_address",
-              "type": "core::starknet::contract_address::ContractAddress"
-            }
-          ],
-          "outputs": [],
-          "state_mutability": "external"
-        },
-        {
-          "type": "impl",
-          "name": "PackSystemImpl",
-          "interface_name": "jokers_of_neon_profile::systems::pack_system::IPackSystem"
-        },
-        {
-          "type": "struct",
-          "name": "core::array::Span::<core::integer::u32>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<core::integer::u32>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "core::array::Span::<core::array::Span::<core::integer::u32>>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<core::array::Span::<core::integer::u32>>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "jokers_of_neon_profile::models::Pack",
-          "members": [
-            {
-              "name": "id",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "season_id",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "name",
-              "type": "core::byte_array::ByteArray"
-            },
-            {
-              "name": "probabilities",
-              "type": "core::array::Span::<core::array::Span::<core::integer::u32>>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "jokers_of_neon_profile::models::FreePackConfig",
-          "members": [
-            {
-              "name": "key",
-              "type": "core::felt252"
-            },
-            {
-              "name": "cooldown",
-              "type": "core::integer::u64"
-            },
-            {
-              "name": "pack_id",
-              "type": "core::integer::u32"
-            }
-          ]
-        },
-        {
-          "type": "enum",
-          "name": "jokers_of_neon_profile::models::ItemType",
-          "variants": [
-            {
-              "name": "Traditional",
-              "type": "()"
-            },
-            {
-              "name": "Special",
-              "type": "()"
-            },
-            {
-              "name": "Neon",
-              "type": "()"
-            },
-            {
-              "name": "Skin",
-              "type": "()"
-            },
-            {
-              "name": "None",
-              "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "jokers_of_neon_profile::models::Item",
-          "members": [
-            {
-              "name": "id",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "item_type",
-              "type": "jokers_of_neon_profile::models::ItemType"
-            },
-            {
-              "name": "content_id",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "rarity",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "skin_id",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "skin_rarity",
-              "type": "core::integer::u32"
-            }
-          ]
-        },
-        {
-          "type": "enum",
-          "name": "core::bool",
-          "variants": [
-            {
-              "name": "False",
-              "type": "()"
-            },
-            {
-              "name": "True",
-              "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "jokers_of_neon_profile::models::SeasonContent",
-          "members": [
-            {
-              "name": "season_id",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "initialized",
-              "type": "core::bool"
-            },
-            {
-              "name": "items",
-              "type": "core::array::Span::<core::array::Span::<core::integer::u32>>"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "jokers_of_neon_profile::systems::pack_system::IPackSystem",
-          "items": [
-            {
-              "type": "function",
-              "name": "mint",
-              "inputs": [
-                {
-                  "name": "recipient",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "pack_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "add_pack",
-              "inputs": [
-                {
-                  "name": "pack",
-                  "type": "jokers_of_neon_profile::models::Pack"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "init_season_content",
-              "inputs": [],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "claim_free_pack",
-              "inputs": [
-                {
-                  "name": "recipient",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "set_free_pack_config",
-              "inputs": [
-                {
-                  "name": "config",
-                  "type": "jokers_of_neon_profile::models::FreePackConfig"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "get_next_free_pack_timestamp",
-              "inputs": [
-                {
-                  "name": "recipient",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::integer::u64"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_available_packs",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::array::Array::<jokers_of_neon_profile::models::Pack>"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_available_items",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::array::Array::<jokers_of_neon_profile::models::Item>"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_season_content",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "jokers_of_neon_profile::models::SeasonContent"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "WorldProviderImpl",
-          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
-        },
-        {
-          "type": "struct",
-          "name": "dojo::world::iworld::IWorldDispatcher",
-          "members": [
-            {
-              "name": "contract_address",
-              "type": "core::starknet::contract_address::ContractAddress"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::components::world_provider::IWorldProvider",
-          "items": [
-            {
-              "type": "function",
-              "name": "world_dispatcher",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "dojo::world::iworld::IWorldDispatcher"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "UpgradeableImpl",
-          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::components::upgradeable::IUpgradeable",
-          "items": [
-            {
-              "type": "function",
-              "name": "upgrade",
-              "inputs": [
-                {
-                  "name": "new_class_hash",
-                  "type": "core::starknet::class_hash::ClassHash"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "AccessControlMixinImpl",
-          "interface_name": "openzeppelin_access::accesscontrol::interface::AccessControlABI"
-        },
-        {
-          "type": "interface",
-          "name": "openzeppelin_access::accesscontrol::interface::AccessControlABI",
-          "items": [
-            {
-              "type": "function",
-              "name": "has_role",
-              "inputs": [
-                {
-                  "name": "role",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "account",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_role_admin",
-              "inputs": [
-                {
-                  "name": "role",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::felt252"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "grant_role",
-              "inputs": [
-                {
-                  "name": "role",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "account",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "revoke_role",
-              "inputs": [
-                {
-                  "name": "role",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "account",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "renounce_role",
-              "inputs": [
-                {
-                  "name": "role",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "account",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "hasRole",
-              "inputs": [
-                {
-                  "name": "role",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "account",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "getRoleAdmin",
-              "inputs": [
-                {
-                  "name": "role",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::felt252"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "grantRole",
-              "inputs": [
-                {
-                  "name": "role",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "account",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "revokeRole",
-              "inputs": [
-                {
-                  "name": "role",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "account",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "renounceRole",
-              "inputs": [
-                {
-                  "name": "role",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "account",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "supports_interface",
-              "inputs": [
-                {
-                  "name": "interface_id",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "constructor",
-          "name": "constructor",
-          "inputs": []
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "class_hash",
-              "type": "core::starknet::class_hash::ClassHash",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
-          "kind": "enum",
-          "variants": [
-            {
-              "name": "Upgraded",
-              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
-              "kind": "nested"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
-          "kind": "enum",
-          "variants": []
-        },
-        {
-          "type": "event",
-          "name": "openzeppelin_introspection::src5::SRC5Component::Event",
-          "kind": "enum",
-          "variants": []
-        },
-        {
-          "type": "event",
-          "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleGranted",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "role",
-              "type": "core::felt252",
-              "kind": "data"
-            },
-            {
-              "name": "account",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            },
-            {
-              "name": "sender",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleRevoked",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "role",
-              "type": "core::felt252",
-              "kind": "data"
-            },
-            {
-              "name": "account",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            },
-            {
-              "name": "sender",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleAdminChanged",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "role",
-              "type": "core::felt252",
-              "kind": "data"
-            },
-            {
-              "name": "previous_admin_role",
-              "type": "core::felt252",
-              "kind": "data"
-            },
-            {
-              "name": "new_admin_role",
-              "type": "core::felt252",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::Event",
-          "kind": "enum",
-          "variants": [
-            {
-              "name": "RoleGranted",
-              "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleGranted",
-              "kind": "nested"
-            },
-            {
-              "name": "RoleRevoked",
-              "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleRevoked",
-              "kind": "nested"
-            },
-            {
-              "name": "RoleAdminChanged",
-              "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleAdminChanged",
-              "kind": "nested"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "jokers_of_neon_profile::systems::pack_system::pack_system::Event",
-          "kind": "enum",
-          "variants": [
-            {
-              "name": "UpgradeableEvent",
-              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
-              "kind": "nested"
-            },
-            {
-              "name": "WorldProviderEvent",
-              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
-              "kind": "nested"
-            },
-            {
-              "name": "SRC5Event",
-              "type": "openzeppelin_introspection::src5::SRC5Component::Event",
-              "kind": "flat"
-            },
-            {
-              "name": "AccessControlEvent",
-              "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::Event",
-              "kind": "flat"
-            }
-          ]
-        }
-      ],
-      "init_calldata": [
-        "0x6677fe62ee39c7b07401f754138502bab7fac99d2d3c5d37df7d1c6fab10819",
-        "0x6677fe62ee39c7b07401f754138502bab7fac99d2d3c5d37df7d1c6fab10819",
-        "0x00f0d676b1ec606a761995f1e61d66afb0abb880eb779e8895f4480ba7f9c515"
-      ],
-      "tag": "jokers_of_neon_profile-pack_system",
-      "selector": "0x4d91ca2ca7f1f15db015167106dc77777c91ad22ab20520c9ddf31a051cb108",
-      "systems": [
-        "dojo_init",
-        "mint",
-        "add_pack",
-        "init_season_content",
-        "claim_free_pack",
-        "set_free_pack_config",
-        "upgrade",
-        "grant_role",
-        "revoke_role",
-        "renounce_role",
-        "grantRole",
-        "revokeRole",
-        "renounceRole"
-      ]
-    },
-    {
-      "address": "0x75513603f167b654961836bd1f8b9c9c2af0f0762f3bb856ce9467984eb41c5",
-      "class_hash": "0x680f9559aa0de608e15b371effff52e7a2ddf9204947a1ab1c411194867ea5d",
+      "address": "0x7ef1fdfd7c1d5eef9b4a042b6fbd125706081fc2b8c2a4e15f655dfe126a9aa",
+      "class_hash": "0x399225a07e451037cd6eaa4cc8ee5a38f0c338a08e33826ce4ed40884b3406a",
       "abi": [
         {
           "type": "impl",
@@ -3208,6 +1761,64 @@
           ]
         },
         {
+          "type": "struct",
+          "name": "core::array::Span::<jokers_of_neon_lib::models::external::profile::Profile>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<jokers_of_neon_lib::models::external::profile::Profile>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "jokers_of_neon_profile::models::SeasonProgress",
+          "members": [
+            {
+              "name": "address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "season_id",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "season_xp",
+              "type": "core::integer::u256"
+            },
+            {
+              "name": "has_season_pass",
+              "type": "core::bool"
+            },
+            {
+              "name": "claimable_rewards_id",
+              "type": "core::array::Span::<core::integer::u32>"
+            },
+            {
+              "name": "season_pass_unlocked_at_level",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "level",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "tournament_ticket",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<jokers_of_neon_profile::models::SeasonProgress>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<jokers_of_neon_profile::models::SeasonProgress>"
+            }
+          ]
+        },
+        {
           "type": "interface",
           "name": "jokers_of_neon_profile::systems::profile_system::IJokersProfile",
           "items": [
@@ -3309,7 +1920,7 @@
             },
             {
               "type": "function",
-              "name": "get_profile_level_config_by_address",
+              "name": "get_next_level_profile_config_by_address",
               "inputs": [
                 {
                   "name": "address",
@@ -3322,6 +1933,22 @@
                 }
               ],
               "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "migrate",
+              "inputs": [
+                {
+                  "name": "profiles",
+                  "type": "core::array::Span::<jokers_of_neon_lib::models::external::profile::Profile>"
+                },
+                {
+                  "name": "season_progresses",
+                  "type": "core::array::Span::<jokers_of_neon_profile::models::SeasonProgress>"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -3742,6 +2369,7 @@
         "create_profile",
         "add_stats",
         "update_avatar",
+        "migrate",
         "upgrade",
         "grant_role",
         "revoke_role",
@@ -3752,8 +2380,8 @@
       ]
     },
     {
-      "address": "0x5e66519fed49e6083eae39901fe0ab23b72aa2fa6dcc1169f96d92271914cce",
-      "class_hash": "0x1ac5e9e02fbf4cc77d59bc7473f246a1a08cf72d1a71ec32f3fe852c7ba1479",
+      "address": "0x470fdaccd32611efe353ba1062bbd21aaaa17267b31d0cbc19f526d1773fc9a",
+      "class_hash": "0x4f740db977f34bc99cb848be49ccdeab6d97d9f56bd5920f2bdc5b4d106c463",
       "abi": [
         {
           "type": "impl",
@@ -4027,46 +2655,6 @@
             {
               "name": "premium_claimed",
               "type": "core::bool"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "jokers_of_neon_profile::models::TournamentTicketReward",
-          "members": [
-            {
-              "name": "season_id",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "level",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "ticket_amount",
-              "type": "core::integer::u32"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "jokers_of_neon_profile::models::TournamentConfig",
-          "members": [
-            {
-              "name": "season_id",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "tournament_id",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "ranking_position",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "rewards",
-              "type": "core::array::Span::<core::integer::u32>"
             }
           ]
         },
@@ -4348,76 +2936,12 @@
             },
             {
               "type": "function",
-              "name": "set_tournament_ticket_reward",
+              "name": "remove_tournament_ticket",
               "inputs": [
                 {
-                  "name": "reward",
-                  "type": "jokers_of_neon_profile::models::TournamentTicketReward"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "set_tournament_config",
-              "inputs": [
-                {
-                  "name": "config",
-                  "type": "jokers_of_neon_profile::models::TournamentConfig"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "get_tournament_ticket_reward",
-              "inputs": [
-                {
-                  "name": "season_id",
-                  "type": "core::integer::u32"
+                  "name": "address",
+                  "type": "core::starknet::contract_address::ContractAddress"
                 },
-                {
-                  "name": "level",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "jokers_of_neon_profile::models::TournamentTicketReward"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "get_tournament_config",
-              "inputs": [
-                {
-                  "name": "season_id",
-                  "type": "core::integer::u32"
-                },
-                {
-                  "name": "tournament_id",
-                  "type": "core::integer::u32"
-                },
-                {
-                  "name": "ranking_position",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "jokers_of_neon_profile::models::TournamentConfig"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "setup_default_tournament_ticket_rewards",
-              "inputs": [
                 {
                   "name": "season_id",
                   "type": "core::integer::u32"
@@ -4894,28 +3418,6 @@
         },
         {
           "type": "event",
-          "name": "jokers_of_neon_profile::systems::season_system::season_system::PackOpened",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "player",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "key"
-            },
-            {
-              "name": "season_id",
-              "type": "core::integer::u32",
-              "kind": "data"
-            },
-            {
-              "name": "pack_id",
-              "type": "core::integer::u32",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
           "name": "jokers_of_neon_profile::systems::season_system::season_system::SeasonLevelReached",
           "kind": "struct",
           "members": [
@@ -5041,11 +3543,6 @@
               "kind": "nested"
             },
             {
-              "name": "PackOpened",
-              "type": "jokers_of_neon_profile::systems::season_system::season_system::PackOpened",
-              "kind": "nested"
-            },
-            {
               "name": "SeasonLevelReached",
               "type": "jokers_of_neon_profile::systems::season_system::season_system::SeasonLevelReached",
               "kind": "nested"
@@ -5080,9 +3577,7 @@
         "set_level_xp_config",
         "setup_default_season_config",
         "claim_season_rewards",
-        "set_tournament_ticket_reward",
-        "set_tournament_config",
-        "setup_default_tournament_ticket_rewards",
+        "remove_tournament_ticket",
         "upgrade",
         "grant_role",
         "revoke_role",
@@ -5093,8 +3588,8 @@
       ]
     },
     {
-      "address": "0x17e6bdfd8a714b988d692823aa6118125c55d3277cb8cb43629a644e7e082c8",
-      "class_hash": "0x582b5f9817ccea142b4d5989f538ccf838d6afdf15b387d103365336818b41e",
+      "address": "0x1679d5228415cb0356faf94605383e54a9b867e8e46598bb3b6648eb7ea53b7",
+      "class_hash": "0x6e30dc06ec66b70e244f6f14bd9a137b5d45b5b77dd6ab3d8082ea4d870eb5b",
       "abi": [
         {
           "type": "impl",
@@ -5471,27 +3966,9 @@
     },
     {
       "members": [],
-      "class_hash": "0x402e03bd760e9f70198329baccd01cfeb851c47406d72ffd8c0abcf80b65025",
-      "tag": "jokers_of_neon_profile-FreePackConfig",
-      "selector": "0x3c3c60bc4f605bef554ef7842320de8525e1f79b77c54f29f2db7b00c863856"
-    },
-    {
-      "members": [],
-      "class_hash": "0x6b28e98a09c485e6774f5a6c60984aeafa72c6d621dd9abfdb2a55f39fa6b58",
-      "tag": "jokers_of_neon_profile-Item",
-      "selector": "0xbd4856db4d3bb87a97fa2ff81d408e9283b31fc4ba4c8dbf5ea8c50eba8dce"
-    },
-    {
-      "members": [],
       "class_hash": "0x4f7da1d85b3c42670cc8c1becb951607e2d63ab1eaf187c72165e2122f563e6",
       "tag": "jokers_of_neon_profile-LevelXPConfig",
       "selector": "0x46728301576f681a49af65d408391787ea662b8423e65da5839dc1f4e6ba15"
-    },
-    {
-      "members": [],
-      "class_hash": "0x33df092ec6e07250e14df04e0c3b4f3e6c250dc23a01d687e01969af20ce3e9",
-      "tag": "jokers_of_neon_profile-LivesConfig",
-      "selector": "0x919ebdaa815dfaf03208403b2502990af3c683eaf485707016ddb6637267ed"
     },
     {
       "members": [],
@@ -5504,24 +3981,6 @@
       "class_hash": "0x2e7dce62b7c43211cf4a0900f38d232e2abb335c8be865a885a683cc8397dd2",
       "tag": "jokers_of_neon_profile-NFTManager",
       "selector": "0x365e642096ad7f7d19b6824339acde1f5c58f812d82ac28b53c58d5d3cab12e"
-    },
-    {
-      "members": [],
-      "class_hash": "0x5ba2801895401253e5733aaca55a44c44e0310c129698bd671c11a78c5839df",
-      "tag": "jokers_of_neon_profile-Pack",
-      "selector": "0xb4ec59c254368dd92cf661c08f25c66794834eeea589b8c490b48657140696"
-    },
-    {
-      "members": [],
-      "class_hash": "0x7924be5d565422df3681b8b8ff0254c46998d058a1a4c93b40874efb89d8cd0",
-      "tag": "jokers_of_neon_profile-PlayerFreePack",
-      "selector": "0x71e78c11aa1912795c950d6dc6e1b8cc7cdf16f3f71c8545c36bdf3ce04bdd8"
-    },
-    {
-      "members": [],
-      "class_hash": "0x77cf50126f3f4f6ae3029e62db47c845e72ab3a717cc239eb9e47a3ae224a5e",
-      "tag": "jokers_of_neon_profile-PlayerLives",
-      "selector": "0x60837fc01c349b2cac3d371c986d480c35b390efff0ecafbeeffff7b1afb018"
     },
     {
       "members": [],
@@ -5555,12 +4014,6 @@
     },
     {
       "members": [],
-      "class_hash": "0x58af0038213cbe9e3dd5eaed940386be3b2f8782b81a04e99e78b6095c04fc1",
-      "tag": "jokers_of_neon_profile-SeasonContent",
-      "selector": "0x2427a5032d4ef84757eeaa21798ca39c3558c5289b60ff1b121c11ec5da8708"
-    },
-    {
-      "members": [],
       "class_hash": "0x1b762f21c5f59b0254259b4dad7fa97ee5830366a09b7671662ab687b8b2f5d",
       "tag": "jokers_of_neon_profile-SeasonLevelConfig",
       "selector": "0x168dec8aa72b4d17ae494fe4ffec4b46a27e28eb103c535473ab0e9792fad84"
@@ -5576,27 +4029,8 @@
       "class_hash": "0x47ad9f039f3fb2b8cc0e5b7b4858c5fa1a262638f7234436d88263eca9f1e2c",
       "tag": "jokers_of_neon_profile-SeasonRewardClaim",
       "selector": "0x79d68f69a747b48cd49a3dfcb4a78e7cf6867371a00396dd36f31ec32644608"
-    },
-    {
-      "members": [],
-      "class_hash": "0x3c09a442a0d2c23df6ec5b9faea52585e924ebd934e70bbdf2594fc4e5945e6",
-      "tag": "jokers_of_neon_profile-TournamentConfig",
-      "selector": "0x6d9698b14f9524a41f1dd013c46caf6ff577e8a1b2a9b5c4a6f477e760a04da"
-    },
-    {
-      "members": [],
-      "class_hash": "0x1a596c4521c70dfdae2e32774a216f453d5a1c7f586f33a5309884c6a174103",
-      "tag": "jokers_of_neon_profile-TournamentTicketReward",
-      "selector": "0x6f0b0889719ce1bfa379ae6dba4a4c02845b41dfc4e7bb4f134c77703d946ec"
     }
   ],
-  "events": [
-    {
-      "members": [],
-      "class_hash": "0x195bcf9aa9b080936ded5cae161703e2ecf2595d2ce7f8ac4fddfd382b2e7e4",
-      "tag": "jokers_of_neon_profile-CardMintedEvent",
-      "selector": "0x23d19ceef5f9cf1c142d9617c7d468ba55b17f84c7ebcfc45638d2e2668575b"
-    }
-  ],
+  "events": [],
   "external_contracts": []
 }
