@@ -338,7 +338,7 @@ pub mod season_system {
             let free_rewards = level_config.free_rewards;
             let free_rewards_count = free_rewards.len();
             let premium_rewards = level_config.premium_rewards;
-            let premium_rewards_count = premium_rewards.len(); 
+            let premium_rewards_count = premium_rewards.len();
             let mut tickets_earned = 0;
 
             if is_premium {
@@ -379,7 +379,9 @@ pub mod season_system {
             store.set_season_reward_claim(claim_record);
         }
 
-        fn get_season_rewards(self: @ContractState, season_id: u32, level: u32, is_premium: bool) -> Span<u32> {            
+        fn get_season_rewards(
+            self: @ContractState, season_id: u32, level: u32, is_premium: bool,
+        ) -> Span<u32> {
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
 
