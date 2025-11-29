@@ -137,15 +137,11 @@ pub mod profile_system {
             // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
 
-            println!("Profiles length: {}", profiles.len());
             for profile in profiles {
-                println!("Profile: {:?}", profile);
                 store.set_profile(profile);
             }
 
-            println!("Season progresses length: {}", season_progresses.len());
             for season_progress in season_progresses {
-                println!("Season progress: {:?}", season_progress);
                 store.set_season_progress(season_progress);
             }
         }

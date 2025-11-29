@@ -25,8 +25,7 @@ if [ -f "$manifest_file" ]; then
 fi
 
 echo "sozo build && sozo inspect && sozo migrate"
-sozo -P ${profile} build && sozo -P ${profile} inspect && sozo -P ${profile} migrate --gas 5568004213
-
+sozo -P ${profile} build && sozo -P ${profile} inspect && sozo -P ${profile} migrate
 echo -e "\n✅ Deployed!"
 
 world_address=$(sozo -P ${profile} inspect | awk '/World/ {getline; getline; print $3}')

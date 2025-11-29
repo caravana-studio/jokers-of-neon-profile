@@ -44,6 +44,8 @@ pub trait ISeasonSystem<T> {
         ref self: T, address: ContractAddress, season_id: u32, level: u32, is_premium: bool,
     );
 
+    fn get_season_rewards(self: @T, season_id: u32, level: u32, is_premium: bool) -> Span<u32>;
+
     // Get season line data for frontend
     fn get_season_line(
         self: @T, player: ContractAddress, season_id: u32, max_level: u32,
@@ -170,7 +172,7 @@ pub mod season_system {
     #[abi(embed_v0)]
     impl SeasonSystemImpl of ISeasonSystem<ContractState> {
         fn create_season(ref self: ContractState, season_id: u32) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
 
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
@@ -183,7 +185,7 @@ pub mod season_system {
         }
 
         fn activate_season(ref self: ContractState, season_id: u32) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
 
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
@@ -198,7 +200,7 @@ pub mod season_system {
         }
 
         fn deactivate_season(ref self: ContractState, season_id: u32) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
 
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
@@ -219,7 +221,7 @@ pub mod season_system {
         }
 
         fn purchase_season_pass(ref self: ContractState, address: ContractAddress, season_id: u32) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
 
@@ -258,7 +260,7 @@ pub mod season_system {
             free_rewards: Span<u32>,
             premium_rewards: Span<u32>,
         ) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
 
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
@@ -275,19 +277,19 @@ pub mod season_system {
         }
 
         fn set_season_level_config(ref self: ContractState, config: SeasonLevelConfig) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
             store.set_season_level_config(config);
         }
 
         fn set_mission_xp_config(ref self: ContractState, config: MissionXPConfig) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
             store.set_mission_xp_config(config);
         }
 
         fn set_level_xp_config(ref self: ContractState, config: LevelXPConfig) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
             store.set_level_xp_config(config);
         }
@@ -314,7 +316,7 @@ pub mod season_system {
             level: u32,
             is_premium: bool,
         ) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
 
@@ -337,9 +339,9 @@ pub mod season_system {
             let free_rewards_count = free_rewards.len();
             let premium_rewards = level_config.premium_rewards;
             let premium_rewards_count = premium_rewards.len();
+            let mut tickets_earned = 0;
 
             if is_premium {
-                // Claim premium rewards
                 assert(season_progress.has_season_pass, 'No season pass');
                 assert(
                     level >= season_progress.season_pass_unlocked_at_level,
@@ -348,73 +350,61 @@ pub mod season_system {
                 assert(!claim_record.premium_claimed, 'Premium already claimed');
                 assert(premium_rewards_count > 0, 'No premium rewards');
 
-                let mut tournament_tickets_earned = 0;
                 for reward_id in premium_rewards {
                     if *reward_id == TOURNAMENT_TICKET_REWARD_ID {
-                        tournament_tickets_earned += 1;
-                    } else { // self.mint_pack(world, address, *reward_id);
+                        tickets_earned += 1;
                     }
                 }
-
-                if tournament_tickets_earned > 0 {
-                    let mut progress = store.get_season_progress(address, season_id);
-                    progress.tournament_ticket += tournament_tickets_earned;
-                    store.set_season_progress(@progress);
-                }
-
                 claim_record.premium_claimed = true;
-
-                self
-                    .emit(
-                        RewardsClaimed {
-                            player: address,
-                            season_id,
-                            level,
-                            is_premium: true,
-                            pack_count: premium_rewards_count,
-                        },
-                    );
             } else {
-                assert(!claim_record.free_claimed, 'Free already claimed');
-                assert(free_rewards_count > 0, 'No free rewards');
-
-                let mut tournament_tickets_earned = 0;
                 for reward_id in free_rewards {
                     if *reward_id == TOURNAMENT_TICKET_REWARD_ID {
-                        tournament_tickets_earned += 1;
-                    } else { // self.mint_pack(world, address, *reward_id);
+                        tickets_earned += 1;
                     }
                 }
-
-                if tournament_tickets_earned > 0 {
-                    let mut progress = store.get_season_progress(address, season_id);
-                    progress.tournament_ticket += tournament_tickets_earned;
-                    store.set_season_progress(@progress);
-                }
-
+                assert(!claim_record.free_claimed, 'Free already claimed');
+                assert(free_rewards_count > 0, 'No free rewards');
                 claim_record.free_claimed = true;
-
-                self
-                    .emit(
-                        RewardsClaimed {
-                            player: address,
-                            season_id,
-                            level,
-                            is_premium: false,
-                            pack_count: free_rewards_count,
-                        },
-                    );
             }
 
-            // Update claim record
+            if tickets_earned > 0 {
+                let mut progress = store.get_season_progress(address, season_id);
+                progress.tournament_ticket += tickets_earned;
+                store.set_season_progress(@progress);
+            }
+
             claim_record.player = address;
             claim_record.season_id = season_id;
             claim_record.level = level;
             store.set_season_reward_claim(claim_record);
         }
 
+        fn get_season_rewards(
+            self: @ContractState, season_id: u32, level: u32, is_premium: bool,
+        ) -> Span<u32> {
+            let world = self.world_default();
+            let mut store = StoreTrait::new(world);
+
+            // Get level configuration
+            let level_config = store.get_season_level_config(season_id, level);
+            let free_rewards = level_config.free_rewards;
+            let premium_rewards = level_config.premium_rewards;
+            let mut rewards = array![];
+
+            if is_premium {
+                for reward_id in premium_rewards {
+                    rewards.append(*reward_id);
+                }
+            } else {
+                for reward_id in free_rewards {
+                    rewards.append(*reward_id);
+                }
+            }
+            rewards.span()
+        }
+
         fn setup_default_season_config(ref self: ContractState, season_id: u32) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let mut store = StoreTrait::new(self.world_default());
 
             // Set season level configs based on sistema_xp.md
@@ -823,7 +813,7 @@ pub mod season_system {
         fn remove_tournament_ticket(
             ref self: ContractState, address: ContractAddress, season_id: u32,
         ) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
 
