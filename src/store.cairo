@@ -4,8 +4,8 @@ use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, Profil
 use starknet::ContractAddress;
 use crate::constants::constants::NFT_MANAGER_KEY;
 use crate::models::{
-    DailyProgress, LevelXPConfig, MissionDifficulty, MissionXPConfig, NFTManager, SeasonConfig,
-    SeasonLevelConfig, SeasonProgress, SeasonRewardClaim,
+    DailyProgress, GameData, LevelXPConfig, MissionDifficulty, MissionXPConfig, NFTManager,
+    PokerHandData, RoundData, SeasonConfig, SeasonLevelConfig, SeasonProgress, SeasonRewardClaim,
 };
 
 #[derive(Drop)]
@@ -114,5 +114,29 @@ pub impl StoreImpl of StoreTrait {
 
     fn set_season_reward_claim(ref self: Store, claim: SeasonRewardClaim) {
         self.world.write_model(@claim)
+    }
+
+    fn get_game_data(ref self: Store, address: ContractAddress) -> GameData {
+        self.world.read_model(address)
+    }
+
+    fn set_game_data(ref self: Store, game_data: GameData) {
+        self.world.write_model(@game_data)
+    }
+
+    fn get_round_data(ref self: Store, address: ContractAddress) -> RoundData {
+        self.world.read_model(address)
+    }
+
+    fn set_round_data(ref self: Store, round_data: RoundData) {
+        self.world.write_model(@round_data)
+    }
+
+    fn get_poker_hand_data(ref self: Store, address: ContractAddress) -> PokerHandData {
+        self.world.read_model(address)
+    }
+
+    fn set_poker_hand_data(ref self: Store, poker_hand_data: PokerHandData) {
+        self.world.write_model(@poker_hand_data)
     }
 }

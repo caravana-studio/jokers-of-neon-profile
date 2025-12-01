@@ -111,3 +111,44 @@ pub struct SeasonData {
     pub free_claimed: bool,
     pub premium_claimed: bool,
 }
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct GameData {
+    #[key]
+    id: u32,
+    player_score: u32,
+    specials: Span<u32>,
+    cash: u32,
+    round: u32,
+    is_tournament: bool,
+}
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct RoundData {
+    #[key]
+    round_id: u32,
+    player_address: ContractAddress,
+    current_score: u32,
+    target_score: u32,
+    rages: Span<u32>,
+}
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct PokerHandData {
+    #[key]
+    pub player_address: ContractAddress,
+    pub royal_flush: u32,
+    pub straight_flush: u32,
+    pub five_of_a_kind: u32,
+    pub four_of_a_kind: u32,
+    pub full_house: u32,
+    pub straight: u32,
+    pub flush: u32,
+    pub three_of_a_kind: u32,
+    pub two_pair: u32,
+    pub one_pair: u32,
+    pub high_card: u32,
+}
