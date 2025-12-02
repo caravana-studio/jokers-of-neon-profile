@@ -117,6 +117,7 @@ pub struct SeasonData {
 pub struct GameData {
     #[key]
     id: u32,
+    owner: ContractAddress,
     player_score: u32,
     specials: Span<u32>,
     cash: u32,
@@ -127,6 +128,8 @@ pub struct GameData {
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
 pub struct RoundData {
+    #[key]
+    game_id: u32,
     #[key]
     round_id: u32,
     player_address: ContractAddress,
