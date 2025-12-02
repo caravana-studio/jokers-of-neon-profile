@@ -1,9 +1,8 @@
 use starknet::ContractAddress;
-use crate::models::MissionDifficulty;
 
 #[starknet::interface]
 pub trait IXPSystem<T> {
-    fn add_daily_mission_xp(ref self: T, address: ContractAddress, mission_type: MissionDifficulty);
+    fn add_daily_mission_xp(ref self: T, address: ContractAddress, mission_type: u8);
     fn add_level_completion_xp(ref self: T, address: ContractAddress, level: u32);
 
     // Configuration methods
@@ -20,7 +19,7 @@ pub mod xp_system {
     use jokers_of_neon_lib::models::external::profile::ProfileLevelConfig;
     use starknet::ContractAddress;
     use crate::constants::constants::DEFAULT_NS_BYTE;
-    use crate::models::{MissionDifficulty, SeasonProgress};
+    use crate::models::SeasonProgress;
     use crate::store::{Store, StoreTrait};
     use crate::utils::utils::{
         get_current_day, get_level_xp_configurable, get_mission_xp_configurable,
@@ -39,7 +38,7 @@ pub mod xp_system {
         #[key]
         player: ContractAddress,
         season_id: u32,
-        mission_type: MissionDifficulty,
+        mission_type: u8,
         xp_earned: u32,
         day: u64,
     }
@@ -66,7 +65,7 @@ pub mod xp_system {
     #[abi(embed_v0)]
     impl XPSystemImpl of IXPSystem<ContractState> {
         fn add_daily_mission_xp(
-            ref self: ContractState, address: ContractAddress, mission_type: MissionDifficulty,
+            ref self: ContractState, address: ContractAddress, mission_type: u8,
         ) {
             // self.accesscontrol.assert_only_role(WRITER_ROLE);
 
@@ -82,9 +81,10 @@ pub mod xp_system {
             let mut daily_progress = store.get_daily_progress(address, current_day);
 
             let completion_count = match mission_type {
-                MissionDifficulty::Easy => daily_progress.easy_missions,
-                MissionDifficulty::Medium => daily_progress.medium_missions,
-                MissionDifficulty::Hard => daily_progress.hard_missions,
+                1 => daily_progress.easy_missions,
+                2 => daily_progress.medium_missions,
+                3 => daily_progress.hard_missions,
+                _ => 999,
             };
 
             let xp_earned = get_mission_xp_configurable(
@@ -93,9 +93,10 @@ pub mod xp_system {
 
             if xp_earned > 0 {
                 match mission_type {
-                    MissionDifficulty::Easy => daily_progress.easy_missions += 1,
-                    MissionDifficulty::Medium => daily_progress.medium_missions += 1,
-                    MissionDifficulty::Hard => daily_progress.hard_missions += 1,
+                    1 => daily_progress.easy_missions += 1,
+                    2 => daily_progress.medium_missions += 1,
+                    3 => daily_progress.hard_missions += 1,
+                    _ => {},
                 }
 
                 daily_progress.daily_xp += xp_earned;

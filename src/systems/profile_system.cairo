@@ -1,6 +1,6 @@
 use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, ProfileLevelConfig};
 use starknet::ContractAddress;
-use crate::models::SeasonProgress;
+use crate::models::{GameData, PokerHandData, RoundData, SeasonProgress};
 
 #[starknet::interface]
 pub trait IJokersProfile<T> {
@@ -13,6 +13,10 @@ pub trait IJokersProfile<T> {
     fn get_next_level_profile_config_by_address(
         self: @T, address: ContractAddress,
     ) -> ProfileLevelConfig;
+
+    fn set_game_data(ref self: T, game_data: GameData);
+    fn set_round_data(ref self: T, round_data: RoundData);
+    fn add_poker_hand_data(ref self: T, poker_hand_data: PokerHandData);
     fn migrate(ref self: T, profiles: Span<Profile>, season_progresses: Span<SeasonProgress>);
 }
 
@@ -23,7 +27,7 @@ pub mod profile_system {
     use openzeppelin_introspection::src5::SRC5Component;
     use starknet::ContractAddress;
     use crate::constants::constants::DEFAULT_NS_BYTE;
-    use crate::models::SeasonProgress;
+    use crate::models::{GameData, PokerHandData, RoundData, SeasonProgress};
     use crate::store::StoreTrait;
     use super::IJokersProfile;
 
@@ -144,6 +148,37 @@ pub mod profile_system {
             for season_progress in season_progresses {
                 store.set_season_progress(season_progress);
             }
+        }
+
+        // TODO: add security
+        fn set_game_data(ref self: ContractState, game_data: GameData) {
+            let mut store = StoreTrait::new(self.world_default());
+            store.set_game_data(game_data);
+        }
+
+        // TODO: add security
+        fn set_round_data(ref self: ContractState, round_data: RoundData) {
+            let mut store = StoreTrait::new(self.world_default());
+            store.set_round_data(round_data);
+        }
+
+        // TODO: add security
+        fn add_poker_hand_data(ref self: ContractState, poker_hand_data: PokerHandData) {
+            let mut store = StoreTrait::new(self.world_default());
+            let mut poker_hand_data = store.get_poker_hand_data(poker_hand_data.player_address);
+
+            poker_hand_data.royal_flush += poker_hand_data.royal_flush;
+            poker_hand_data.straight_flush += poker_hand_data.straight_flush;
+            poker_hand_data.five_of_a_kind += poker_hand_data.five_of_a_kind;
+            poker_hand_data.four_of_a_kind += poker_hand_data.four_of_a_kind;
+            poker_hand_data.full_house += poker_hand_data.full_house;
+            poker_hand_data.straight += poker_hand_data.straight;
+            poker_hand_data.flush += poker_hand_data.flush;
+            poker_hand_data.three_of_a_kind += poker_hand_data.three_of_a_kind;
+            poker_hand_data.two_pair += poker_hand_data.two_pair;
+            poker_hand_data.one_pair += poker_hand_data.one_pair;
+            poker_hand_data.high_card += poker_hand_data.high_card;
+            store.set_poker_hand_data(poker_hand_data);
         }
     }
 
