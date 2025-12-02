@@ -4,8 +4,8 @@ use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, Profil
 use starknet::ContractAddress;
 use crate::constants::constants::NFT_MANAGER_KEY;
 use crate::models::{
-    DailyProgress, GameData, LevelXPConfig, MissionDifficulty, MissionXPConfig, NFTManager,
-    PokerHandData, RoundData, SeasonConfig, SeasonLevelConfig, SeasonProgress, SeasonRewardClaim,
+    DailyProgress, GameData, LevelXPConfig, MissionXPConfig, NFTManager, PokerHandData, RoundData,
+    SeasonConfig, SeasonLevelConfig, SeasonProgress, SeasonRewardClaim,
 };
 
 #[derive(Drop)]
@@ -55,7 +55,7 @@ pub impl StoreImpl of StoreTrait {
     }
 
     fn get_mission_xp_config(
-        ref self: Store, season_id: u32, difficulty: MissionDifficulty, completion_count: u32,
+        ref self: Store, season_id: u32, difficulty: u8, completion_count: u32,
     ) -> MissionXPConfig {
         self.world.read_model((season_id, difficulty, completion_count))
     }

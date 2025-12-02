@@ -15,13 +15,6 @@ pub struct SeasonProgress {
     pub tournament_ticket: u32,
 }
 
-#[derive(Copy, Drop, Serde, Debug, PartialEq, Introspect)]
-pub enum MissionDifficulty {
-    Easy,
-    Medium,
-    Hard,
-}
-
 #[derive(Copy, Drop, Serde, Debug)]
 #[dojo::model]
 pub struct DailyProgress {
@@ -42,7 +35,7 @@ pub struct MissionXPConfig {
     #[key]
     pub season_id: u32,
     #[key]
-    pub difficulty: MissionDifficulty,
+    pub difficulty: u8,
     #[key]
     pub completion_count: u32,
     pub xp_reward: u32,
