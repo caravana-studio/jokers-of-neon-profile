@@ -33,18 +33,21 @@
   },
   "contracts": [
     {
-      "address": "0x8a68d5b4f3ed26ccdc2f7b69682a86a1b77c8e9ca625415c1def42b59be588",
-      "class_hash": "0x208c74592bf7a0b5c29f46c35ece37947a25262f38a909ffd03b66a31469922",
+      "address": "0x5c8128635d99c15c0315ef71ef280394d9616cbb81e0b5605dfd747d7cb85e6",
+      "class_hash": "0x64449c20b8fa9b5f783b2742afc4cea47f0b80bcd0c8290c51f344af02ac8b4",
       "init_calldata": [
         "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245"
       ],
-      "tag": "jokers_of_neon_profile9-profile_system",
-      "selector": "0x690426ddade12d0af2e6fa641c662ee68f6ab962b155ab6415cde954fe4ce04",
+      "tag": "jokers_of_neon_profile10-profile_system",
+      "selector": "0x10e145064d553f81b08e630bb805d5704c2f99f676b1f90b8b081daddd396ab",
       "systems": [
         "dojo_init",
         "create_profile",
         "add_stats",
         "update_avatar",
+        "set_game_data",
+        "set_round_data",
+        "add_poker_hand_data",
         "migrate",
         "upgrade",
         "grant_role",
@@ -56,13 +59,13 @@
       ]
     },
     {
-      "address": "0x15963a44a0630994c7e48e473a1bf6bba6623f771e99fa2146f4532eca7dd1f",
-      "class_hash": "0xe781327579c24980728fd9fe3def0a556612900e1a51a494c6a0b92892388d",
+      "address": "0x7c4b9f7090c4540a036f89b296df2d63ef86f7d7595b76250b43ad8fcb47e98",
+      "class_hash": "0x744eac7ce1642f05be2a78a8890adb8f166e6ea94b2896031e1713807e36800",
       "init_calldata": [
         "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245"
       ],
-      "tag": "jokers_of_neon_profile9-season_system",
-      "selector": "0x2520a76a6d381cb9dcd7ddba43db2a00750a0a3087af3acd1ebe76de0bad5ba",
+      "tag": "jokers_of_neon_profile10-season_system",
+      "selector": "0x744acc2774eb73c96a41d96f2648767fc84dbb61642660d885876786e7f5015",
       "systems": [
         "dojo_init",
         "create_season",
@@ -86,13 +89,13 @@
       ]
     },
     {
-      "address": "0x22cbf012db80a744264a2718c46911c0ea2ed97a6ef54d0f6c24c5498ddb713",
-      "class_hash": "0x5d66ce42c0f5291a5d76b1cff330c017b4cde89873210ec67608067b9804306",
+      "address": "0x58c91a5582685762eb424af825709aa5e8d4f5158ffd773edda1e75907b6d1a",
+      "class_hash": "0x10870471db8639208475ea0ae3ff72991fd85178dd92ad7d343ae9a42af35e5",
       "init_calldata": [
         "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245"
       ],
-      "tag": "jokers_of_neon_profile9-xp_system",
-      "selector": "0x413cee4a084e9dfdbe1cfd7f56e08f655d0b97eb98f15b400b96325fc8841ab",
+      "tag": "jokers_of_neon_profile10-xp_system",
+      "selector": "0x64ffb09b0eabdf2332ef9d388b2fed608fc3c0a2c3cfa3caa963bbce503b535",
       "systems": [
         "dojo_init",
         "add_daily_mission_xp",
@@ -144,8 +147,50 @@
         }
       ],
       "class_hash": "0x1f5e59eed94020af488753f011d90119985b8b7a6811222bd26d48c74618e74",
-      "tag": "jokers_of_neon_profile9-DailyProgress",
-      "selector": "0x1229ac045a788bbd69339be627dc4715b232c1933f8f99315248166a8edb34b"
+      "tag": "jokers_of_neon_profile10-DailyProgress",
+      "selector": "0x3cc3c5270b0e6689156959cca79e1ac1ac02bab43b5ce65225257a8b0b8a6ef"
+    },
+    {
+      "members": [
+        {
+          "name": "id",
+          "type": "core::integer::u32",
+          "key": true
+        },
+        {
+          "name": "owner",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "key": false
+        },
+        {
+          "name": "player_score",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "specials",
+          "type": "core::array::Span::<core::integer::u32>",
+          "key": false
+        },
+        {
+          "name": "cash",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "round",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "is_tournament",
+          "type": "core::bool",
+          "key": false
+        }
+      ],
+      "class_hash": "0x171f6e536945082be97a0f69394c78ed9749d9ad4b89b18c4e623d5d4274770",
+      "tag": "jokers_of_neon_profile10-GameData",
+      "selector": "0x3fd26b1e5ca7e8ff9d6b32aec17599b68aea0d2cbcd2bdea24b8ef4430c0d71"
     },
     {
       "members": [
@@ -171,8 +216,8 @@
         }
       ],
       "class_hash": "0x190a46cb6d36ed387a69f606e09a332dc40be1467b01f42f0d094f37a6633c1",
-      "tag": "jokers_of_neon_profile9-LevelXPConfig",
-      "selector": "0x78c79865e143a1aced5b5131979db453d19ca0932e90511b3cd61ef02aead7f"
+      "tag": "jokers_of_neon_profile10-LevelXPConfig",
+      "selector": "0xddf57074fb29c73d4fe0df83af3ba91a67d299de79420fd53c952489c08522"
     },
     {
       "members": [
@@ -183,7 +228,7 @@
         },
         {
           "name": "difficulty",
-          "type": "jokers_of_neon_profile::models::MissionDifficulty",
+          "type": "core::integer::u8",
           "key": true
         },
         {
@@ -197,9 +242,9 @@
           "key": false
         }
       ],
-      "class_hash": "0x6ad8f25f35bd5959e5c041ce69d0ebe450ff4bb8b9c6f727242fa39b688bb1b",
-      "tag": "jokers_of_neon_profile9-MissionXPConfig",
-      "selector": "0x4afd220c4b1286db9585ff6eb026cc763fee1ef84bea65cdbcb6f7cf572fc0f"
+      "class_hash": "0x40ee4287d2cb1990c1c6723488918c38f5d01977f1df899aa89242f8ad7ed03",
+      "tag": "jokers_of_neon_profile10-MissionXPConfig",
+      "selector": "0x2d54b77e147be9befdd2b53523067d00bbe89161b61665b73c960aa9542c41f"
     },
     {
       "members": [
@@ -215,8 +260,8 @@
         }
       ],
       "class_hash": "0x67d7e58040445e622990ca1dcc339f2a9b92a8d584dc47ee9c7450bd76b266b",
-      "tag": "jokers_of_neon_profile9-NFTManager",
-      "selector": "0x7622c950351ea490421b86e2665498d8d52931f9ab00912c13e9657313fa1eb"
+      "tag": "jokers_of_neon_profile10-NFTManager",
+      "selector": "0x29b51b5efed83b9b1ebf041a1b6600ff13329339d988fc7c1eb36359b76524f"
     },
     {
       "members": [
@@ -337,8 +382,75 @@
         }
       ],
       "class_hash": "0x3290681fa913cd896342ecf818641c1549f57826d6538fcdc6d1fd324854cb7",
-      "tag": "jokers_of_neon_profile9-PlayerStats",
-      "selector": "0x6bb406dc934bc3224fb9701300b688be76a33596a1c020230e5baaba5b158d3"
+      "tag": "jokers_of_neon_profile10-PlayerStats",
+      "selector": "0x78b1ed673e39acb5a0b1c3982b08f21098ab0296c06fe786ad7704e69002b6d"
+    },
+    {
+      "members": [
+        {
+          "name": "player_address",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "key": true
+        },
+        {
+          "name": "royal_flush",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "straight_flush",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "five_of_a_kind",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "four_of_a_kind",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "full_house",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "straight",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "flush",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "three_of_a_kind",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "two_pair",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "one_pair",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "high_card",
+          "type": "core::integer::u32",
+          "key": false
+        }
+      ],
+      "class_hash": "0x5c61be8cee5eabafc74c7ed31acf56b6ce373790a6524f3e1bc1f6923b1cf24",
+      "tag": "jokers_of_neon_profile10-PokerHandData",
+      "selector": "0x42ad9a0e6216baa0c2c5946b2c2f587049109aaf871d2f13c9504d55377e7fb"
     },
     {
       "members": [
@@ -399,8 +511,8 @@
         }
       ],
       "class_hash": "0x38d766a1334aabb7f99e39a2d9000f94f862268d3aa8186da89529f0b788f24",
-      "tag": "jokers_of_neon_profile9-Profile",
-      "selector": "0x5fa65931e4765b09366b895af95a9fdd5457a33a93d9cf2916d7e68a09d2965"
+      "tag": "jokers_of_neon_profile10-Profile",
+      "selector": "0xdbc0b84b552ca2f0eac5523fa7a2b3c0f4ae807bf10695dc66d13a0ecf908a"
     },
     {
       "members": [
@@ -416,8 +528,8 @@
         }
       ],
       "class_hash": "0x191539c7a9c0570c570805fe1c24c09fd9bbd6a2dd8ef7c521323160839ad63",
-      "tag": "jokers_of_neon_profile9-ProfileLevelConfig",
-      "selector": "0x7029f29de1c5d47faa617c0e0068511154fe17e738178944f3188dbfc40a89e"
+      "tag": "jokers_of_neon_profile10-ProfileLevelConfig",
+      "selector": "0x1bb883a96720219ca16cfa206454425f806d70ed842a77aaaca1199abdc43cd"
     },
     {
       "members": [
@@ -433,8 +545,45 @@
         }
       ],
       "class_hash": "0x501017325f303f558d0ae57faf2dfe959399f97380f9159563eee157a251d73",
-      "tag": "jokers_of_neon_profile9-Random",
-      "selector": "0xe7610a5d457c787cfb01e8b1e9ac6523025e1c9bd187eb9fc1f6b19aaaab85"
+      "tag": "jokers_of_neon_profile10-Random",
+      "selector": "0x33020662bcab60542a9fcca14abd16db6e84d60776fc091e42a647fe9ed53d4"
+    },
+    {
+      "members": [
+        {
+          "name": "game_id",
+          "type": "core::integer::u32",
+          "key": true
+        },
+        {
+          "name": "round_id",
+          "type": "core::integer::u32",
+          "key": true
+        },
+        {
+          "name": "player_address",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "key": false
+        },
+        {
+          "name": "current_score",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "target_score",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "rages",
+          "type": "core::array::Span::<core::integer::u32>",
+          "key": false
+        }
+      ],
+      "class_hash": "0x6b6177bdacfdf1ea667a2e7a08e47429591295cbef448f4652a07b12dc67d30",
+      "tag": "jokers_of_neon_profile10-RoundData",
+      "selector": "0x96251e7c133d309837815cff78426795e2c23b6d1750183c64f492229fa309"
     },
     {
       "members": [
@@ -450,8 +599,8 @@
         }
       ],
       "class_hash": "0x74519dae7cdd1daa342d75dee18ed8b7fcc182fead104ab927305174b84e370",
-      "tag": "jokers_of_neon_profile9-SeasonConfig",
-      "selector": "0x325b2c4754287ec8c22ff288ab0baef45f81cec5be10a607ed6d575998aed4f"
+      "tag": "jokers_of_neon_profile10-SeasonConfig",
+      "selector": "0x7c8695c678e9de701c387fed985a7b348ac5b7aefcf5c57b08af2b5b2fb667a"
     },
     {
       "members": [
@@ -482,8 +631,8 @@
         }
       ],
       "class_hash": "0x4032079cb88407892883a4463ec73e1dbea171db00cff8a5e69c9068519d7ff",
-      "tag": "jokers_of_neon_profile9-SeasonLevelConfig",
-      "selector": "0x4aa43298260ac78a9370a52e4608f5dffa08fb568f08f9eb6ce2943aa8090b3"
+      "tag": "jokers_of_neon_profile10-SeasonLevelConfig",
+      "selector": "0x5e212101911bcf43be3fb2095c1e8938c1ace1cf65104fd93bfdb0dc325a28d"
     },
     {
       "members": [
@@ -529,8 +678,8 @@
         }
       ],
       "class_hash": "0x6e37701b290f92334b9e2871898f422099affcde90882f79b6b412c9450752d",
-      "tag": "jokers_of_neon_profile9-SeasonProgress",
-      "selector": "0x3620f81bb1ddda06f5169198379813e398e5b738bdf479ecaf87f85fcdeaf49"
+      "tag": "jokers_of_neon_profile10-SeasonProgress",
+      "selector": "0x1c3952470c7f8eb463441d9e878493c5abb79f0d6747d0fe039156436a704e9"
     },
     {
       "members": [
@@ -561,8 +710,8 @@
         }
       ],
       "class_hash": "0x4fe396406b0036f174a1ee24fd82aac8baca166ed7e37ddbcab0865212fdd37",
-      "tag": "jokers_of_neon_profile9-SeasonRewardClaim",
-      "selector": "0x30200cdedbfb0226b248b605925624b885ee93666c6c732d4e979b17cd2ab7d"
+      "tag": "jokers_of_neon_profile10-SeasonRewardClaim",
+      "selector": "0x30067f0c57bd9fd5016f81783579c572c902bf672daa545e688199474daa79b"
     }
   ],
   "events": [],
@@ -2850,6 +2999,70 @@
     },
     {
       "type": "struct",
+      "name": "jokers_of_neon_profile::models::GameData",
+      "members": [
+        {
+          "name": "id",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "owner",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "player_score",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "specials",
+          "type": "core::array::Span::<core::integer::u32>"
+        },
+        {
+          "name": "cash",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "round",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "is_tournament",
+          "type": "core::bool"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "jokers_of_neon_profile::models::GameDataValue",
+      "members": [
+        {
+          "name": "owner",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "player_score",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "specials",
+          "type": "core::array::Span::<core::integer::u32>"
+        },
+        {
+          "name": "cash",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "round",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "is_tournament",
+          "type": "core::bool"
+        }
+      ]
+    },
+    {
+      "type": "struct",
       "name": "jokers_of_neon_profile::models::LevelXPConfig",
       "members": [
         {
@@ -2881,24 +3094,6 @@
       ]
     },
     {
-      "type": "enum",
-      "name": "jokers_of_neon_profile::models::MissionDifficulty",
-      "variants": [
-        {
-          "name": "Easy",
-          "type": "()"
-        },
-        {
-          "name": "Medium",
-          "type": "()"
-        },
-        {
-          "name": "Hard",
-          "type": "()"
-        }
-      ]
-    },
-    {
       "type": "struct",
       "name": "jokers_of_neon_profile::models::MissionXPConfig",
       "members": [
@@ -2908,7 +3103,7 @@
         },
         {
           "name": "difficulty",
-          "type": "jokers_of_neon_profile::models::MissionDifficulty"
+          "type": "core::integer::u8"
         },
         {
           "name": "completion_count",
@@ -2951,6 +3146,162 @@
         {
           "name": "address",
           "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "jokers_of_neon_profile::models::PokerHandData",
+      "members": [
+        {
+          "name": "player_address",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "royal_flush",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "straight_flush",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "five_of_a_kind",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "four_of_a_kind",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "full_house",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "straight",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "flush",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "three_of_a_kind",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "two_pair",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "one_pair",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "high_card",
+          "type": "core::integer::u32"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "jokers_of_neon_profile::models::PokerHandDataValue",
+      "members": [
+        {
+          "name": "royal_flush",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "straight_flush",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "five_of_a_kind",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "four_of_a_kind",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "full_house",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "straight",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "flush",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "three_of_a_kind",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "two_pair",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "one_pair",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "high_card",
+          "type": "core::integer::u32"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "jokers_of_neon_profile::models::RoundData",
+      "members": [
+        {
+          "name": "game_id",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "round_id",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "player_address",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "current_score",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "target_score",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "rages",
+          "type": "core::array::Span::<core::integer::u32>"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "jokers_of_neon_profile::models::RoundDataValue",
+      "members": [
+        {
+          "name": "player_address",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "current_score",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "target_score",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "rages",
+          "type": "core::array::Span::<core::integer::u32>"
         }
       ]
     },
@@ -3168,6 +3519,12 @@
     },
     {
       "type": "event",
+      "name": "jokers_of_neon_profile::models::m_GameData::Event",
+      "kind": "enum",
+      "variants": []
+    },
+    {
+      "type": "event",
       "name": "jokers_of_neon_profile::models::m_LevelXPConfig::Event",
       "kind": "enum",
       "variants": []
@@ -3181,6 +3538,18 @@
     {
       "type": "event",
       "name": "jokers_of_neon_profile::models::m_NFTManager::Event",
+      "kind": "enum",
+      "variants": []
+    },
+    {
+      "type": "event",
+      "name": "jokers_of_neon_profile::models::m_PokerHandData::Event",
+      "kind": "enum",
+      "variants": []
+    },
+    {
+      "type": "event",
+      "name": "jokers_of_neon_profile::models::m_RoundData::Event",
       "kind": "enum",
       "variants": []
     },
@@ -3323,6 +3692,42 @@
             }
           ],
           "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "set_game_data",
+          "inputs": [
+            {
+              "name": "game_data",
+              "type": "jokers_of_neon_profile::models::GameData"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "set_round_data",
+          "inputs": [
+            {
+              "name": "round_data",
+              "type": "jokers_of_neon_profile::models::RoundData"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "add_poker_hand_data",
+          "inputs": [
+            {
+              "name": "poker_hand_data",
+              "type": "jokers_of_neon_profile::models::PokerHandData"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
         },
         {
           "type": "function",
@@ -3929,7 +4334,7 @@
             },
             {
               "name": "mission_type",
-              "type": "jokers_of_neon_profile::models::MissionDifficulty"
+              "type": "core::integer::u8"
             }
           ],
           "outputs": [],
@@ -4060,7 +4465,7 @@
         },
         {
           "name": "mission_type",
-          "type": "jokers_of_neon_profile::models::MissionDifficulty",
+          "type": "core::integer::u8",
           "kind": "data"
         },
         {

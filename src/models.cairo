@@ -15,13 +15,6 @@ pub struct SeasonProgress {
     pub tournament_ticket: u32,
 }
 
-#[derive(Copy, Drop, Serde, Debug, PartialEq, Introspect)]
-pub enum MissionDifficulty {
-    Easy,
-    Medium,
-    Hard,
-}
-
 #[derive(Copy, Drop, Serde, Debug)]
 #[dojo::model]
 pub struct DailyProgress {
@@ -42,7 +35,7 @@ pub struct MissionXPConfig {
     #[key]
     pub season_id: u32,
     #[key]
-    pub difficulty: MissionDifficulty,
+    pub difficulty: u8,
     #[key]
     pub completion_count: u32,
     pub xp_reward: u32,
@@ -110,4 +103,48 @@ pub struct SeasonData {
     pub premium_rewards: Span<u32>,
     pub free_claimed: bool,
     pub premium_claimed: bool,
+}
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct GameData {
+    #[key]
+    id: u32,
+    owner: ContractAddress,
+    player_score: u32,
+    specials: Span<u32>,
+    cash: u32,
+    round: u32,
+    is_tournament: bool,
+}
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct RoundData {
+    #[key]
+    game_id: u32,
+    #[key]
+    round_id: u32,
+    player_address: ContractAddress,
+    current_score: u32,
+    target_score: u32,
+    rages: Span<u32>,
+}
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct PokerHandData {
+    #[key]
+    pub player_address: ContractAddress,
+    pub royal_flush: u32,
+    pub straight_flush: u32,
+    pub five_of_a_kind: u32,
+    pub four_of_a_kind: u32,
+    pub full_house: u32,
+    pub straight: u32,
+    pub flush: u32,
+    pub three_of_a_kind: u32,
+    pub two_pair: u32,
+    pub one_pair: u32,
+    pub high_card: u32,
 }

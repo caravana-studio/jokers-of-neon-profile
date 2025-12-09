@@ -1,5 +1,4 @@
 use dojo::world::WorldStorage;
-use crate::models::MissionDifficulty;
 use crate::store::StoreTrait;
 
 pub fn get_current_day() -> u64 {
@@ -7,7 +6,7 @@ pub fn get_current_day() -> u64 {
 }
 
 pub fn get_mission_xp_configurable(
-    world: WorldStorage, season_id: u32, difficulty: MissionDifficulty, completion_count: u32,
+    world: WorldStorage, season_id: u32, difficulty: u8, completion_count: u32,
 ) -> u32 {
     let mut store = StoreTrait::new(world);
     let config = store.get_mission_xp_config(season_id, difficulty, completion_count);
