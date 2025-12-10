@@ -778,60 +778,36 @@ pub mod season_system {
             store
                 .set_mission_xp_config(
                     MissionXPConfig {
-                        season_id,
-                        difficulty: 1,
-                        completion_count: 0,
-                        xp_reward: 10,
+                        season_id, difficulty: 1, completion_count: 0, xp_reward: 10,
                     },
                 );
             store
                 .set_mission_xp_config(
-                    MissionXPConfig {
-                        season_id,
-                        difficulty: 1,
-                        completion_count: 1,
-                        xp_reward: 0,
-                    },
+                    MissionXPConfig { season_id, difficulty: 1, completion_count: 1, xp_reward: 0 },
                 );
 
             // Medium missions
             store
                 .set_mission_xp_config(
                     MissionXPConfig {
-                        season_id,
-                        difficulty: 2,
-                        completion_count: 0,
-                        xp_reward: 20,
+                        season_id, difficulty: 2, completion_count: 0, xp_reward: 20,
                     },
                 );
             store
                 .set_mission_xp_config(
-                    MissionXPConfig {
-                        season_id,
-                        difficulty: 2,
-                        completion_count: 1,
-                        xp_reward: 0,
-                    },
+                    MissionXPConfig { season_id, difficulty: 2, completion_count: 1, xp_reward: 0 },
                 );
 
             // Hard missions
             store
                 .set_mission_xp_config(
                     MissionXPConfig {
-                        season_id,
-                        difficulty: 3,
-                        completion_count: 0,
-                        xp_reward: 30,
+                        season_id, difficulty: 3, completion_count: 0, xp_reward: 30,
                     },
                 );
             store
                 .set_mission_xp_config(
-                    MissionXPConfig {
-                        season_id,
-                        difficulty: 3,
-                        completion_count: 1,
-                        xp_reward: 0,
-                    },
+                    MissionXPConfig { season_id, difficulty: 3, completion_count: 1, xp_reward: 0 },
                 );
 
             // Set level XP configs
