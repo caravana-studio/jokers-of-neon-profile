@@ -773,6 +773,133 @@ pub mod season_system {
                             .span(),
                     },
                 );
+
+            // Easy missions
+            store
+                .set_mission_xp_config(
+                    MissionXPConfig {
+                        season_id,
+                        difficulty: 1,
+                        completion_count: 0,
+                        xp_reward: 10,
+                    },
+                );
+            store
+                .set_mission_xp_config(
+                    MissionXPConfig {
+                        season_id,
+                        difficulty: 1,
+                        completion_count: 1,
+                        xp_reward: 0,
+                    },
+                );
+
+            // Medium missions
+            store
+                .set_mission_xp_config(
+                    MissionXPConfig {
+                        season_id,
+                        difficulty: 2,
+                        completion_count: 0,
+                        xp_reward: 20,
+                    },
+                );
+            store
+                .set_mission_xp_config(
+                    MissionXPConfig {
+                        season_id,
+                        difficulty: 2,
+                        completion_count: 1,
+                        xp_reward: 0,
+                    },
+                );
+
+            // Hard missions
+            store
+                .set_mission_xp_config(
+                    MissionXPConfig {
+                        season_id,
+                        difficulty: 3,
+                        completion_count: 0,
+                        xp_reward: 30,
+                    },
+                );
+            store
+                .set_mission_xp_config(
+                    MissionXPConfig {
+                        season_id,
+                        difficulty: 3,
+                        completion_count: 1,
+                        xp_reward: 0,
+                    },
+                );
+
+            // Set level XP configs
+            // Level 1
+            store
+                .set_level_xp_config(
+                    LevelXPConfig { season_id, level: 1, completion_count: 0, xp_reward: 5 },
+                );
+            store
+                .set_level_xp_config(
+                    LevelXPConfig { season_id, level: 1, completion_count: 1, xp_reward: 0 },
+                );
+
+            // Level 2
+            store
+                .set_level_xp_config(
+                    LevelXPConfig { season_id, level: 2, completion_count: 0, xp_reward: 10 },
+                );
+            store
+                .set_level_xp_config(
+                    LevelXPConfig { season_id, level: 2, completion_count: 1, xp_reward: 0 },
+                );
+
+            // Level 3
+            store
+                .set_level_xp_config(
+                    LevelXPConfig { season_id, level: 3, completion_count: 0, xp_reward: 15 },
+                );
+            store
+                .set_level_xp_config(
+                    LevelXPConfig { season_id, level: 3, completion_count: 1, xp_reward: 5 },
+                );
+            store
+                .set_level_xp_config(
+                    LevelXPConfig { season_id, level: 3, completion_count: 2, xp_reward: 0 },
+                );
+
+            // Level 4
+            store
+                .set_level_xp_config(
+                    LevelXPConfig { season_id, level: 4, completion_count: 0, xp_reward: 20 },
+                );
+            store
+                .set_level_xp_config(
+                    LevelXPConfig { season_id, level: 4, completion_count: 1, xp_reward: 10 },
+                );
+            store
+                .set_level_xp_config(
+                    LevelXPConfig { season_id, level: 4, completion_count: 2, xp_reward: 0 },
+                );
+
+            // Level 5
+            store
+                .set_level_xp_config(
+                    LevelXPConfig { season_id, level: 5, completion_count: 0, xp_reward: 25 },
+                );
+            store
+                .set_level_xp_config(
+                    LevelXPConfig { season_id, level: 5, completion_count: 1, xp_reward: 15 },
+                );
+            store
+                .set_level_xp_config(
+                    LevelXPConfig { season_id, level: 5, completion_count: 2, xp_reward: 5 },
+                );
+            store
+                .set_level_xp_config(
+                    LevelXPConfig { season_id, level: 5, completion_count: 3, xp_reward: 0 },
+                );
         }
 
         fn get_season_line(
