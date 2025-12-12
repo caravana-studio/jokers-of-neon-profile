@@ -1,0 +1,6 @@
+world_address = "0x39c8aff3ceda2fffddf0ac20a94c465de6c0020372d43d225cf83655ef99477"
+
+rpc = "https://api.cartridge.gg/x/starknet/sepolia"
+
+[indexing]
+transactions = true
