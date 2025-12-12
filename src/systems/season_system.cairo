@@ -232,7 +232,8 @@ pub mod season_system {
             assert(!progress.has_season_pass, 'Already has season pass');
 
             progress.has_season_pass = true;
-            progress.season_pass_unlocked_at_level = progress.level;
+            // TODO: This is for retroactive rewards
+            progress.season_pass_unlocked_at_level = 0;
             store.set_season_progress(@progress);
 
             self.emit(SeasonPassPurchased { player: address, season_id });
