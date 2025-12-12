@@ -487,7 +487,7 @@ pub mod season_system {
                         level: 8,
                         required_xp: 400,
                         free_rewards: [ADVANCED_PACK_ID].span(),
-                        premium_rewards: [].span(),
+                        premium_rewards: [TOURNAMENT_TICKET_REWARD_ID].span(),
                     },
                 );
             store
@@ -547,8 +547,10 @@ pub mod season_system {
                         season_id,
                         level: 14,
                         required_xp: 1000,
-                        free_rewards: [].span(),
-                        premium_rewards: [].span(),
+                        free_rewards: [TOURNAMENT_TICKET_REWARD_ID, TOURNAMENT_TICKET_REWARD_ID]
+                            .span(),
+                        premium_rewards: [TOURNAMENT_TICKET_REWARD_ID, TOURNAMENT_TICKET_REWARD_ID]
+                            .span(),
                     },
                 );
             store
@@ -699,7 +701,8 @@ pub mod season_system {
                         level: 29,
                         required_xp: 2500,
                         free_rewards: [EPIC_PACK_ID].span(),
-                        premium_rewards: [].span(),
+                        premium_rewards: [TOURNAMENT_TICKET_REWARD_ID, TOURNAMENT_TICKET_REWARD_ID]
+                            .span(),
                     },
                 );
             store
@@ -708,7 +711,7 @@ pub mod season_system {
                         season_id,
                         level: 30,
                         required_xp: 2750,
-                        free_rewards: [].span(),
+                        free_rewards: [TOURNAMENT_TICKET_REWARD_ID].span(),
                         premium_rewards: [LEGENDARY_PACK_ID].span(),
                     },
                 );
