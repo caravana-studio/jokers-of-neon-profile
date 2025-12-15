@@ -5,7 +5,7 @@ use starknet::ContractAddress;
 use crate::constants::constants::{NFT_MANAGER_KEY, PERMISSION_CONFIG_KEY};
 use crate::models::{
     DailyProgress, GameData, LevelXPConfig, MissionXPConfig, NFTManager, PokerHandData, RoundData,
-    SeasonConfig, SeasonLevelConfig, SeasonProgress, SeasonRewardClaim,
+    SeasonConfig, SeasonLevelConfig, SeasonProgress, SeasonRewardClaim, XPMultiplier,
 };
 use crate::systems::permission_system::PermissionConfig;
 
@@ -139,6 +139,14 @@ pub impl StoreImpl of StoreTrait {
 
     fn set_poker_hand_data(ref self: Store, poker_hand_data: PokerHandData) {
         self.world.write_model(@poker_hand_data)
+    }
+
+    fn get_xp_multiplier(ref self: Store) -> XPMultiplier {
+        self.world.read_model('xp_multiplier')
+    }
+
+    fn set_xp_multiplier(ref self: Store, multiplier: XPMultiplier) {
+        self.world.write_model(@multiplier)
     }
 
     fn get_permission_config(ref self: Store) -> PermissionConfig {

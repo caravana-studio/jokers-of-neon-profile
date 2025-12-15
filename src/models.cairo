@@ -148,3 +148,11 @@ pub struct PokerHandData {
     pub one_pair: u32,
     pub high_card: u32,
 }
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+pub struct XPMultiplier {
+    #[key]
+    pub key: felt252, // Global key for singleton
+    pub multiplier: u32 // Multiplier in basis points (100 = 1x, 200 = 2x, 150 = 1.5x)
+}

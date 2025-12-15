@@ -8,6 +8,10 @@ pub trait IXPSystem<T> {
     // Configuration methods
     fn setup_default_profile_config(ref self: T);
 
+    // XP Multiplier methods
+    fn set_xp_multiplier(ref self: T, multiplier: u32);
+    fn get_xp_multiplier(self: @T) -> u32;
+
     // Test method to add XP directly
     fn test_xp(
         ref self: T, address: ContractAddress, season_id: u32, season_xp: u256, profile_xp: u256,
@@ -20,7 +24,7 @@ pub mod xp_system {
     use jokers_of_neon_lib::models::external::profile::ProfileLevelConfig;
     use starknet::{ContractAddress, get_caller_address, get_contract_address};
     use crate::constants::constants::DEFAULT_NS_BYTE;
-    use crate::models::SeasonProgress;
+    use crate::models::{SeasonProgress, XPMultiplier};
     use crate::store::{Store, StoreTrait};
     use crate::systems::permission_system::IPermissionSystemDispatcherTrait;
     use crate::utils::systems::SystemsTrait;
@@ -80,9 +84,18 @@ pub mod xp_system {
                 _ => 999,
             };
 
-            let xp_earned = get_mission_xp_configurable(
+            let base_xp = get_mission_xp_configurable(
                 store.world, season_id, mission_type, completion_count,
             );
+
+            // Apply multiplier
+            let multiplier_config = store.get_xp_multiplier();
+            let multiplier = if multiplier_config.multiplier == 0 {
+                100
+            } else {
+                multiplier_config.multiplier
+            };
+            let xp_earned = (base_xp * multiplier) / 100;
 
             if xp_earned > 0 {
                 match mission_type {
@@ -130,9 +143,18 @@ pub mod xp_system {
                 0
             };
 
-            let xp_earned = get_level_xp_configurable(
+            let base_xp = get_level_xp_configurable(
                 store.world, season_id, level, completion_count,
             );
+
+            // Apply multiplier
+            let multiplier_config = store.get_xp_multiplier();
+            let multiplier = if multiplier_config.multiplier == 0 {
+                100
+            } else {
+                multiplier_config.multiplier
+            };
+            let xp_earned = (base_xp * multiplier) / 100;
 
             if xp_earned > 0 {
                 if level > 0 {
@@ -210,6 +232,29 @@ pub mod xp_system {
                     );
 
                 level += 1;
+            }
+
+            // Initialize XP multiplier to 1x (100 basis points)
+            store.set_xp_multiplier(XPMultiplier { key: 'xp_multiplier', multiplier: 100 });
+        }
+
+        fn set_xp_multiplier(ref self: ContractState, multiplier: u32) {
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            assert(multiplier > 0, 'Multiplier must be > 0');
+
+            let mut store = self.create_store();
+            store.set_xp_multiplier(XPMultiplier { key: 'xp_multiplier', multiplier });
+        }
+
+        fn get_xp_multiplier(self: @ContractState) -> u32 {
+            let mut store = self.create_store();
+            let multiplier_config = store.get_xp_multiplier();
+
+            // If multiplier is not set, return default 1x (100)
+            if multiplier_config.multiplier == 0 {
+                100
+            } else {
+                multiplier_config.multiplier
             }
         }
 
