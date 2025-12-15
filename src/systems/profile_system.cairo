@@ -20,7 +20,7 @@ pub trait IJokersProfile<T> {
     fn migrate(ref self: T, profiles: Span<Profile>, season_progresses: Span<SeasonProgress>);
     fn add_claimable_pack(ref self: T, address: ContractAddress, pack_id: u32);
     fn remove_claimable_pack(ref self: T, address: ContractAddress, pack_id: u32);
-    fn claim_claimable_packs(ref self: T, address: ContractAddress);
+    fn claim_packs(ref self: T, address: ContractAddress);
 }
 
 #[dojo::contract]
@@ -227,7 +227,7 @@ pub mod profile_system {
             store.set_profile(@profile);
         }
 
-        fn claim_claimable_packs(ref self: ContractState, address: ContractAddress) {
+        fn claim_packs(ref self: ContractState, address: ContractAddress) {
             // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
