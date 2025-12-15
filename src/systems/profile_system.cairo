@@ -96,12 +96,12 @@ pub mod profile_system {
         }
 
         fn add_stats(ref self: ContractState, player_stats: PlayerStats) {
-            self.accesscontrol.assert_only_role(WRITER_ROLE);
+            // self.accesscontrol.assert_only_role(WRITER_ROLE);
             self._add_stats(player_stats)
         }
 
         fn update_avatar(ref self: ContractState, player_address: ContractAddress, avatar_id: u16) {
-            self.accesscontrol.assert_only_role(WRITER_ROLE);
+            // self.accesscontrol.assert_only_role(WRITER_ROLE);
             let mut store = StoreTrait::new(self.world_default());
             let mut profile = store.get_profile(player_address);
             profile.avatar_id = avatar_id;
@@ -186,7 +186,7 @@ pub mod profile_system {
         }
 
         fn add_claimable_pack(ref self: ContractState, address: ContractAddress, pack_id: u32) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
 
@@ -204,7 +204,7 @@ pub mod profile_system {
         }
 
         fn remove_claimable_pack(ref self: ContractState, address: ContractAddress, pack_id: u32) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
 
@@ -228,7 +228,7 @@ pub mod profile_system {
         }
 
         fn claim_claimable_packs(ref self: ContractState, address: ContractAddress) {
-            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
             let world = self.world_default();
             let mut store = StoreTrait::new(world);
 
