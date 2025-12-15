@@ -18,6 +18,9 @@ pub trait IJokersProfile<T> {
     fn set_round_data(ref self: T, round_data: RoundData);
     fn add_poker_hand_data(ref self: T, poker_hand_data: PokerHandData);
     fn migrate(ref self: T, profiles: Span<Profile>, season_progresses: Span<SeasonProgress>);
+    fn add_claimable_pack(ref self: T, address: ContractAddress, pack_id: u32);
+    fn remove_claimable_pack(ref self: T, address: ContractAddress, pack_id: u32);
+    fn claim_claimable_packs(ref self: T, address: ContractAddress);
 }
 
 #[dojo::contract]
@@ -87,6 +90,7 @@ pub mod profile_system {
                         banned: false,
                         badges_ids: [].span(),
                         avatar_id,
+                        claimable_packs: [].span(),
                     },
                 )
         }
@@ -179,6 +183,60 @@ pub mod profile_system {
             poker_hand_data.one_pair += poker_hand_data.one_pair;
             poker_hand_data.high_card += poker_hand_data.high_card;
             store.set_poker_hand_data(poker_hand_data);
+        }
+
+        fn add_claimable_pack(ref self: ContractState, address: ContractAddress, pack_id: u32) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            let world = self.world_default();
+            let mut store = StoreTrait::new(world);
+
+            let mut profile = store.get_profile(address);
+
+            let mut new_packs: Array<u32> = array![];
+            for pack in profile.claimable_packs {
+                new_packs.append(*pack);
+            }
+            new_packs.append(pack_id);
+
+            profile.claimable_packs = new_packs.span();
+
+            store.set_profile(@profile);
+        }
+
+        fn remove_claimable_pack(ref self: ContractState, address: ContractAddress, pack_id: u32) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            let world = self.world_default();
+            let mut store = StoreTrait::new(world);
+
+            let mut profile = store.get_profile(address);
+
+            let mut new_packs: Array<u32> = array![];
+            let mut found = false;
+            for pack in profile.claimable_packs {
+                if *pack == pack_id && !found {
+                    found = true;
+                } else {
+                    new_packs.append(*pack);
+                }
+            }
+
+            assert(found, 'Pack not found');
+
+            profile.claimable_packs = new_packs.span();
+
+            store.set_profile(@profile);
+        }
+
+        fn claim_claimable_packs(ref self: ContractState, address: ContractAddress) {
+            self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
+            let world = self.world_default();
+            let mut store = StoreTrait::new(world);
+
+            let mut profile = store.get_profile(address);
+
+            profile.claimable_packs = [].span();
+
+            store.set_profile(@profile);
         }
     }
 
