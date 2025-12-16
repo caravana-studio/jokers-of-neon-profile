@@ -116,6 +116,8 @@ pub struct GameData {
     cash: u32,
     round: u32,
     is_tournament: bool,
+    level: u32,
+    player_name: felt252,
 }
 
 #[derive(Copy, Drop, Serde)]
