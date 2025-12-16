@@ -20,11 +20,14 @@ pub trait IXPSystem<T> {
 
 #[dojo::contract]
 pub mod xp_system {
+    use dojo::world::WorldStorage;
     use jokers_of_neon_lib::models::external::profile::ProfileLevelConfig;
-    use starknet::ContractAddress;
+    use starknet::{ContractAddress, get_caller_address, get_contract_address};
     use crate::constants::constants::DEFAULT_NS_BYTE;
     use crate::models::{SeasonProgress, XPMultiplier};
     use crate::store::{Store, StoreTrait};
+    use crate::systems::permission_system::IPermissionSystemDispatcherTrait;
+    use crate::utils::systems::SystemsTrait;
     use crate::utils::utils::{
         get_current_day, get_level_xp_configurable, get_mission_xp_configurable,
     };
@@ -57,24 +60,14 @@ pub mod xp_system {
         day: u64,
     }
 
-    const WRITER_ROLE: felt252 = selector!("WRITER_ROLE");
-
-    fn dojo_init(
-        ref self: ContractState, owner: ContractAddress,
-    ) { // self.accesscontrol.initializer();
-    // self.accesscontrol._grant_role(DEFAULT_ADMIN_ROLE, owner);
-    // self.accesscontrol._grant_role(WRITER_ROLE, owner);
-    }
-
     #[abi(embed_v0)]
     impl XPSystemImpl of IXPSystem<ContractState> {
         fn add_daily_mission_xp(
             ref self: ContractState, address: ContractAddress, mission_type: u8,
         ) {
-            // self.accesscontrol.assert_only_role(WRITER_ROLE);
-
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
 
             // TODO: Validate that the season is active
             let season_id = 1;
@@ -92,7 +85,7 @@ pub mod xp_system {
             };
 
             let base_xp = get_mission_xp_configurable(
-                world, season_id, mission_type, completion_count,
+                store.world, season_id, mission_type, completion_count,
             );
 
             // Apply multiplier
@@ -131,10 +124,9 @@ pub mod xp_system {
         }
 
         fn add_level_completion_xp(ref self: ContractState, address: ContractAddress, level: u32) {
-            // self.accesscontrol.assert_only_role(WRITER_ROLE);
-
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
 
             // TODO: Validate that the season is active
             let season_id = 1;
@@ -151,7 +143,9 @@ pub mod xp_system {
                 0
             };
 
-            let base_xp = get_level_xp_configurable(world, season_id, level, completion_count);
+            let base_xp = get_level_xp_configurable(
+                store.world, season_id, level, completion_count,
+            );
 
             // Apply multiplier
             let multiplier_config = store.get_xp_multiplier();
@@ -209,8 +203,9 @@ pub mod xp_system {
         }
 
         fn setup_default_profile_config(ref self: ContractState) {
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
 
             // Set profile level configs with exponential XP requirements
             let mut level = 1;
@@ -270,9 +265,9 @@ pub mod xp_system {
             season_xp: u256,
             profile_xp: u256,
         ) {
-            // self.accesscontrol.assert_only_role(WRITER_ROLE);
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
 
             // Add profile XP if provided
             if profile_xp > 0 {
@@ -288,7 +283,12 @@ pub mod xp_system {
 
     #[generate_trait]
     impl InternalImpl of InternalTrait {
-        fn world_default(self: @ContractState) -> dojo::world::WorldStorage {
+        fn create_store(self: @ContractState) -> Store {
+            let mut world = self.create_world();
+            StoreTrait::new(world)
+        }
+
+        fn create_world(self: @ContractState) -> WorldStorage {
             self.world(@DEFAULT_NS_BYTE())
         }
 
