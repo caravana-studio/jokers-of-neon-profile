@@ -25,11 +25,12 @@ pub trait IJokersProfile<T> {
 
 #[dojo::contract]
 pub mod profile_system {
+    use dojo::world::WorldStorage;
     use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, ProfileLevelConfig};
     use starknet::{ContractAddress, get_caller_address, get_contract_address};
     use crate::constants::constants::DEFAULT_NS_BYTE;
     use crate::models::{GameData, PokerHandData, RoundData, SeasonProgress};
-    use crate::store::StoreTrait;
+    use crate::store::{Store, StoreTrait};
     use crate::systems::permission_system::IPermissionSystemDispatcherTrait;
     use crate::utils::systems::SystemsTrait;
     use super::IJokersProfile;
@@ -39,7 +40,7 @@ pub mod profile_system {
         fn create_profile(
             ref self: ContractState, address: ContractAddress, username: ByteArray, avatar_id: u16,
         ) {
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
             SystemsTrait::permission(store.world)
                 .assert_has_permission(get_contract_address(), get_caller_address());
 
@@ -63,14 +64,15 @@ pub mod profile_system {
         }
 
         fn add_stats(ref self: ContractState, player_stats: PlayerStats) {
-            let world = self.world_default();
-            SystemsTrait::permission(world)
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
                 .assert_has_permission(get_contract_address(), get_caller_address());
+
             self._add_stats(player_stats)
         }
 
         fn update_avatar(ref self: ContractState, player_address: ContractAddress, avatar_id: u16) {
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
             SystemsTrait::permission(store.world)
                 .assert_has_permission(get_contract_address(), get_caller_address());
 
@@ -80,26 +82,26 @@ pub mod profile_system {
         }
 
         fn get_profile(self: @ContractState, player_address: ContractAddress) -> Profile {
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
             store.get_profile(player_address)
         }
 
         fn get_player_stats(self: @ContractState, player_address: ContractAddress) -> PlayerStats {
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
             store.get_player_stats(player_address)
         }
 
         fn get_profile_level_config_by_level(
             self: @ContractState, level: u32,
         ) -> ProfileLevelConfig {
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
             store.get_profile_level_config(level)
         }
 
         fn get_next_level_profile_config_by_address(
             self: @ContractState, address: ContractAddress,
         ) -> ProfileLevelConfig {
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
             let profile = store.get_profile(address);
             store.get_profile_level_config(profile.level + 1)
         }
@@ -109,7 +111,7 @@ pub mod profile_system {
             profiles: Span<Profile>,
             season_progresses: Span<SeasonProgress>,
         ) {
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
             SystemsTrait::permission(store.world)
                 .assert_has_permission(get_contract_address(), get_caller_address());
 
@@ -128,21 +130,21 @@ pub mod profile_system {
         }
 
         fn set_game_data(ref self: ContractState, game_data: GameData) {
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
             SystemsTrait::permission(store.world)
                 .assert_has_permission(get_contract_address(), get_caller_address());
             store.set_game_data(game_data);
         }
 
         fn set_round_data(ref self: ContractState, round_data: RoundData) {
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
             SystemsTrait::permission(store.world)
                 .assert_has_permission(get_contract_address(), get_caller_address());
             store.set_round_data(round_data);
         }
 
         fn add_poker_hand_data(ref self: ContractState, poker_hand_data: PokerHandData) {
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
             SystemsTrait::permission(store.world)
                 .assert_has_permission(get_contract_address(), get_caller_address());
             let mut poker_hand_data = store.get_poker_hand_data(poker_hand_data.player_address);
@@ -162,7 +164,7 @@ pub mod profile_system {
         }
 
         fn add_claimable_pack(ref self: ContractState, address: ContractAddress, pack_id: u32) {
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
             SystemsTrait::permission(store.world)
                 .assert_has_permission(get_contract_address(), get_caller_address());
 
@@ -179,7 +181,7 @@ pub mod profile_system {
         }
 
         fn remove_claimable_pack(ref self: ContractState, address: ContractAddress, pack_id: u32) {
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
             SystemsTrait::permission(store.world)
                 .assert_has_permission(get_contract_address(), get_caller_address());
 
@@ -202,7 +204,7 @@ pub mod profile_system {
         }
 
         fn claim_packs(ref self: ContractState, address: ContractAddress) {
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
             SystemsTrait::permission(store.world)
                 .assert_has_permission(get_contract_address(), get_caller_address());
 
@@ -215,12 +217,16 @@ pub mod profile_system {
 
     #[generate_trait]
     impl InternalImpl of InternalTrait {
-        fn world_default(self: @ContractState) -> dojo::world::WorldStorage {
+        fn create_store(self: @ContractState) -> Store {
+            StoreTrait::new(self.create_world())
+        }
+
+        fn create_world(self: @ContractState) -> WorldStorage {
             self.world(@DEFAULT_NS_BYTE())
         }
 
         fn _add_stats(self: @ContractState, player_stats: PlayerStats) {
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
             let mut current_player_stats = store.get_player_stats(player_stats.address);
 
             current_player_stats.games_played += player_stats.games_played;
