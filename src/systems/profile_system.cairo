@@ -26,55 +26,22 @@ pub trait IJokersProfile<T> {
 #[dojo::contract]
 pub mod profile_system {
     use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, ProfileLevelConfig};
-    use openzeppelin_access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
-    use openzeppelin_introspection::src5::SRC5Component;
-    use starknet::ContractAddress;
+    use starknet::{ContractAddress, get_caller_address, get_contract_address};
     use crate::constants::constants::DEFAULT_NS_BYTE;
     use crate::models::{GameData, PokerHandData, RoundData, SeasonProgress};
     use crate::store::StoreTrait;
+    use crate::systems::permission_system::IPermissionSystemDispatcherTrait;
+    use crate::utils::systems::SystemsTrait;
     use super::IJokersProfile;
-
-    component!(path: SRC5Component, storage: src5, event: SRC5Event);
-    component!(path: AccessControlComponent, storage: accesscontrol, event: AccessControlEvent);
-
-    #[abi(embed_v0)]
-    impl AccessControlMixinImpl =
-        AccessControlComponent::AccessControlMixinImpl<ContractState>;
-
-    impl AccessControlInternalImpl = AccessControlComponent::InternalImpl<ContractState>;
-
-    #[storage]
-    struct Storage {
-        #[substorage(v0)]
-        src5: SRC5Component::Storage,
-        #[substorage(v0)]
-        accesscontrol: AccessControlComponent::Storage,
-    }
-
-    #[event]
-    #[derive(Drop, starknet::Event)]
-    enum Event {
-        #[flat]
-        SRC5Event: SRC5Component::Event,
-        #[flat]
-        AccessControlEvent: AccessControlComponent::Event,
-    }
-
-    const WRITER_ROLE: felt252 = selector!("WRITER_ROLE");
-
-    fn dojo_init(ref self: ContractState, owner: ContractAddress) {
-        self.accesscontrol.initializer();
-        self.accesscontrol._grant_role(DEFAULT_ADMIN_ROLE, owner);
-        self.accesscontrol._grant_role(WRITER_ROLE, owner);
-    }
 
     #[abi(embed_v0)]
     impl ProfileImpl of IJokersProfile<ContractState> {
         fn create_profile(
             ref self: ContractState, address: ContractAddress, username: ByteArray, avatar_id: u16,
         ) {
-            // self.accesscontrol.assert_only_role(WRITER_ROLE);
             let mut store = StoreTrait::new(self.world_default());
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
 
             store
                 .set_profile(
@@ -96,13 +63,17 @@ pub mod profile_system {
         }
 
         fn add_stats(ref self: ContractState, player_stats: PlayerStats) {
-            // self.accesscontrol.assert_only_role(WRITER_ROLE);
+            let world = self.world_default();
+            SystemsTrait::permission(world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
             self._add_stats(player_stats)
         }
 
         fn update_avatar(ref self: ContractState, player_address: ContractAddress, avatar_id: u16) {
-            // self.accesscontrol.assert_only_role(WRITER_ROLE);
             let mut store = StoreTrait::new(self.world_default());
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
+
             let mut profile = store.get_profile(player_address);
             profile.avatar_id = avatar_id;
             store.set_profile(@profile);
@@ -138,12 +109,14 @@ pub mod profile_system {
             profiles: Span<Profile>,
             season_progresses: Span<SeasonProgress>,
         ) {
+            let mut store = StoreTrait::new(self.world_default());
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
+
             assert!(
                 profiles.len() == season_progresses.len(),
                 "[ProfileSystem] Profiles and season progresses must have the same length",
             );
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-            let mut store = StoreTrait::new(self.world_default());
 
             for profile in profiles {
                 store.set_profile(profile);
@@ -154,21 +127,24 @@ pub mod profile_system {
             }
         }
 
-        // TODO: add security
         fn set_game_data(ref self: ContractState, game_data: GameData) {
             let mut store = StoreTrait::new(self.world_default());
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
             store.set_game_data(game_data);
         }
 
-        // TODO: add security
         fn set_round_data(ref self: ContractState, round_data: RoundData) {
             let mut store = StoreTrait::new(self.world_default());
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
             store.set_round_data(round_data);
         }
 
-        // TODO: add security
         fn add_poker_hand_data(ref self: ContractState, poker_hand_data: PokerHandData) {
             let mut store = StoreTrait::new(self.world_default());
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
             let mut poker_hand_data = store.get_poker_hand_data(poker_hand_data.player_address);
 
             poker_hand_data.royal_flush += poker_hand_data.royal_flush;
@@ -186,9 +162,9 @@ pub mod profile_system {
         }
 
         fn add_claimable_pack(ref self: ContractState, address: ContractAddress, pack_id: u32) {
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
+            let mut store = StoreTrait::new(self.world_default());
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
 
             let mut profile = store.get_profile(address);
 
@@ -199,14 +175,13 @@ pub mod profile_system {
             new_packs.append(pack_id);
 
             profile.claimable_packs = new_packs.span();
-
             store.set_profile(@profile);
         }
 
         fn remove_claimable_pack(ref self: ContractState, address: ContractAddress, pack_id: u32) {
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
+            let mut store = StoreTrait::new(self.world_default());
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
 
             let mut profile = store.get_profile(address);
 
@@ -223,19 +198,17 @@ pub mod profile_system {
             assert(found, 'Pack not found');
 
             profile.claimable_packs = new_packs.span();
-
             store.set_profile(@profile);
         }
 
         fn claim_packs(ref self: ContractState, address: ContractAddress) {
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
+            let mut store = StoreTrait::new(self.world_default());
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
 
             let mut profile = store.get_profile(address);
 
             profile.claimable_packs = [].span();
-
             store.set_profile(@profile);
         }
     }

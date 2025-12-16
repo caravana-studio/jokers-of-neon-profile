@@ -2,11 +2,12 @@ use dojo::model::ModelStorage;
 use dojo::world::WorldStorage;
 use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, ProfileLevelConfig};
 use starknet::ContractAddress;
-use crate::constants::constants::NFT_MANAGER_KEY;
+use crate::constants::constants::{NFT_MANAGER_KEY, PERMISSION_CONFIG_KEY};
 use crate::models::{
     DailyProgress, GameData, LevelXPConfig, MissionXPConfig, NFTManager, PokerHandData, RoundData,
     SeasonConfig, SeasonLevelConfig, SeasonProgress, SeasonRewardClaim,
 };
+use crate::systems::permission_system::PermissionConfig;
 
 #[derive(Drop)]
 pub struct Store {
@@ -138,5 +139,13 @@ pub impl StoreImpl of StoreTrait {
 
     fn set_poker_hand_data(ref self: Store, poker_hand_data: PokerHandData) {
         self.world.write_model(@poker_hand_data)
+    }
+
+    fn get_permission_config(ref self: Store) -> PermissionConfig {
+        self.world.read_model(PERMISSION_CONFIG_KEY)
+    }
+
+    fn set_permission_config(ref self: Store, permission_config: PermissionConfig) {
+        self.world.write_model(@permission_config)
     }
 }
