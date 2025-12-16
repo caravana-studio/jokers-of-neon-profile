@@ -54,7 +54,7 @@
     },
     {
       "address": "0x5d07d9f64be843eb189f898200ab5ed66663d2db5523ce6f90b43654462ee66",
-      "class_hash": "0xf4c896a8a17acfc7856ded52e824964bdfbeeee8a91e2d460941e2bf5e36bb",
+      "class_hash": "0x5fc4c2905e9208476d1ec5a7ea9c569f769c98e860660dcf9508778820c2ca3",
       "init_calldata": [],
       "tag": "jokers_of_neon_profile20-profile_system",
       "selector": "0x1d81b33b768b07ef5f6be4244434418f4c93f129ad67c73ffc1015fb871f581",
@@ -189,9 +189,19 @@
           "name": "is_tournament",
           "type": "core::bool",
           "key": false
+        },
+        {
+          "name": "level",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "player_name",
+          "type": "core::felt252",
+          "key": false
         }
       ],
-      "class_hash": "0x171f6e536945082be97a0f69394c78ed9749d9ad4b89b18c4e623d5d4274770",
+      "class_hash": "0x453ce9e1c2e716d20eda7b6733565de18cbd25a2c70d9c7dedefcf90cff3b4e",
       "tag": "jokers_of_neon_profile20-GameData",
       "selector": "0x7e50a40b4ef5ea90acc98290a1d773ea07133fc9e60b7aae7e0387ce7ce97ec"
     },
@@ -3078,6 +3088,14 @@
         {
           "name": "is_tournament",
           "type": "core::bool"
+        },
+        {
+          "name": "level",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "player_name",
+          "type": "core::felt252"
         }
       ]
     },
@@ -3108,6 +3126,14 @@
         {
           "name": "is_tournament",
           "type": "core::bool"
+        },
+        {
+          "name": "level",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "player_name",
+          "type": "core::felt252"
         }
       ]
     },
