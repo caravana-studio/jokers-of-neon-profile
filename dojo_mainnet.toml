@@ -14,7 +14,7 @@ rpc_url = "https://api.cartridge.gg/x/starknet/mainnet"
     "jokers_of_neon_profile-profile_system",
     "jokers_of_neon_profile-xp_system",
     "jokers_of_neon_profile-season_system",
-    "jokers_of_neon_profile-permission_system",
+    "jokers_of_neon_profile-permission_system"
 ]
 
 [init_call_args]
