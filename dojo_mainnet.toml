@@ -4,20 +4,20 @@ name = "jokers_of_neon_profile"
 seed = "jokers_of_neon_profile"
 
 [namespace]
-default = "jokers_of_neon_profile"
+default = "jokers_of_neon_profile20"
 
 [env]
 rpc_url = "https://api.cartridge.gg/x/starknet/mainnet"
 
 [writers]
-"jokers_of_neon_profile" = [
-    "jokers_of_neon_profile-profile_system",
-    "jokers_of_neon_profile-xp_system",
-    "jokers_of_neon_profile-season_system",
-    "jokers_of_neon_profile-permission_system"
+"jokers_of_neon_profile20" = [
+    "jokers_of_neon_profile20-profile_system",
+    "jokers_of_neon_profile20-xp_system",
+    "jokers_of_neon_profile20-season_system",
+    "jokers_of_neon_profile20-permission_system"
 ]
 
 [init_call_args]
-"jokers_of_neon_profile-permission_system" = [
-    "0x6677fe62ee39c7b07401f754138502bab7fac99d2d3c5d37df7d1c6fab10819",
+"jokers_of_neon_profile20-permission_system" = [
+    "0x03b4cea30c8499e90ff4fd7e830eb9120740391cae15ad3bc28ad04087417053",
 ]

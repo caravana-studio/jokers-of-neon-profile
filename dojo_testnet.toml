@@ -4,7 +4,7 @@ name = "jokers_of_neon_profile"
 seed = "jokers_of_neon_profile"
 
 [namespace]
-default = "jokers_of_neon_profile16"
+default = "jokers_of_neon_profile17"
 
 [env]
 rpc_url = "https://api.cartridge.gg/x/starknet/sepolia"
@@ -12,14 +12,14 @@ account_address = "0x3c2c6f73bc088d83c96edcf46854a60f256a7cd58a350904cef5716d4a8
 private_key = "0x0291db342f82b9e9aebdcc9c6251f28fa5fd622ca872d494da957fb99c6e4e7b"
 
 [writers]
-"jokers_of_neon_profile16" = [
-    "jokers_of_neon_profile16-profile_system",
-    "jokers_of_neon_profile16-xp_system",
-    "jokers_of_neon_profile16-season_system",
-    "jokers_of_neon_profile16-permission_system",
+"jokers_of_neon_profile17" = [
+    "jokers_of_neon_profile17-profile_system",
+    "jokers_of_neon_profile17-xp_system",
+    "jokers_of_neon_profile17-season_system",
+    "jokers_of_neon_profile17-permission_system",
 ]
 
 [init_call_args]
-"jokers_of_neon_profile16-permission_system" = [
+"jokers_of_neon_profile17-permission_system" = [
     "0x6677fe62ee39c7b07401f754138502bab7fac99d2d3c5d37df7d1c6fab10819",
 ]

@@ -15,7 +15,7 @@ echo "Deploying in ${profile}."
 # Clean up build artifacts
 echo "Cleaning up build artifacts..."
 rm -rf "target"
-# rm -f "Scarb.lock"
+rm -f "Scarb.lock"
 
 # Remove corresponding manifest file
 manifest_file="manifest_${profile}.json"
@@ -25,7 +25,7 @@ if [ -f "$manifest_file" ]; then
 fi
 
 echo "sozo build && sozo inspect && sozo migrate"
-sozo -P ${profile} build && sozo -P ${profile} inspect && sozo -P ${profile} migrate
+sozo -P ${profile} build && sozo -P ${profile} inspect && sozo -P ${profile} migrate --use-blake2s-casm-class-hash
 echo -e "\n✅ Deployed!"
 
 world_address=$(sozo -P ${profile} inspect | awk '/World/ {getline; getline; print $3}')
