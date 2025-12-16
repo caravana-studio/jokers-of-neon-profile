@@ -56,43 +56,21 @@ pub trait ISeasonSystem<T> {
 
 #[dojo::contract]
 pub mod season_system {
-    use openzeppelin_access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
-    use openzeppelin_introspection::src5::SRC5Component;
-    use starknet::ContractAddress;
+    use dojo::world::WorldStorage;
+    use starknet::{ContractAddress, get_caller_address, get_contract_address};
     use crate::constants::constants::{DEFAULT_NS_BYTE, TOURNAMENT_TICKET_REWARD_ID};
     use crate::constants::packs::{ADVANCED_PACK_ID, EPIC_PACK_ID, LEGENDARY_PACK_ID};
     use crate::models::{
         LevelXPConfig, MissionXPConfig, SeasonConfig, SeasonData, SeasonLevelConfig, SeasonProgress,
     };
-    use crate::store::StoreTrait;
+    use crate::store::{Store, StoreTrait};
+    use crate::systems::permission_system::IPermissionSystemDispatcherTrait;
+    use crate::utils::systems::SystemsTrait;
     use super::ISeasonSystem;
-
-    component!(path: SRC5Component, storage: src5, event: SRC5Event);
-    component!(path: AccessControlComponent, storage: accesscontrol, event: AccessControlEvent);
-
-    // External
-    #[abi(embed_v0)]
-    impl AccessControlMixinImpl =
-        AccessControlComponent::AccessControlMixinImpl<ContractState>;
-
-    // Internal
-    impl AccessControlInternalImpl = AccessControlComponent::InternalImpl<ContractState>;
-
-    #[storage]
-    struct Storage {
-        #[substorage(v0)]
-        accesscontrol: AccessControlComponent::Storage,
-        #[substorage(v0)]
-        src5: SRC5Component::Storage,
-    }
 
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
-        #[flat]
-        SRC5Event: SRC5Component::Event,
-        #[flat]
-        AccessControlEvent: AccessControlComponent::Event,
         SeasonCreated: SeasonCreated,
         SeasonActivated: SeasonActivated,
         SeasonDeactivated: SeasonDeactivated,
@@ -164,31 +142,22 @@ pub mod season_system {
         pack_count: u32,
     }
 
-    fn dojo_init(ref self: ContractState, owner: ContractAddress) {
-        self.accesscontrol.initializer();
-        self.accesscontrol._grant_role(DEFAULT_ADMIN_ROLE, owner);
-    }
-
     #[abi(embed_v0)]
     impl SeasonSystemImpl of ISeasonSystem<ContractState> {
         fn create_season(ref self: ContractState, season_id: u32) {
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
 
             let season_config = SeasonConfig { season_id, is_active: true };
-
             store.set_season_config(season_config);
-
             self.emit(SeasonCreated { season_id });
         }
 
         fn activate_season(ref self: ContractState, season_id: u32) {
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
 
             let season_config = store.get_season_config(season_id);
             assert(!season_config.is_active, 'Season already active');
@@ -200,10 +169,9 @@ pub mod season_system {
         }
 
         fn deactivate_season(ref self: ContractState, season_id: u32) {
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
 
             let season_config = store.get_season_config(season_id);
             assert(season_config.is_active, 'Season not active');
@@ -215,15 +183,14 @@ pub mod season_system {
         }
 
         fn get_season_config(self: @ContractState, season_id: u32) -> SeasonConfig {
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
+            let mut store = self.create_store();
             store.get_season_config(season_id)
         }
 
         fn purchase_season_pass(ref self: ContractState, address: ContractAddress, season_id: u32) {
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
 
             let season_config = store.get_season_config(season_id);
             assert(season_config.is_active, 'Season not active');
@@ -242,13 +209,12 @@ pub mod season_system {
         fn get_season_progress(
             self: @ContractState, player_address: ContractAddress, season_id: u32,
         ) -> SeasonProgress {
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
             store.get_season_progress(player_address, season_id)
         }
 
         fn has_season_pass(self: @ContractState, address: ContractAddress, season_id: u32) -> bool {
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
+            let mut store = self.create_store();
             let progress = store.get_season_progress(address, season_id);
             progress.has_season_pass
         }
@@ -261,10 +227,9 @@ pub mod season_system {
             free_rewards: Span<u32>,
             premium_rewards: Span<u32>,
         ) {
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
 
             // Verify season exists
             let season_config = store.get_season_config(season_id);
@@ -278,34 +243,40 @@ pub mod season_system {
         }
 
         fn set_season_level_config(ref self: ContractState, config: SeasonLevelConfig) {
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
+
             store.set_season_level_config(config);
         }
 
         fn set_mission_xp_config(ref self: ContractState, config: MissionXPConfig) {
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
+
             store.set_mission_xp_config(config);
         }
 
         fn set_level_xp_config(ref self: ContractState, config: LevelXPConfig) {
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
+
             store.set_level_xp_config(config);
         }
 
         fn get_season_level_config_by_level(
             self: @ContractState, season_id: u32, level: u32,
         ) -> SeasonLevelConfig {
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
             store.get_season_level_config(season_id, level)
         }
 
         fn get_season_level_config_by_address(
             self: @ContractState, address: ContractAddress, season_id: u32,
         ) -> SeasonLevelConfig {
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
             let season_progress = store.get_season_progress(address, season_id);
             store.get_season_level_config(season_id, season_progress.level)
         }
@@ -317,9 +288,9 @@ pub mod season_system {
             level: u32,
             is_premium: bool,
         ) {
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
 
             // Verify season exists and is active
             let season_config = store.get_season_config(season_id);
@@ -383,8 +354,7 @@ pub mod season_system {
         fn get_season_rewards(
             self: @ContractState, season_id: u32, level: u32, is_premium: bool,
         ) -> Span<u32> {
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
+            let mut store = self.create_store();
 
             // Get level configuration
             let level_config = store.get_season_level_config(season_id, level);
@@ -405,8 +375,9 @@ pub mod season_system {
         }
 
         fn setup_default_season_config(ref self: ContractState, season_id: u32) {
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-            let mut store = StoreTrait::new(self.world_default());
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
 
             // Set season level configs based on sistema_xp.md
             // Leveles 1-11 - Casual (Tier 1)
@@ -885,8 +856,7 @@ pub mod season_system {
         fn get_season_line(
             self: @ContractState, player: ContractAddress, season_id: u32, max_level: u32,
         ) -> Array<SeasonData> {
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
+            let mut store = self.create_store();
             let mut result: Array<SeasonData> = array![];
 
             let mut current_level: u32 = 1;
@@ -920,27 +890,24 @@ pub mod season_system {
         fn remove_tournament_ticket(
             ref self: ContractState, address: ContractAddress, season_id: u32,
         ) {
-            // self.accesscontrol.assert_only_role(DEFAULT_ADMIN_ROLE);
-            let world = self.world_default();
-            let mut store = StoreTrait::new(world);
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
 
-            // Get current season progress
             let mut progress = store.get_season_progress(address, season_id);
-
-            // Check if player has tournament tickets
             assert(progress.tournament_ticket > 0, 'No tournament tickets available');
-
-            // Decrease tournament ticket by 1
             progress.tournament_ticket -= 1;
-
-            // Save updated progress
             store.set_season_progress(@progress);
         }
     }
 
     #[generate_trait]
     impl InternalImpl of InternalTrait {
-        fn world_default(self: @ContractState) -> dojo::world::WorldStorage {
+        fn create_store(self: @ContractState) -> Store {
+            StoreTrait::new(self.create_world())
+        }
+
+        fn create_world(self: @ContractState) -> WorldStorage {
             self.world(@DEFAULT_NS_BYTE())
         }
     }
