@@ -33,25 +33,16 @@
   },
   "contracts": [
     {
-      "address": "0x66f5379396af776e941588f8b62dbf3749832560c3fb0ca6ee79d5a5d777f95",
-      "class_hash": "0x3ba0824743c74392d7e687ac6c05d9004437d70a10f02193e193fa4301bdd9c",
+      "address": "0x72063c716d9c1680eb0eee0c93a7d00a63b2462cc612a137723ff41908cbd52",
+      "class_hash": "0x6194dd5ad26e6990783957addb0ddbcb5ee038bb0a5320d037297fecdbd229e",
       "init_calldata": [
-        "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245"
+        "0x6677fe62ee39c7b07401f754138502bab7fac99d2d3c5d37df7d1c6fab10819"
       ],
-      "tag": "jokers_of_neon_profile12-profile_system",
-      "selector": "0x47f48223145592b6ebcf8c39cd28b8494cae3bbf44a3df94cba4addf423c65b",
+      "tag": "jokers_of_neon_profile16-permission_system",
+      "selector": "0x34f5d70fe3c7962ec67361fe888a213c61323246636469de5c4b58596256b4",
       "systems": [
         "dojo_init",
-        "create_profile",
-        "add_stats",
-        "update_avatar",
-        "set_game_data",
-        "set_round_data",
-        "add_poker_hand_data",
-        "migrate",
-        "add_claimable_pack",
-        "remove_claimable_pack",
-        "claim_claimable_packs",
+        "initialize",
         "upgrade",
         "grant_role",
         "revoke_role",
@@ -62,15 +53,32 @@
       ]
     },
     {
-      "address": "0x3699d8ac91a1caca22f2459e56e97fbebb0f1b1f949dfaccaffbf480c58ceed",
-      "class_hash": "0x7e44abbd26fe8f346be519a349668a5eb67ef7f6e05faf1c3bfe94286a592e1",
-      "init_calldata": [
-        "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245"
-      ],
-      "tag": "jokers_of_neon_profile12-season_system",
-      "selector": "0x4dcfd44be9c24304ca4a9cf16cf4fb9565e6dbb45364bc91a8dea2cc872f8fb",
+      "address": "0x25667d077ec8b3f7b075fe241445431787e0d02f15c051e756ddef4814514a8",
+      "class_hash": "0x5137183a4b2b9de260ae93c4cb4214550c643b3cb47cf23bf220966cc1e89f",
+      "init_calldata": [],
+      "tag": "jokers_of_neon_profile16-profile_system",
+      "selector": "0x6244f98a200860656472812251afcf283bb7e3c1dfb6f95e37d9051ec11ee12",
       "systems": [
-        "dojo_init",
+        "create_profile",
+        "add_stats",
+        "update_avatar",
+        "set_game_data",
+        "set_round_data",
+        "add_poker_hand_data",
+        "migrate",
+        "add_claimable_pack",
+        "remove_claimable_pack",
+        "claim_packs",
+        "upgrade"
+      ]
+    },
+    {
+      "address": "0x44a70c35bbf370e0e9548dce25d2d22e124d4f5d97b887435aa2d918f3efc7",
+      "class_hash": "0x77f9e948488e67394d5e99cb1cac5452cd1a6276b8347fe3c6fafb84dd01bfd",
+      "init_calldata": [],
+      "tag": "jokers_of_neon_profile16-season_system",
+      "selector": "0x611d88a23cc26dec5faa47f011a476da8abc2920e6635c8307d6ec8d4ec78a7",
+      "systems": [
         "create_season",
         "activate_season",
         "deactivate_season",
@@ -82,25 +90,16 @@
         "setup_default_season_config",
         "claim_season_rewards",
         "remove_tournament_ticket",
-        "upgrade",
-        "grant_role",
-        "revoke_role",
-        "renounce_role",
-        "grantRole",
-        "revokeRole",
-        "renounceRole"
+        "upgrade"
       ]
     },
     {
-      "address": "0x6ba9eb50bc7be1c9527b7083c80bd2cbae0f79ef4149072c346ac7512253b02",
-      "class_hash": "0x6564303a4cd283e480005cb46f1a6a5940b2b3409118b14b4872c78d70c085b",
-      "init_calldata": [
-        "0x00dba4d5ba495338b74aceac92ddc26afff9319d675e09db0aadba40cc606245"
-      ],
-      "tag": "jokers_of_neon_profile12-xp_system",
-      "selector": "0x6f41db0cfeba1c9ea03226c67abb6efbd6a2fdf2605e41553d7d4b45057f3e3",
+      "address": "0x3aecec531749ae6ef42679745c99659bb32a58cb7bcb7d7116466b3490a7425",
+      "class_hash": "0xe5ee921c9d0344de4847cb00407612d7390817f443c696e98e2b021083fd16",
+      "init_calldata": [],
+      "tag": "jokers_of_neon_profile16-xp_system",
+      "selector": "0xdf4609917d73a22e7c488be9a6bb639319e8d30ea87624c063f8b7c6cb0fff",
       "systems": [
-        "dojo_init",
         "add_daily_mission_xp",
         "add_level_completion_xp",
         "setup_default_profile_config",
@@ -150,8 +149,8 @@
         }
       ],
       "class_hash": "0x1f5e59eed94020af488753f011d90119985b8b7a6811222bd26d48c74618e74",
-      "tag": "jokers_of_neon_profile12-DailyProgress",
-      "selector": "0xf5d2eed8347fbc2e70aecdcb660247d35a6fa568366e3aaf153690f8f2a527"
+      "tag": "jokers_of_neon_profile16-DailyProgress",
+      "selector": "0x24d6eaf7c58f254c4a6ac649af1c1786ac662cd3e3f292824d0db510c4ab6d"
     },
     {
       "members": [
@@ -192,8 +191,8 @@
         }
       ],
       "class_hash": "0x171f6e536945082be97a0f69394c78ed9749d9ad4b89b18c4e623d5d4274770",
-      "tag": "jokers_of_neon_profile12-GameData",
-      "selector": "0xb4c10eee855ba3bd989c897b9c595635e84de059fd79e05941926177444b42"
+      "tag": "jokers_of_neon_profile16-GameData",
+      "selector": "0x6dfa27ff507ad473893cc3925668e331c1827c47a5bf843dd3c73a82203ba02"
     },
     {
       "members": [
@@ -219,8 +218,8 @@
         }
       ],
       "class_hash": "0x190a46cb6d36ed387a69f606e09a332dc40be1467b01f42f0d094f37a6633c1",
-      "tag": "jokers_of_neon_profile12-LevelXPConfig",
-      "selector": "0x5dfec3d0aeb7c783d94acce23d1690410be91867f7ca04992630a5d5cecc16e"
+      "tag": "jokers_of_neon_profile16-LevelXPConfig",
+      "selector": "0x378947d239ddd9ffb8371394d6e152a11cae833d68f8de73046db8ec134e9f3"
     },
     {
       "members": [
@@ -246,8 +245,8 @@
         }
       ],
       "class_hash": "0x40ee4287d2cb1990c1c6723488918c38f5d01977f1df899aa89242f8ad7ed03",
-      "tag": "jokers_of_neon_profile12-MissionXPConfig",
-      "selector": "0x15e75636d6476eced3906d7f9bc41fd339a82bf32b7600973dd5a70d307b938"
+      "tag": "jokers_of_neon_profile16-MissionXPConfig",
+      "selector": "0x58f073f0bbbc60f7fd88df78d5c7b1a4112b9b3757ebc9ae9ad1c6c6571f781"
     },
     {
       "members": [
@@ -263,8 +262,30 @@
         }
       ],
       "class_hash": "0x67d7e58040445e622990ca1dcc339f2a9b92a8d584dc47ee9c7450bd76b266b",
-      "tag": "jokers_of_neon_profile12-NFTManager",
-      "selector": "0x734efdd356e5dcd4d8171d0b2de8899431ce8f205147908117635694191b6fc"
+      "tag": "jokers_of_neon_profile16-NFTManager",
+      "selector": "0x5d53a849175e69be2f75c53ac02311802056ef0cce8439092ed9989262e2630"
+    },
+    {
+      "members": [
+        {
+          "name": "key",
+          "type": "core::felt252",
+          "key": true
+        },
+        {
+          "name": "owner",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "key": false
+        },
+        {
+          "name": "permissions_address",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "key": false
+        }
+      ],
+      "class_hash": "0x549658fde7422a768bb743ddb75283822c3bd23e281c03b5144ba15f6602f82",
+      "tag": "jokers_of_neon_profile16-PermissionConfig",
+      "selector": "0x261475a4d43fec46e2be028b3b8a06c4cb621d4d2e3a43eae11c38f0d944df8"
     },
     {
       "members": [
@@ -385,8 +406,8 @@
         }
       ],
       "class_hash": "0x3290681fa913cd896342ecf818641c1549f57826d6538fcdc6d1fd324854cb7",
-      "tag": "jokers_of_neon_profile12-PlayerStats",
-      "selector": "0x6fc6d7c298ec89782c1b8ed6e8a1acec0bef185933e070638f7aa4120841346"
+      "tag": "jokers_of_neon_profile16-PlayerStats",
+      "selector": "0x33de3b7c3ed8f7a6f97c0d6b8baab28f6d78aef761985386b6b35a354662f69"
     },
     {
       "members": [
@@ -452,8 +473,8 @@
         }
       ],
       "class_hash": "0x5c61be8cee5eabafc74c7ed31acf56b6ce373790a6524f3e1bc1f6923b1cf24",
-      "tag": "jokers_of_neon_profile12-PokerHandData",
-      "selector": "0x4ad94354860f1bfb227244079febd1bc4cff56792f3122ad7c3cf783d463621"
+      "tag": "jokers_of_neon_profile16-PokerHandData",
+      "selector": "0x2760a0df88cdd82c101292a1ea03115136fa947fe28c9a30e1405ac358f386b"
     },
     {
       "members": [
@@ -519,8 +540,8 @@
         }
       ],
       "class_hash": "0x5dc943e920ba4215a11383910f6734ad02dce58661977dcf4e6b7b0adff102f",
-      "tag": "jokers_of_neon_profile12-Profile",
-      "selector": "0x646197ba678542f703446e561f6ebcfeb59cdd9447d0f4f5aa301d3b7a21215"
+      "tag": "jokers_of_neon_profile16-Profile",
+      "selector": "0x6c0a2bd6974b4991314f4ae7a4ec1c0228e38b943a80ff5144b3a6de81ebf99"
     },
     {
       "members": [
@@ -536,8 +557,8 @@
         }
       ],
       "class_hash": "0x191539c7a9c0570c570805fe1c24c09fd9bbd6a2dd8ef7c521323160839ad63",
-      "tag": "jokers_of_neon_profile12-ProfileLevelConfig",
-      "selector": "0x47251aa70c24a520a85d7b4fbd8965aa929966eb72af872649894744fadcdeb"
+      "tag": "jokers_of_neon_profile16-ProfileLevelConfig",
+      "selector": "0x2d238a3339de4e581b964e9e7bf3e6698adcd2731a92c8246c444006f429296"
     },
     {
       "members": [
@@ -553,8 +574,8 @@
         }
       ],
       "class_hash": "0x501017325f303f558d0ae57faf2dfe959399f97380f9159563eee157a251d73",
-      "tag": "jokers_of_neon_profile12-Random",
-      "selector": "0x17c857906285e17b29ae203b2999eb16adbc31c2936387aa81cf6fe1cca6b5e"
+      "tag": "jokers_of_neon_profile16-Random",
+      "selector": "0x4cbd7b384c344c9e7f456eb3f7f3bad094bf4dcf48dbea279d9676954d07dc0"
     },
     {
       "members": [
@@ -590,8 +611,8 @@
         }
       ],
       "class_hash": "0x6b6177bdacfdf1ea667a2e7a08e47429591295cbef448f4652a07b12dc67d30",
-      "tag": "jokers_of_neon_profile12-RoundData",
-      "selector": "0x76dd686f970fd4d60367684eaf67a905b1d59fb17e74d45f8857f1d8f4ab120"
+      "tag": "jokers_of_neon_profile16-RoundData",
+      "selector": "0x79124dd3969556f83d88089f6ea50e0bbc31b090d6dadcdb8a280c3d89b647a"
     },
     {
       "members": [
@@ -607,8 +628,8 @@
         }
       ],
       "class_hash": "0x74519dae7cdd1daa342d75dee18ed8b7fcc182fead104ab927305174b84e370",
-      "tag": "jokers_of_neon_profile12-SeasonConfig",
-      "selector": "0x57540902c796b1a04e9dd32da7f3d9cde9907a41d102bfc57039eef2a334cb"
+      "tag": "jokers_of_neon_profile16-SeasonConfig",
+      "selector": "0x22de442da96a1819ba0d2902aca05619902a41190417f3576f49f35a84abd1c"
     },
     {
       "members": [
@@ -639,8 +660,8 @@
         }
       ],
       "class_hash": "0x4032079cb88407892883a4463ec73e1dbea171db00cff8a5e69c9068519d7ff",
-      "tag": "jokers_of_neon_profile12-SeasonLevelConfig",
-      "selector": "0x5b087548de0c8c8255fba3ebb0c36d14056fa330f3381d7f72227b9b60161af"
+      "tag": "jokers_of_neon_profile16-SeasonLevelConfig",
+      "selector": "0x5c68325cae8f2eb63d5d614b10b474bebb66bb62d7aede638ddf2350c3b9e52"
     },
     {
       "members": [
@@ -686,8 +707,8 @@
         }
       ],
       "class_hash": "0x6e37701b290f92334b9e2871898f422099affcde90882f79b6b412c9450752d",
-      "tag": "jokers_of_neon_profile12-SeasonProgress",
-      "selector": "0x7320317dfc3495b8a6ae99365e61b08914adfa524127e122f821747546ae87e"
+      "tag": "jokers_of_neon_profile16-SeasonProgress",
+      "selector": "0x7dded2bbeb28254ff9f6818fd0237c49d5f18b36747ecbe7e01a33c5224c41"
     },
     {
       "members": [
@@ -718,8 +739,8 @@
         }
       ],
       "class_hash": "0x4fe396406b0036f174a1ee24fd82aac8baca166ed7e37ddbcab0865212fdd37",
-      "tag": "jokers_of_neon_profile12-SeasonRewardClaim",
-      "selector": "0x2ce2e7af927214b44e0945ca740161e201da878bf967879dc1cc388e3e1681b"
+      "tag": "jokers_of_neon_profile16-SeasonRewardClaim",
+      "selector": "0xde117fd05c2520e265735ebabf85b4f5cbfa8a6fb51d2ad5e4f13e76e04f2d"
     }
   ],
   "events": [],
@@ -2545,14 +2566,9 @@
     {
       "type": "function",
       "name": "dojo_init",
-      "inputs": [
-        {
-          "name": "owner",
-          "type": "core::starknet::contract_address::ContractAddress"
-        }
-      ],
+      "inputs": [],
       "outputs": [],
-      "state_mutability": "external"
+      "state_mutability": "view"
     },
     {
       "type": "function",
@@ -3595,6 +3611,105 @@
     },
     {
       "type": "interface",
+      "name": "jokers_of_neon_profile::systems::permission_system::IPermissionSystem",
+      "items": [
+        {
+          "type": "function",
+          "name": "initialize",
+          "inputs": [
+            {
+              "name": "permissions_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "assert_has_permission",
+          "inputs": [
+            {
+              "name": "contract_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "caller",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "view"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "jokers_of_neon_profile::systems::permission_system::PermissionConfig",
+      "members": [
+        {
+          "name": "key",
+          "type": "core::felt252"
+        },
+        {
+          "name": "owner",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "permissions_address",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "jokers_of_neon_profile::systems::permission_system::PermissionConfigValue",
+      "members": [
+        {
+          "name": "owner",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "permissions_address",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "jokers_of_neon_profile::systems::permission_system::m_PermissionConfig::Event",
+      "kind": "enum",
+      "variants": []
+    },
+    {
+      "type": "event",
+      "name": "jokers_of_neon_profile::systems::permission_system::permission_system::Event",
+      "kind": "enum",
+      "variants": [
+        {
+          "name": "UpgradeableEvent",
+          "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+          "kind": "nested"
+        },
+        {
+          "name": "WorldProviderEvent",
+          "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+          "kind": "nested"
+        },
+        {
+          "name": "SRC5Event",
+          "type": "openzeppelin_introspection::src5::SRC5Component::Event",
+          "kind": "flat"
+        },
+        {
+          "name": "AccessControlEvent",
+          "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::Event",
+          "kind": "flat"
+        }
+      ]
+    },
+    {
+      "type": "interface",
       "name": "jokers_of_neon_profile::systems::profile_system::IJokersProfile",
       "items": [
         {
@@ -3795,7 +3910,7 @@
         },
         {
           "type": "function",
-          "name": "claim_claimable_packs",
+          "name": "claim_packs",
           "inputs": [
             {
               "name": "address",
@@ -3821,16 +3936,6 @@
           "name": "WorldProviderEvent",
           "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
           "kind": "nested"
-        },
-        {
-          "name": "SRC5Event",
-          "type": "openzeppelin_introspection::src5::SRC5Component::Event",
-          "kind": "flat"
-        },
-        {
-          "name": "AccessControlEvent",
-          "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::Event",
-          "kind": "flat"
         }
       ]
     },
@@ -4166,16 +4271,6 @@
           "name": "WorldProviderEvent",
           "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
           "kind": "nested"
-        },
-        {
-          "name": "SRC5Event",
-          "type": "openzeppelin_introspection::src5::SRC5Component::Event",
-          "kind": "flat"
-        },
-        {
-          "name": "AccessControlEvent",
-          "type": "openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::Event",
-          "kind": "flat"
         },
         {
           "name": "SeasonCreated",
