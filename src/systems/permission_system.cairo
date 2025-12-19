@@ -93,10 +93,10 @@ pub mod permission_system {
             self: @ContractState, contract_address: ContractAddress, caller: ContractAddress,
         ) {
             let mut store = self.create_store();
-            let contract_address = store.get_permission_config().permissions_address;
+            let permissions_contract_address = store.get_permission_config().permissions_address;
 
-            if contract_address.is_non_zero() {
-                let dispatcher = IPermissionsDispatcher { contract_address };
+            if permissions_contract_address.is_non_zero() {
+                let dispatcher = IPermissionsDispatcher { contract_address: permissions_contract_address };
                 assert!(
                     dispatcher.has_permission(contract_address, caller),
                     "[Permission System] - Caller `{:x}` does not have permission for contract `{:x}`.",
