@@ -19,5 +19,5 @@ rpc_url = "https://api.cartridge.gg/x/starknet/mainnet"
 
 [init_call_args]
 "jokers_of_neon_profile-permission_system" = [
-    "0x6677fe62ee39c7b07401f754138502bab7fac99d2d3c5d37df7d1c6fab10819",
+    "0x03b4cea30c8499e90ff4fd7e830eb9120740391cae15ad3bc28ad04087417053",
 ]
