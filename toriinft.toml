@@ -1,0 +1,14 @@
+world_address = "0x0"
+
+rpc = "https://api.cartridge.gg/x/starknet/mainnet"
+
+[indexing]
+allowed_origins = ["*"]
+polling_interval = 500
+world_block = 4387094
+pending = true
+transactions = true
+contracts = [
+    "ERC721:0x04ddbbab7aa237c1b73c931b6f836ded6036f5e12d4898fccdcde81d494f7956"
+]
+
