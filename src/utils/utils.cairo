@@ -1,8 +1,11 @@
 use dojo::world::WorldStorage;
 use crate::store::StoreTrait;
 
+const SECONDS_IN_DAY: u64 = 86400;
+const DAY_START_OFFSET: u64 = 21600; // 6 hours (3am Argentina time = 6am UTC)
+
 pub fn get_current_day() -> u64 {
-    starknet::get_block_timestamp() / 86400 // Seconds per day
+    (starknet::get_block_timestamp() - DAY_START_OFFSET) / SECONDS_IN_DAY
 }
 
 pub fn get_mission_xp_configurable(
