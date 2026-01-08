@@ -242,7 +242,7 @@ pub mod xp_system {
             assert(multiplier > 0, 'Multiplier must be > 0');
 
             let mut store = self.create_store();
-                        SystemsTrait::permission(store.world)
+            SystemsTrait::permission(store.world)
                 .assert_has_permission(get_contract_address(), get_caller_address());
 
             store.set_xp_multiplier(XPMultiplier { key: 'xp_multiplier', multiplier });
