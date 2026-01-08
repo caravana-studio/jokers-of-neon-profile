@@ -791,19 +791,11 @@ pub mod season_system {
                 .set_level_xp_config(
                     LevelXPConfig { season_id, level: 1, completion_count: 0, xp_reward: 5 },
                 );
-            store
-                .set_level_xp_config(
-                    LevelXPConfig { season_id, level: 1, completion_count: 1, xp_reward: 0 },
-                );
 
             // Level 2
             store
                 .set_level_xp_config(
                     LevelXPConfig { season_id, level: 2, completion_count: 0, xp_reward: 10 },
-                );
-            store
-                .set_level_xp_config(
-                    LevelXPConfig { season_id, level: 2, completion_count: 1, xp_reward: 0 },
                 );
 
             // Level 3
@@ -815,10 +807,6 @@ pub mod season_system {
                 .set_level_xp_config(
                     LevelXPConfig { season_id, level: 3, completion_count: 1, xp_reward: 5 },
                 );
-            store
-                .set_level_xp_config(
-                    LevelXPConfig { season_id, level: 3, completion_count: 2, xp_reward: 0 },
-                );
 
             // Level 4
             store
@@ -828,10 +816,6 @@ pub mod season_system {
             store
                 .set_level_xp_config(
                     LevelXPConfig { season_id, level: 4, completion_count: 1, xp_reward: 10 },
-                );
-            store
-                .set_level_xp_config(
-                    LevelXPConfig { season_id, level: 4, completion_count: 2, xp_reward: 0 },
                 );
 
             // Level 5
@@ -846,10 +830,6 @@ pub mod season_system {
             store
                 .set_level_xp_config(
                     LevelXPConfig { season_id, level: 5, completion_count: 2, xp_reward: 5 },
-                );
-            store
-                .set_level_xp_config(
-                    LevelXPConfig { season_id, level: 5, completion_count: 3, xp_reward: 0 },
                 );
         }
 
