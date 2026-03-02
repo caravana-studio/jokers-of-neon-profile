@@ -25,24 +25,24 @@ if [ -f "$manifest_file" ]; then
 fi
 
 echo "sozo build && sozo inspect && sozo migrate"
-sozo -P ${profile} build && sozo -P ${profile} inspect && sozo -P ${profile} migrate
+sozo -P ${profile} build && sozo -P ${profile} inspect && sozo -P ${profile} migrate --use-blake2s-casm-class-hash
 echo -e "\n✅ Deployed!"
 
 world_address=$(sozo -P ${profile} inspect | awk '/World/ {getline; getline; print $3}')
 
 echo -e "\n🎮 Default config season en profile..."
-sozo -P ${profile} execute season_system setup_default_season_config \
-    1 \
+sozo -P mainnet execute season_system setup_default_season_config \
+    2 \
     --wait \
-    --world $world_address
+    --world 0x039c8aff3ceda2fffddf0ac20a94c465de6c0020372d43d225cf83655ef99477
 
 echo -e "\n🎮 Create season 1 en profile..."
-sozo -P ${profile} execute season_system create_season \
-    1 \
+sozo -P mainnet execute season_system create_season \
+    2 \
     --wait \
-    --world $world_address
+    --world 0x039c8aff3ceda2fffddf0ac20a94c465de6c0020372d43d225cf83655ef99477
 
-echo -e "\n🎮 Default config xp profile en profile..."
-sozo -P ${profile} execute xp_system setup_default_profile_config \
-    --wait \
-    --world $world_address
+# echo -e "\n🎮 Default config xp profile en profile..."
+# sozo -P ${profile} execute xp_system setup_default_profile_config \
+#     --wait \
+#     --world $world_address

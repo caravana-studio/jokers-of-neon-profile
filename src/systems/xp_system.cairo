@@ -23,7 +23,7 @@ pub mod xp_system {
     use dojo::world::WorldStorage;
     use jokers_of_neon_lib::models::external::profile::ProfileLevelConfig;
     use starknet::{ContractAddress, get_caller_address, get_contract_address};
-    use crate::constants::constants::DEFAULT_NS_BYTE;
+    use crate::constants::constants::{CURRENT_SEASON_ID, DEFAULT_NS_BYTE};
     use crate::models::{SeasonProgress, XPMultiplier};
     use crate::store::{Store, StoreTrait};
     use crate::systems::permission_system::IPermissionSystemDispatcherTrait;
@@ -70,7 +70,7 @@ pub mod xp_system {
                 .assert_has_permission(get_contract_address(), get_caller_address());
 
             // TODO: Validate that the season is active
-            let season_id = 1;
+            let season_id = CURRENT_SEASON_ID;
             let season_config = store.get_season_config(season_id);
             // assert(season_config.is_active, 'Season is not active');
 
@@ -129,7 +129,7 @@ pub mod xp_system {
                 .assert_has_permission(get_contract_address(), get_caller_address());
 
             // TODO: Validate that the season is active
-            let season_id = 1;
+            let season_id = CURRENT_SEASON_ID;
             let season_config = store.get_season_config(season_id);
             // assert(season_config.is_active, 'Season is not active');
 

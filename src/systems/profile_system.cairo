@@ -44,6 +44,11 @@ pub mod profile_system {
             SystemsTrait::permission(store.world)
                 .assert_has_permission(get_contract_address(), get_caller_address());
 
+            let existing_profile = store.get_profile(address);
+            if existing_profile.username.len() > 0 {
+                return;
+            }
+
             store
                 .set_profile(
                     @Profile {
@@ -52,9 +57,9 @@ pub mod profile_system {
                         total_xp: 0,
                         xp: 0,
                         level: 0,
-                        available_games: 3,
-                        max_available_games: 3,
-                        daily_streak: 1,
+                        available_games: 0,
+                        max_available_games: 0,
+                        daily_streak: 0,
                         banned: false,
                         badges_ids: [].span(),
                         avatar_id,

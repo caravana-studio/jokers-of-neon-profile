@@ -4,3 +4,10 @@ pub const EPIC_PACK_ID: u32 = 3;
 pub const LEGENDARY_PACK_ID: u32 = 4;
 pub const COLLECTORS_PACK_ID: u32 = 5;
 pub const COLLECTORS_XL_PACK_ID: u32 = 6;
+
+pub const BASIC_SEASON_2_PACK_ID: u32 = 21;
+pub const ADVANCED_SEASON_2_PACK_ID: u32 = 22;
+pub const EPIC_SEASON_2_PACK_ID: u32 = 23;
+pub const LEGENDARY_SEASON_2_PACK_ID: u32 = 24;
+pub const COLLECTORS_SEASON_2_PACK_ID: u32 = 25;
+pub const COLLECTORS_XL_SEASON_2_PACK_ID: u32 = 26;
