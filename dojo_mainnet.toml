@@ -8,6 +8,8 @@ default = "jokers_of_neon_profile20"
 
 [env]
 rpc_url = "https://api.cartridge.gg/x/starknet/mainnet"
+account_address = ""
+private_key = ""
 
 [writers]
 "jokers_of_neon_profile20" = [
