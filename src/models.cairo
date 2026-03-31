@@ -158,3 +158,14 @@ pub struct XPMultiplier {
     pub key: felt252, // Global key for singleton
     pub multiplier: u32 // Multiplier in basis points (100 = 1x, 200 = 2x, 150 = 1.5x)
 }
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+pub struct PlayerProgression {
+    #[key]
+    pub address: ContractAddress,
+    pub tier: u8,
+    pub total_runs: u32,
+    pub max_level: u32,
+    pub max_round: u32,
+}

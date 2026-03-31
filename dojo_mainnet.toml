@@ -17,6 +17,7 @@ private_key = ""
     "jokers_of_neon_profile20-xp_system",
     "jokers_of_neon_profile20-season_system",
     "jokers_of_neon_profile20-permission_system",
+    "jokers_of_neon_profile20-progression_system",
 ]
 
 [init_call_args]

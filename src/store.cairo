@@ -4,8 +4,8 @@ use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, Profil
 use starknet::ContractAddress;
 use crate::constants::constants::{NFT_MANAGER_KEY, PERMISSION_CONFIG_KEY};
 use crate::models::{
-    DailyProgress, GameData, LevelXPConfig, MissionXPConfig, NFTManager, PokerHandData, RoundData,
-    SeasonConfig, SeasonLevelConfig, SeasonProgress, SeasonRewardClaim, XPMultiplier,
+    DailyProgress, GameData, LevelXPConfig, MissionXPConfig, NFTManager, PlayerProgression, PokerHandData,
+    RoundData, SeasonConfig, SeasonLevelConfig, SeasonProgress, SeasonRewardClaim, XPMultiplier,
 };
 use crate::systems::permission_system::PermissionConfig;
 
@@ -155,5 +155,13 @@ pub impl StoreImpl of StoreTrait {
 
     fn set_permission_config(ref self: Store, permission_config: PermissionConfig) {
         self.world.write_model(@permission_config)
+    }
+
+    fn get_player_progression(ref self: Store, address: ContractAddress) -> PlayerProgression {
+        self.world.read_model(address)
+    }
+
+    fn set_player_progression(ref self: Store, progression: PlayerProgression) {
+        self.world.write_model(@progression)
     }
 }
