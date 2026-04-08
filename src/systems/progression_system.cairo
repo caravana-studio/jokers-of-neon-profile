@@ -1,4 +1,5 @@
 use starknet::ContractAddress;
+use crate::models::PlayerProgression;
 
 #[starknet::interface]
 pub trait IProgressionSystem<T> {
@@ -10,7 +11,7 @@ pub trait IProgressionSystem<T> {
         max_level: u32,
         max_round: u32,
     );
-    fn get_progression(self: @T, player: ContractAddress) -> (u8, u32, u32, u32);
+    fn get_progression(self: @T, player: ContractAddress) -> PlayerProgression;
 }
 
 #[dojo::contract]
@@ -39,7 +40,11 @@ pub mod progression_system {
             let existing = store.get_player_progression(player);
 
             // Use max values to avoid overwriting better progression
-            let new_tier = if tier > existing.tier { tier } else { existing.tier };
+            let new_tier = if tier > existing.tier {
+                tier
+            } else {
+                existing.tier
+            };
             let new_total_runs = if total_runs > existing.total_runs {
                 total_runs
             } else {
@@ -70,10 +75,9 @@ pub mod progression_system {
                 );
         }
 
-        fn get_progression(self: @ContractState, player: ContractAddress) -> (u8, u32, u32, u32) {
+        fn get_progression(self: @ContractState, player: ContractAddress) -> PlayerProgression {
             let mut store = self.create_store();
-            let progression = store.get_player_progression(player);
-            (progression.tier, progression.total_runs, progression.max_level, progression.max_round)
+            store.get_player_progression(player)
         }
     }
 

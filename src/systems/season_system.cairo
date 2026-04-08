@@ -59,7 +59,9 @@ pub mod season_system {
     use dojo::world::WorldStorage;
     use starknet::{ContractAddress, get_caller_address, get_contract_address};
     use crate::constants::constants::{DEFAULT_NS_BYTE, TOURNAMENT_TICKET_REWARD_ID};
-    use crate::constants::packs::{ADVANCED_SEASON_2_PACK_ID, EPIC_SEASON_2_PACK_ID, LEGENDARY_SEASON_2_PACK_ID};
+    use crate::constants::packs::{
+        ADVANCED_SEASON_2_PACK_ID, EPIC_SEASON_2_PACK_ID, LEGENDARY_SEASON_2_PACK_ID,
+    };
     use crate::models::{
         LevelXPConfig, MissionXPConfig, SeasonConfig, SeasonData, SeasonLevelConfig, SeasonProgress,
     };
@@ -714,7 +716,8 @@ pub mod season_system {
                         level: 33,
                         required_xp: 4000,
                         free_rewards: [EPIC_SEASON_2_PACK_ID].span(),
-                        premium_rewards: [LEGENDARY_SEASON_2_PACK_ID, LEGENDARY_SEASON_2_PACK_ID].span(),
+                        premium_rewards: [LEGENDARY_SEASON_2_PACK_ID, LEGENDARY_SEASON_2_PACK_ID]
+                            .span(),
                     },
                 );
             store
@@ -724,7 +727,8 @@ pub mod season_system {
                         level: 34,
                         required_xp: 5000,
                         free_rewards: [LEGENDARY_SEASON_2_PACK_ID].span(),
-                        premium_rewards: [LEGENDARY_SEASON_2_PACK_ID, LEGENDARY_SEASON_2_PACK_ID].span(),
+                        premium_rewards: [LEGENDARY_SEASON_2_PACK_ID, LEGENDARY_SEASON_2_PACK_ID]
+                            .span(),
                     },
                 );
             store
@@ -734,7 +738,8 @@ pub mod season_system {
                         level: 35,
                         required_xp: 7500,
                         free_rewards: [EPIC_SEASON_2_PACK_ID, EPIC_SEASON_2_PACK_ID].span(),
-                        premium_rewards: [LEGENDARY_SEASON_2_PACK_ID, LEGENDARY_SEASON_2_PACK_ID].span(),
+                        premium_rewards: [LEGENDARY_SEASON_2_PACK_ID, LEGENDARY_SEASON_2_PACK_ID]
+                            .span(),
                     },
                 );
             store
@@ -743,8 +748,12 @@ pub mod season_system {
                         season_id,
                         level: 36,
                         required_xp: 10000,
-                        free_rewards: [LEGENDARY_SEASON_2_PACK_ID, LEGENDARY_SEASON_2_PACK_ID].span(),
-                        premium_rewards: [LEGENDARY_SEASON_2_PACK_ID, LEGENDARY_SEASON_2_PACK_ID, LEGENDARY_SEASON_2_PACK_ID]
+                        free_rewards: [LEGENDARY_SEASON_2_PACK_ID, LEGENDARY_SEASON_2_PACK_ID]
+                            .span(),
+                        premium_rewards: [
+                            LEGENDARY_SEASON_2_PACK_ID, LEGENDARY_SEASON_2_PACK_ID,
+                            LEGENDARY_SEASON_2_PACK_ID,
+                        ]
                             .span(),
                     },
                 );

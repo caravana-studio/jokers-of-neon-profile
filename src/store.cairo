@@ -4,8 +4,9 @@ use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, Profil
 use starknet::ContractAddress;
 use crate::constants::constants::{NFT_MANAGER_KEY, PERMISSION_CONFIG_KEY};
 use crate::models::{
-    DailyProgress, GameData, LevelXPConfig, MissionXPConfig, NFTManager, PlayerProgression, PokerHandData,
-    RoundData, SeasonConfig, SeasonLevelConfig, SeasonProgress, SeasonRewardClaim, XPMultiplier,
+    DailyProgress, GameData, LevelXPConfig, MissionXPConfig, NFTManager, PlayerProgression,
+    PokerHandData, RoundData, SeasonConfig, SeasonLevelConfig, SeasonProgress, SeasonRewardClaim,
+    XPMultiplier,
 };
 use crate::systems::permission_system::PermissionConfig;
 
