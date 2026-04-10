@@ -9,6 +9,7 @@ pub mod systems {
 pub mod constants {
     pub mod constants;
     pub mod packs;
+    pub mod season_configs;
 }
 
 pub mod models;

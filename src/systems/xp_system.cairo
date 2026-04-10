@@ -24,6 +24,7 @@ pub mod xp_system {
     use jokers_of_neon_lib::models::external::profile::ProfileLevelConfig;
     use starknet::{ContractAddress, get_caller_address, get_contract_address};
     use crate::constants::constants::{CURRENT_SEASON_ID, DEFAULT_NS_BYTE};
+    use crate::constants::season_configs::get_season_level_data;
     use crate::models::{SeasonProgress, XPMultiplier};
     use crate::store::{Store, StoreTrait};
     use crate::systems::permission_system::IPermissionSystemDispatcherTrait;
@@ -85,7 +86,7 @@ pub mod xp_system {
             };
 
             let base_xp = get_mission_xp_configurable(
-                store.world, season_id, mission_type, completion_count,
+                season_id, mission_type, completion_count,
             );
 
             // Apply multiplier
@@ -144,7 +145,7 @@ pub mod xp_system {
             };
 
             let base_xp = get_level_xp_configurable(
-                store.world, season_id, level, completion_count,
+                season_id, level, completion_count,
             );
 
             // Apply multiplier
@@ -353,14 +354,14 @@ pub mod xp_system {
             let mut level_to_check = old_level + 1;
 
             loop {
-                let level_config = store.get_season_level_config(season_id, level_to_check);
+                let level_data = get_season_level_data(season_id, level_to_check);
 
                 // If level config doesn't exist (required_xp is 0), we've reached the max level
-                if level_config.required_xp == 0 {
+                if level_data.required_xp == 0 {
                     break;
                 }
 
-                if season_progress.season_xp >= level_config.required_xp {
+                if season_progress.season_xp >= level_data.required_xp {
                     new_level = level_to_check;
                     level_to_check += 1;
                 } else {
