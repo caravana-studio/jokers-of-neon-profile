@@ -29,6 +29,8 @@ pub struct DailyProgress {
     pub level_completions: Span<u32>,
 }
 
+// TODO: MissionXPConfig is no longer written on-chain. Config is now in constants/season_configs.cairo.
+// Keep this model for now to avoid breaking Dojo migrations.
 #[derive(Copy, Drop, Serde, Debug)]
 #[dojo::model]
 pub struct MissionXPConfig {
@@ -41,6 +43,8 @@ pub struct MissionXPConfig {
     pub xp_reward: u32,
 }
 
+// TODO: LevelXPConfig is no longer written on-chain. Config is now in constants/season_configs.cairo.
+// Keep this model for now to avoid breaking Dojo migrations.
 #[derive(Copy, Drop, Serde, Debug)]
 #[dojo::model]
 pub struct LevelXPConfig {
@@ -61,6 +65,8 @@ pub struct SeasonConfig {
     pub is_active: bool,
 }
 
+// TODO: SeasonLevelConfig is no longer written on-chain. Config is now in constants/season_configs.cairo.
+// Keep this model for now to avoid breaking Dojo migrations.
 #[derive(Drop, Serde, Debug)]
 #[dojo::model]
 pub struct SeasonLevelConfig {
@@ -157,4 +163,15 @@ pub struct XPMultiplier {
     #[key]
     pub key: felt252, // Global key for singleton
     pub multiplier: u32 // Multiplier in basis points (100 = 1x, 200 = 2x, 150 = 1.5x)
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+pub struct PlayerProgression {
+    #[key]
+    pub address: ContractAddress,
+    pub tier: u8,
+    pub total_runs: u32,
+    pub max_level: u32,
+    pub max_round: u32,
 }

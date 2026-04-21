@@ -1,6 +1,7 @@
 pub mod systems {
     pub mod permission_system;
     pub mod profile_system;
+    pub mod progression_system;
     pub mod season_system;
     pub mod xp_system;
 }
@@ -8,6 +9,7 @@ pub mod systems {
 pub mod constants {
     pub mod constants;
     pub mod packs;
+    pub mod season_configs;
 }
 
 pub mod models;

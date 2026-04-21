@@ -30,15 +30,12 @@ echo -e "\n✅ Deployed!"
 
 world_address=$(sozo -P ${profile} inspect | awk '/World/ {getline; getline; print $3}')
 
-echo -e "\n🎮 Default config season en profile..."
-sozo -P mainnet execute season_system setup_default_season_config \
-    2 \
-    --wait \
-    --world 0x039c8aff3ceda2fffddf0ac20a94c465de6c0020372d43d225cf83655ef99477
+# NOTE: setup_default_season_config ya no es necesario.
+# Las configs de season ahora estan en constants/season_configs.cairo como funciones puras.
 
-echo -e "\n🎮 Create season 1 en profile..."
+echo -e "\n🎮 Create season 3 en profile..."
 sozo -P mainnet execute season_system create_season \
-    2 \
+    3 \
     --wait \
     --world 0x039c8aff3ceda2fffddf0ac20a94c465de6c0020372d43d225cf83655ef99477
 
