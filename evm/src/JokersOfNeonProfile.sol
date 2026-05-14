@@ -9,6 +9,32 @@ contract JokersOfNeonProfile is Ownable {
     error RoundNotFound(uint32 gameId, uint32 roundId);
     error InvalidGameRange(uint32 minGameId, uint32 maxGameId);
 
+    struct PlayerStats {
+        address player;
+        uint32 gamesPlayed;
+        uint32 gamesWon;
+        uint32 highCardPlayed;
+        uint32 pairPlayed;
+        uint32 twoPairPlayed;
+        uint32 threeOfAKindPlayed;
+        uint32 fourOfAKindPlayed;
+        uint32 fiveOfAKindPlayed;
+        uint32 fullHousePlayed;
+        uint32 flushPlayed;
+        uint32 straightPlayed;
+        uint32 straightFlushPlayed;
+        uint32 royalFlushPlayed;
+        uint32 lootBoxesPurchased;
+        uint32 cardsPurchased;
+        uint32 specialsPurchased;
+        uint32 specialsSold;
+        uint32 powerUpsPurchased;
+        uint32 levelUpsPurchased;
+        uint32 modifiersPurchased;
+        uint32 rerollsPurchased;
+        uint32 burnPurchased;
+    }
+
     struct GameData {
         uint32 id;
         address owner;
@@ -46,14 +72,12 @@ contract JokersOfNeonProfile is Ownable {
     mapping(uint32 => uint32) private _maxRoundIdByGame;
 
     mapping(address => PlayerProgression) private _progressions;
+    mapping(address => PlayerStats) private _playerStats;
 
     event GameDataSet(uint32 indexed gameId, address indexed player, uint32 score, uint32 round);
-    event RoundDataSet(
-        uint32 indexed gameId, uint32 indexed roundId, address indexed player, uint32 currentScore
-    );
-    event ProgressionSynced(
-        address indexed player, uint8 tier, uint32 totalRuns, uint32 maxLevel, uint32 maxRound
-    );
+    event RoundDataSet(uint32 indexed gameId, uint32 indexed roundId, address indexed player, uint32 currentScore);
+    event PlayerStatsAdded(address indexed player, uint32 gamesPlayed, uint32 gamesWon);
+    event ProgressionSynced(address indexed player, uint8 tier, uint32 totalRuns, uint32 maxLevel, uint32 maxRound);
 
     constructor() Ownable(msg.sender) {}
 
@@ -104,9 +128,7 @@ contract JokersOfNeonProfile is Ownable {
             _maxRoundIdByGame[roundData.gameId] = roundData.roundId;
         }
 
-        emit RoundDataSet(
-            roundData.gameId, roundData.roundId, roundData.playerAddress, roundData.currentScore
-        );
+        emit RoundDataSet(roundData.gameId, roundData.roundId, roundData.playerAddress, roundData.currentScore);
     }
 
     function getRoundData(uint32 gameId, uint32 roundId) external view returns (RoundData memory) {
@@ -120,7 +142,7 @@ contract JokersOfNeonProfile is Ownable {
         uint32 maxRoundId = _maxRoundIdByGame[gameId];
         uint256 count;
 
-        for (uint32 roundId; roundId <= maxRoundId; ) {
+        for (uint32 roundId; roundId <= maxRoundId;) {
             if (_roundExists[gameId][roundId]) {
                 ++count;
             }
@@ -134,7 +156,7 @@ contract JokersOfNeonProfile is Ownable {
         rounds = new RoundData[](count);
         uint256 index;
 
-        for (uint32 roundId; roundId <= maxRoundId; ) {
+        for (uint32 roundId; roundId <= maxRoundId;) {
             if (_roundExists[gameId][roundId]) {
                 rounds[index] = _rounds[gameId][roundId];
                 ++index;
@@ -147,13 +169,45 @@ contract JokersOfNeonProfile is Ownable {
         }
     }
 
-    function syncProgression(
-        address player,
-        uint8 tier,
-        uint32 totalRuns,
-        uint32 maxLevel,
-        uint32 maxRound
-    ) external onlyOwner {
+    function addPlayerStats(PlayerStats calldata playerStats) external onlyOwner {
+        if (playerStats.player == address(0)) revert ZeroAddress();
+
+        PlayerStats storage currentPlayerStats = _playerStats[playerStats.player];
+        currentPlayerStats.player = playerStats.player;
+        currentPlayerStats.gamesPlayed += playerStats.gamesPlayed;
+        currentPlayerStats.gamesWon += playerStats.gamesWon;
+        currentPlayerStats.highCardPlayed += playerStats.highCardPlayed;
+        currentPlayerStats.pairPlayed += playerStats.pairPlayed;
+        currentPlayerStats.twoPairPlayed += playerStats.twoPairPlayed;
+        currentPlayerStats.threeOfAKindPlayed += playerStats.threeOfAKindPlayed;
+        currentPlayerStats.fourOfAKindPlayed += playerStats.fourOfAKindPlayed;
+        currentPlayerStats.fiveOfAKindPlayed += playerStats.fiveOfAKindPlayed;
+        currentPlayerStats.fullHousePlayed += playerStats.fullHousePlayed;
+        currentPlayerStats.flushPlayed += playerStats.flushPlayed;
+        currentPlayerStats.straightPlayed += playerStats.straightPlayed;
+        currentPlayerStats.straightFlushPlayed += playerStats.straightFlushPlayed;
+        currentPlayerStats.royalFlushPlayed += playerStats.royalFlushPlayed;
+        currentPlayerStats.lootBoxesPurchased += playerStats.lootBoxesPurchased;
+        currentPlayerStats.cardsPurchased += playerStats.cardsPurchased;
+        currentPlayerStats.specialsPurchased += playerStats.specialsPurchased;
+        currentPlayerStats.specialsSold += playerStats.specialsSold;
+        currentPlayerStats.powerUpsPurchased += playerStats.powerUpsPurchased;
+        currentPlayerStats.levelUpsPurchased += playerStats.levelUpsPurchased;
+        currentPlayerStats.modifiersPurchased += playerStats.modifiersPurchased;
+        currentPlayerStats.rerollsPurchased += playerStats.rerollsPurchased;
+        currentPlayerStats.burnPurchased += playerStats.burnPurchased;
+
+        emit PlayerStatsAdded(playerStats.player, currentPlayerStats.gamesPlayed, currentPlayerStats.gamesWon);
+    }
+
+    function getPlayerStats(address player) external view returns (PlayerStats memory) {
+        return _playerStats[player];
+    }
+
+    function syncProgression(address player, uint8 tier, uint32 totalRuns, uint32 maxLevel, uint32 maxRound)
+        external
+        onlyOwner
+    {
         if (player == address(0)) revert ZeroAddress();
 
         PlayerProgression storage existing = _progressions[player];
@@ -184,16 +238,12 @@ contract JokersOfNeonProfile is Ownable {
         return _progressions[player];
     }
 
-    function getGamesByIdRange(uint32 minGameId, uint32 maxGameId)
-        external
-        view
-        returns (GameData[] memory games)
-    {
+    function getGamesByIdRange(uint32 minGameId, uint32 maxGameId) external view returns (GameData[] memory games) {
         if (maxGameId < minGameId) revert InvalidGameRange(minGameId, maxGameId);
 
         uint256 count;
 
-        for (uint32 gameId = minGameId; gameId <= maxGameId; ) {
+        for (uint32 gameId = minGameId; gameId <= maxGameId;) {
             if (_gameExists[gameId]) {
                 ++count;
             }
@@ -207,7 +257,7 @@ contract JokersOfNeonProfile is Ownable {
         games = new GameData[](count);
         uint256 index;
 
-        for (uint32 gameId = minGameId; gameId <= maxGameId; ) {
+        for (uint32 gameId = minGameId; gameId <= maxGameId;) {
             if (_gameExists[gameId]) {
                 games[index] = _games[gameId];
                 ++index;
@@ -238,7 +288,7 @@ contract JokersOfNeonProfile is Ownable {
         }
 
         uint256 length = source.length;
-        for (uint256 i; i < length; ) {
+        for (uint256 i; i < length;) {
             target.push(source[i]);
             unchecked {
                 ++i;

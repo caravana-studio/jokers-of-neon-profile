@@ -72,22 +72,12 @@ contract JokersOfNeonProfileTest {
 
         profile.setRoundData(
             JokersOfNeonProfile.RoundData({
-                gameId: 21,
-                roundId: 0,
-                playerAddress: player,
-                currentScore: 100,
-                targetScore: 500,
-                rages: firstRages
+                gameId: 21, roundId: 0, playerAddress: player, currentScore: 100, targetScore: 500, rages: firstRages
             })
         );
         profile.setRoundData(
             JokersOfNeonProfile.RoundData({
-                gameId: 21,
-                roundId: 2,
-                playerAddress: player,
-                currentScore: 330,
-                targetScore: 600,
-                rages: secondRages
+                gameId: 21, roundId: 2, playerAddress: player, currentScore: 330, targetScore: 600, rages: secondRages
             })
         );
 
@@ -116,6 +106,89 @@ contract JokersOfNeonProfileTest {
         _assertEq(progression.totalRuns, 12);
         _assertEq(progression.maxLevel, 6);
         _assertEq(progression.maxRound, 1);
+    }
+
+    function testAddPlayerStatsAccumulatesValues() public {
+        profile.addPlayerStats(
+            JokersOfNeonProfile.PlayerStats({
+                player: player,
+                gamesPlayed: 3,
+                gamesWon: 1,
+                highCardPlayed: 5,
+                pairPlayed: 4,
+                twoPairPlayed: 3,
+                threeOfAKindPlayed: 2,
+                fourOfAKindPlayed: 1,
+                fiveOfAKindPlayed: 1,
+                fullHousePlayed: 2,
+                flushPlayed: 3,
+                straightPlayed: 4,
+                straightFlushPlayed: 1,
+                royalFlushPlayed: 0,
+                lootBoxesPurchased: 2,
+                cardsPurchased: 9,
+                specialsPurchased: 7,
+                specialsSold: 1,
+                powerUpsPurchased: 6,
+                levelUpsPurchased: 2,
+                modifiersPurchased: 5,
+                rerollsPurchased: 8,
+                burnPurchased: 3
+            })
+        );
+
+        profile.addPlayerStats(
+            JokersOfNeonProfile.PlayerStats({
+                player: player,
+                gamesPlayed: 4,
+                gamesWon: 2,
+                highCardPlayed: 1,
+                pairPlayed: 2,
+                twoPairPlayed: 3,
+                threeOfAKindPlayed: 4,
+                fourOfAKindPlayed: 5,
+                fiveOfAKindPlayed: 0,
+                fullHousePlayed: 1,
+                flushPlayed: 2,
+                straightPlayed: 3,
+                straightFlushPlayed: 1,
+                royalFlushPlayed: 1,
+                lootBoxesPurchased: 3,
+                cardsPurchased: 1,
+                specialsPurchased: 2,
+                specialsSold: 4,
+                powerUpsPurchased: 1,
+                levelUpsPurchased: 3,
+                modifiersPurchased: 2,
+                rerollsPurchased: 1,
+                burnPurchased: 5
+            })
+        );
+
+        JokersOfNeonProfile.PlayerStats memory stats = profile.getPlayerStats(player);
+        _assertEq(stats.player, player);
+        _assertEq(stats.gamesPlayed, 7);
+        _assertEq(stats.gamesWon, 3);
+        _assertEq(stats.highCardPlayed, 6);
+        _assertEq(stats.pairPlayed, 6);
+        _assertEq(stats.twoPairPlayed, 6);
+        _assertEq(stats.threeOfAKindPlayed, 6);
+        _assertEq(stats.fourOfAKindPlayed, 6);
+        _assertEq(stats.fiveOfAKindPlayed, 1);
+        _assertEq(stats.fullHousePlayed, 3);
+        _assertEq(stats.flushPlayed, 5);
+        _assertEq(stats.straightPlayed, 7);
+        _assertEq(stats.straightFlushPlayed, 2);
+        _assertEq(stats.royalFlushPlayed, 1);
+        _assertEq(stats.lootBoxesPurchased, 5);
+        _assertEq(stats.cardsPurchased, 10);
+        _assertEq(stats.specialsPurchased, 9);
+        _assertEq(stats.specialsSold, 5);
+        _assertEq(stats.powerUpsPurchased, 7);
+        _assertEq(stats.levelUpsPurchased, 5);
+        _assertEq(stats.modifiersPurchased, 7);
+        _assertEq(stats.rerollsPurchased, 9);
+        _assertEq(stats.burnPurchased, 8);
     }
 
     function testGetGamesByIdRangeFiltersMissingIds() public {
@@ -167,9 +240,6 @@ contract JokersOfNeonProfileTest {
     }
 
     function _assertEq(string memory left, string memory right) internal pure {
-        require(
-            keccak256(bytes(left)) == keccak256(bytes(right)),
-            "assert eq failed"
-        );
+        require(keccak256(bytes(left)) == keccak256(bytes(right)), "assert eq failed");
     }
 }
