@@ -29,6 +29,42 @@ pub struct DailyProgress {
     pub level_completions: Span<u32>,
 }
 
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+pub struct MissionXPProgress {
+    #[key]
+    pub address: ContractAddress,
+    #[key]
+    pub season_id: u32,
+    #[key]
+    pub period_type: u8,
+    #[key]
+    pub period_id: u64,
+    pub period_xp: u32,
+    pub easy_missions: u32,
+    pub medium_missions: u32,
+    pub hard_missions: u32,
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+pub struct MissionXPAward {
+    #[key]
+    pub address: ContractAddress,
+    #[key]
+    pub season_id: u32,
+    #[key]
+    pub period_type: u8,
+    #[key]
+    pub period_id: u64,
+    #[key]
+    pub mission_id: felt252,
+    pub template_id: felt252,
+    pub difficulty: u8,
+    pub xp_earned: u32,
+    pub completed: bool,
+}
+
 // TODO: MissionXPConfig is no longer written on-chain. Config is now in constants/season_configs.cairo.
 // Keep this model for now to avoid breaking Dojo migrations.
 #[derive(Copy, Drop, Serde, Debug)]

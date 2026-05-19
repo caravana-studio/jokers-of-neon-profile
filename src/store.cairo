@@ -4,9 +4,9 @@ use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, Profil
 use starknet::ContractAddress;
 use crate::constants::constants::{NFT_MANAGER_KEY, PERMISSION_CONFIG_KEY};
 use crate::models::{
-    DailyProgress, GameData, LevelXPConfig, MissionXPConfig, NFTManager, PlayerProgression,
-    PokerHandData, RoundData, SeasonConfig, SeasonLevelConfig, SeasonProgress, SeasonRewardClaim,
-    XPMultiplier,
+    DailyProgress, GameData, LevelXPConfig, MissionXPAward, MissionXPConfig, MissionXPProgress,
+    NFTManager, PlayerProgression, PokerHandData, RoundData, SeasonConfig, SeasonLevelConfig,
+    SeasonProgress, SeasonRewardClaim, XPMultiplier,
 };
 use crate::systems::permission_system::PermissionConfig;
 
@@ -54,6 +54,31 @@ pub impl StoreImpl of StoreTrait {
 
     fn set_daily_progress(ref self: Store, daily_progress: DailyProgress) {
         self.world.write_model(@daily_progress)
+    }
+
+    fn get_mission_xp_progress(
+        ref self: Store, address: ContractAddress, season_id: u32, period_type: u8, period_id: u64,
+    ) -> MissionXPProgress {
+        self.world.read_model((address, season_id, period_type, period_id))
+    }
+
+    fn set_mission_xp_progress(ref self: Store, progress: MissionXPProgress) {
+        self.world.write_model(@progress)
+    }
+
+    fn get_mission_xp_award(
+        ref self: Store,
+        address: ContractAddress,
+        season_id: u32,
+        period_type: u8,
+        period_id: u64,
+        mission_id: felt252,
+    ) -> MissionXPAward {
+        self.world.read_model((address, season_id, period_type, period_id, mission_id))
+    }
+
+    fn set_mission_xp_award(ref self: Store, award: MissionXPAward) {
+        self.world.write_model(@award)
     }
 
     fn get_mission_xp_config(

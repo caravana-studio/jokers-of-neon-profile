@@ -3,6 +3,16 @@ use starknet::ContractAddress;
 #[starknet::interface]
 pub trait IXPSystem<T> {
     fn add_daily_mission_xp(ref self: T, address: ContractAddress, mission_type: u8);
+    fn add_mission_xp(
+        ref self: T,
+        address: ContractAddress,
+        period_type: u8,
+        period_id: u64,
+        mission_id: felt252,
+        template_id: felt252,
+        difficulty: u8,
+        xp: u32,
+    );
     fn add_level_completion_xp(ref self: T, address: ContractAddress, level: u32);
 
     // Configuration methods
@@ -23,9 +33,11 @@ pub mod xp_system {
     use dojo::world::WorldStorage;
     use jokers_of_neon_lib::models::external::profile::ProfileLevelConfig;
     use starknet::{ContractAddress, get_caller_address, get_contract_address};
-    use crate::constants::constants::{CURRENT_SEASON_ID, DEFAULT_NS_BYTE};
+    use crate::constants::constants::{
+        CURRENT_SEASON_ID, DEFAULT_NS_BYTE, MISSION_PERIOD_DAILY, MISSION_PERIOD_WEEKLY,
+    };
     use crate::constants::season_configs::get_season_level_data;
-    use crate::models::{SeasonProgress, XPMultiplier};
+    use crate::models::{MissionXPAward, MissionXPProgress, SeasonProgress, XPMultiplier};
     use crate::store::{Store, StoreTrait};
     use crate::systems::permission_system::IPermissionSystemDispatcherTrait;
     use crate::utils::systems::SystemsTrait;
@@ -38,6 +50,7 @@ pub mod xp_system {
     #[derive(Drop, starknet::Event)]
     enum Event {
         MissionXPAdded: MissionXPAdded,
+        MissionXPAddedV2: MissionXPAddedV2,
         LevelXPAdded: LevelXPAdded,
     }
 
@@ -49,6 +62,20 @@ pub mod xp_system {
         mission_type: u8,
         xp_earned: u32,
         day: u64,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct MissionXPAddedV2 {
+        #[key]
+        player: ContractAddress,
+        season_id: u32,
+        period_type: u8,
+        period_id: u64,
+        mission_id: felt252,
+        template_id: felt252,
+        difficulty: u8,
+        base_xp: u32,
+        xp_earned: u32,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -85,18 +112,9 @@ pub mod xp_system {
                 _ => 999,
             };
 
-            let base_xp = get_mission_xp_configurable(
-                season_id, mission_type, completion_count,
-            );
+            let base_xp = get_mission_xp_configurable(season_id, mission_type, completion_count);
 
-            // Apply multiplier
-            let multiplier_config = store.get_xp_multiplier();
-            let multiplier = if multiplier_config.multiplier == 0 {
-                100
-            } else {
-                multiplier_config.multiplier
-            };
-            let xp_earned = (base_xp * multiplier) / 100;
+            let xp_earned = self._xp_with_multiplier(ref store, base_xp);
 
             if xp_earned > 0 {
                 match mission_type {
@@ -109,11 +127,7 @@ pub mod xp_system {
                 daily_progress.daily_xp += xp_earned;
                 store.set_daily_progress(daily_progress);
 
-                self._add_profile_xp(ref store, address, xp_earned.into());
-
-                if season_config.is_active {
-                    self._add_season_xp(ref store, address, season_id, xp_earned.into());
-                }
+                self._apply_xp(ref store, address, season_id, season_config.is_active, xp_earned);
 
                 self
                     .emit(
@@ -122,6 +136,97 @@ pub mod xp_system {
                         },
                     );
             }
+        }
+
+        fn add_mission_xp(
+            ref self: ContractState,
+            address: ContractAddress,
+            period_type: u8,
+            period_id: u64,
+            mission_id: felt252,
+            template_id: felt252,
+            difficulty: u8,
+            xp: u32,
+        ) {
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
+
+            assert(
+                period_type == MISSION_PERIOD_DAILY || period_type == MISSION_PERIOD_WEEKLY,
+                'Invalid mission period',
+            );
+            assert(mission_id != 0, 'Invalid mission id');
+
+            let season_id = CURRENT_SEASON_ID;
+            let existing_award = store
+                .get_mission_xp_award(address, season_id, period_type, period_id, mission_id);
+            if existing_award.completed {
+                return;
+            }
+
+            let season_config = store.get_season_config(season_id);
+            let xp_earned = self._xp_with_multiplier(ref store, xp);
+            if xp_earned == 0 {
+                return;
+            }
+
+            let progress = store
+                .get_mission_xp_progress(address, season_id, period_type, period_id);
+            let mut easy_missions = progress.easy_missions;
+            let mut medium_missions = progress.medium_missions;
+            let mut hard_missions = progress.hard_missions;
+            match difficulty {
+                1 => easy_missions += 1,
+                2 => medium_missions += 1,
+                3 => hard_missions += 1,
+                _ => {},
+            }
+            store
+                .set_mission_xp_progress(
+                    MissionXPProgress {
+                        address,
+                        season_id,
+                        period_type,
+                        period_id,
+                        period_xp: progress.period_xp + xp_earned,
+                        easy_missions,
+                        medium_missions,
+                        hard_missions,
+                    },
+                );
+
+            store
+                .set_mission_xp_award(
+                    MissionXPAward {
+                        address,
+                        season_id,
+                        period_type,
+                        period_id,
+                        mission_id,
+                        template_id,
+                        difficulty,
+                        xp_earned,
+                        completed: true,
+                    },
+                );
+
+            self._apply_xp(ref store, address, season_id, season_config.is_active, xp_earned);
+
+            self
+                .emit(
+                    MissionXPAddedV2 {
+                        player: address,
+                        season_id,
+                        period_type,
+                        period_id,
+                        mission_id,
+                        template_id,
+                        difficulty,
+                        base_xp: xp,
+                        xp_earned,
+                    },
+                );
         }
 
         fn add_level_completion_xp(ref self: ContractState, address: ContractAddress, level: u32) {
@@ -144,18 +249,9 @@ pub mod xp_system {
                 0
             };
 
-            let base_xp = get_level_xp_configurable(
-                season_id, level, completion_count,
-            );
+            let base_xp = get_level_xp_configurable(season_id, level, completion_count);
 
-            // Apply multiplier
-            let multiplier_config = store.get_xp_multiplier();
-            let multiplier = if multiplier_config.multiplier == 0 {
-                100
-            } else {
-                multiplier_config.multiplier
-            };
-            let xp_earned = (base_xp * multiplier) / 100;
+            let xp_earned = self._xp_with_multiplier(ref store, base_xp);
 
             if xp_earned > 0 {
                 if level > 0 {
@@ -188,11 +284,7 @@ pub mod xp_system {
                 daily_progress.daily_xp += xp_earned;
                 store.set_daily_progress(daily_progress);
 
-                self._add_profile_xp(ref store, address, xp_earned.into());
-
-                if season_config.is_active {
-                    self._add_season_xp(ref store, address, season_id, xp_earned.into());
-                }
+                self._apply_xp(ref store, address, season_id, season_config.is_active, xp_earned);
 
                 self
                     .emit(
@@ -293,6 +385,31 @@ pub mod xp_system {
 
         fn create_world(self: @ContractState) -> WorldStorage {
             self.world(@DEFAULT_NS_BYTE())
+        }
+
+        fn _xp_with_multiplier(ref self: ContractState, ref store: Store, base_xp: u32) -> u32 {
+            let multiplier_config = store.get_xp_multiplier();
+            let multiplier = if multiplier_config.multiplier == 0 {
+                100
+            } else {
+                multiplier_config.multiplier
+            };
+            (base_xp * multiplier) / 100
+        }
+
+        fn _apply_xp(
+            ref self: ContractState,
+            ref store: Store,
+            address: ContractAddress,
+            season_id: u32,
+            is_season_active: bool,
+            xp_earned: u32,
+        ) {
+            self._add_profile_xp(ref store, address, xp_earned.into());
+
+            if is_season_active {
+                self._add_season_xp(ref store, address, season_id, xp_earned.into());
+            }
         }
 
         fn _add_profile_xp(
