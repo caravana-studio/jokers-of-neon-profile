@@ -21,4 +21,6 @@ pub mod utils {
 }
 
 #[cfg(test)]
-pub mod tests {}
+pub mod tests {
+    pub mod test_streak;
+}

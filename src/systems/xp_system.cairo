@@ -13,6 +13,10 @@ pub trait IXPSystem<T> {
         difficulty: u8,
         xp: u32,
     );
+    fn get_streak_status(self: @T, address: ContractAddress) -> crate::models::StreakStatus;
+    fn grant_streak_protectors(
+        ref self: T, address: ContractAddress, quantity: u16, source: felt252, source_id: felt252,
+    );
     fn add_level_completion_xp(ref self: T, address: ContractAddress, level: u32);
 
     // Configuration methods
@@ -34,10 +38,14 @@ pub mod xp_system {
     use jokers_of_neon_lib::models::external::profile::ProfileLevelConfig;
     use starknet::{ContractAddress, get_caller_address, get_contract_address};
     use crate::constants::constants::{
-        CURRENT_SEASON_ID, DEFAULT_NS_BYTE, MISSION_PERIOD_DAILY, MISSION_PERIOD_WEEKLY,
+        CURRENT_SEASON_ID, DEFAULT_NS_BYTE, MAX_STREAK_PROTECTORS, MISSION_PERIOD_DAILY,
+        MISSION_PERIOD_WEEKLY,
     };
     use crate::constants::season_configs::get_season_level_data;
-    use crate::models::{MissionXPAward, MissionXPProgress, SeasonProgress, XPMultiplier};
+    use crate::models::{
+        MissionXPAward, MissionXPProgress, SeasonProgress, StreakDayCompletion,
+        StreakProtectorGrant, StreakStatus, XPMultiplier,
+    };
     use crate::store::{Store, StoreTrait};
     use crate::systems::permission_system::IPermissionSystemDispatcherTrait;
     use crate::utils::systems::SystemsTrait;
@@ -51,6 +59,8 @@ pub mod xp_system {
     enum Event {
         MissionXPAdded: MissionXPAdded,
         MissionXPAddedV2: MissionXPAddedV2,
+        DailyStreakUpdated: DailyStreakUpdated,
+        StreakProtectorsGranted: StreakProtectorsGranted,
         LevelXPAdded: LevelXPAdded,
     }
 
@@ -76,6 +86,29 @@ pub mod xp_system {
         difficulty: u8,
         base_xp: u32,
         xp_earned: u32,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct DailyStreakUpdated {
+        #[key]
+        player: ContractAddress,
+        period_id: u64,
+        mission_id: felt252,
+        current_streak: u16,
+        longest_streak: u16,
+        protectors_used: u16,
+        protectors_available: u16,
+        reset: bool,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct StreakProtectorsGranted {
+        #[key]
+        player: ContractAddress,
+        source: felt252,
+        source_id: felt252,
+        quantity: u16,
+        protectors_available: u16,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -213,6 +246,10 @@ pub mod xp_system {
 
             self._apply_xp(ref store, address, season_id, season_config.is_active, xp_earned);
 
+            if period_type == MISSION_PERIOD_DAILY {
+                self._apply_daily_streak(ref store, address, period_id, mission_id);
+            }
+
             self
                 .emit(
                     MissionXPAddedV2 {
@@ -225,6 +262,68 @@ pub mod xp_system {
                         difficulty,
                         base_xp: xp,
                         xp_earned,
+                    },
+                );
+        }
+
+        fn get_streak_status(self: @ContractState, address: ContractAddress) -> StreakStatus {
+            let mut store = self.create_store();
+            self._streak_status(ref store, address)
+        }
+
+        fn grant_streak_protectors(
+            ref self: ContractState,
+            address: ContractAddress,
+            quantity: u16,
+            source: felt252,
+            source_id: felt252,
+        ) {
+            assert(quantity > 0, 'Invalid quantity');
+            assert(source != 0, 'Invalid source');
+            assert(source_id != 0, 'Invalid source id');
+
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
+
+            let existing_grant = store.get_streak_protector_grant(address, source, source_id);
+            if existing_grant.claimed {
+                return;
+            }
+
+            let mut state = store.get_streak_state(address);
+            let current_available: u32 = state.protectors_available.into();
+            let requested: u32 = quantity.into();
+            let max_protectors: u32 = MAX_STREAK_PROTECTORS.into();
+            let next_available = if current_available + requested > max_protectors {
+                max_protectors
+            } else {
+                current_available + requested
+            };
+            let applied_quantity: u16 = (next_available - current_available).try_into().unwrap();
+
+            state.player = address;
+            state.protectors_available = next_available.try_into().unwrap();
+            store.set_streak_state(state);
+            store
+                .set_streak_protector_grant(
+                    StreakProtectorGrant {
+                        player: address,
+                        source,
+                        source_id,
+                        quantity: applied_quantity,
+                        claimed: true,
+                    },
+                );
+
+            self
+                .emit(
+                    StreakProtectorsGranted {
+                        player: address,
+                        source,
+                        source_id,
+                        quantity: applied_quantity,
+                        protectors_available: state.protectors_available,
                     },
                 );
         }
@@ -410,6 +509,125 @@ pub mod xp_system {
             if is_season_active {
                 self._add_season_xp(ref store, address, season_id, xp_earned.into());
             }
+        }
+
+        fn _streak_status(
+            self: @ContractState, ref store: Store, address: ContractAddress,
+        ) -> StreakStatus {
+            let profile = store.get_profile(address);
+            let state = store.get_streak_state(address);
+            let current_day = get_current_day();
+            let days_missed = if state.has_started && current_day > state.last_completed_day {
+                current_day - state.last_completed_day - 1
+            } else {
+                0
+            };
+            let available: u64 = state.protectors_available.into();
+            let is_broken = state.has_started && days_missed > available;
+            let is_protected = state.has_started && days_missed > 0 && days_missed <= available;
+            let longest_streak = if state.longest_streak > profile.daily_streak {
+                state.longest_streak
+            } else {
+                profile.daily_streak
+            };
+
+            StreakStatus {
+                player: address,
+                current_streak: profile.daily_streak,
+                longest_streak,
+                last_completed_day: state.last_completed_day,
+                protectors_available: state.protectors_available,
+                protectors_needed: days_missed,
+                days_missed,
+                is_protected,
+                is_broken,
+            }
+        }
+
+        fn _increment_streak(ref self: ContractState, current_streak: u16) -> u16 {
+            if current_streak == 65535 {
+                current_streak
+            } else {
+                current_streak + 1
+            }
+        }
+
+        fn _apply_daily_streak(
+            ref self: ContractState,
+            ref store: Store,
+            address: ContractAddress,
+            period_id: u64,
+            mission_id: felt252,
+        ) {
+            let existing_completion = store.get_streak_day_completion(address, period_id);
+            if existing_completion.completed {
+                return;
+            }
+
+            let mut state = store.get_streak_state(address);
+            if state.has_started && period_id <= state.last_completed_day {
+                return;
+            }
+
+            let mut profile = store.get_profile(address);
+            let mut protectors_used: u16 = 0;
+            let mut reset = false;
+            let new_streak = if state.has_started {
+                let missed_days = period_id - state.last_completed_day - 1;
+                if missed_days == 0 {
+                    self._increment_streak(profile.daily_streak)
+                } else {
+                    let available: u64 = state.protectors_available.into();
+                    let used_u64 = if missed_days < available {
+                        missed_days
+                    } else {
+                        available
+                    };
+                    protectors_used = used_u64.try_into().unwrap();
+                    state.protectors_available -= protectors_used;
+                    state.protectors_used_total += protectors_used.into();
+
+                    if missed_days <= available {
+                        self._increment_streak(profile.daily_streak)
+                    } else {
+                        reset = true;
+                        1
+                    }
+                }
+            } else {
+                1
+            };
+
+            profile.daily_streak = new_streak;
+            state.player = address;
+            state.last_completed_day = period_id;
+            state.has_started = true;
+            if new_streak > state.longest_streak {
+                state.longest_streak = new_streak;
+            }
+
+            store.set_profile(@profile);
+            store.set_streak_state(state);
+            store
+                .set_streak_day_completion(
+                    StreakDayCompletion {
+                        player: address, day: period_id, completed: true, mission_id, period_id,
+                    },
+                );
+
+            self
+                .emit(
+                    DailyStreakUpdated {
+                        player: address,
+                        period_id,
+                        mission_id,
+                        current_streak: new_streak,
+                        longest_streak: state.longest_streak,
+                        protectors_used,
+                        protectors_available: state.protectors_available,
+                        reset,
+                    },
+                );
         }
 
         fn _add_profile_xp(

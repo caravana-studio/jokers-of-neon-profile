@@ -65,6 +65,56 @@ pub struct MissionXPAward {
     pub completed: bool,
 }
 
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+pub struct StreakState {
+    #[key]
+    pub player: ContractAddress,
+    pub last_completed_day: u64,
+    pub longest_streak: u16,
+    pub protectors_available: u16,
+    pub protectors_used_total: u32,
+    pub has_started: bool,
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+pub struct StreakDayCompletion {
+    #[key]
+    pub player: ContractAddress,
+    #[key]
+    pub day: u64,
+    pub completed: bool,
+    pub mission_id: felt252,
+    pub period_id: u64,
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+pub struct StreakProtectorGrant {
+    #[key]
+    pub player: ContractAddress,
+    #[key]
+    pub source: felt252,
+    #[key]
+    pub source_id: felt252,
+    pub quantity: u16,
+    pub claimed: bool,
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+pub struct StreakStatus {
+    pub player: ContractAddress,
+    pub current_streak: u16,
+    pub longest_streak: u16,
+    pub last_completed_day: u64,
+    pub protectors_available: u16,
+    pub protectors_needed: u64,
+    pub days_missed: u64,
+    pub is_protected: bool,
+    pub is_broken: bool,
+}
+
 // TODO: MissionXPConfig is no longer written on-chain. Config is now in
 // constants/season_configs.cairo.
 // Keep this model for now to avoid breaking Dojo migrations.

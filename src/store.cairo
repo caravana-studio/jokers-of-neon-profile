@@ -6,7 +6,8 @@ use crate::constants::constants::{NFT_MANAGER_KEY, PERMISSION_CONFIG_KEY};
 use crate::models::{
     DailyProgress, GameData, LevelXPConfig, MissionXPAward, MissionXPConfig, MissionXPProgress,
     NFTManager, PlayerProgression, PokerHandData, RoundData, SeasonConfig, SeasonLevelConfig,
-    SeasonProgress, SeasonRewardClaim, XPMultiplier,
+    SeasonProgress, SeasonRewardClaim, StreakDayCompletion, StreakProtectorGrant, StreakState,
+    XPMultiplier,
 };
 use crate::systems::permission_system::PermissionConfig;
 
@@ -79,6 +80,34 @@ pub impl StoreImpl of StoreTrait {
 
     fn set_mission_xp_award(ref self: Store, award: MissionXPAward) {
         self.world.write_model(@award)
+    }
+
+    fn get_streak_state(ref self: Store, player: ContractAddress) -> StreakState {
+        self.world.read_model(player)
+    }
+
+    fn set_streak_state(ref self: Store, state: StreakState) {
+        self.world.write_model(@state)
+    }
+
+    fn get_streak_day_completion(
+        ref self: Store, player: ContractAddress, day: u64,
+    ) -> StreakDayCompletion {
+        self.world.read_model((player, day))
+    }
+
+    fn set_streak_day_completion(ref self: Store, completion: StreakDayCompletion) {
+        self.world.write_model(@completion)
+    }
+
+    fn get_streak_protector_grant(
+        ref self: Store, player: ContractAddress, source: felt252, source_id: felt252,
+    ) -> StreakProtectorGrant {
+        self.world.read_model((player, source, source_id))
+    }
+
+    fn set_streak_protector_grant(ref self: Store, grant: StreakProtectorGrant) {
+        self.world.write_model(@grant)
     }
 
     fn get_mission_xp_config(

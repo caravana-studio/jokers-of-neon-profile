@@ -16,3 +16,4 @@ pub const TOURNAMENT_TICKET_REWARD_ID: u32 = 99;
 pub const CURRENT_SEASON_ID: u32 = 3;
 pub const MISSION_PERIOD_DAILY: u8 = 1;
 pub const MISSION_PERIOD_WEEKLY: u8 = 2;
+pub const MAX_STREAK_PROTECTORS: u16 = 2;
