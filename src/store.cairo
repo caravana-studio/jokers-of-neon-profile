@@ -4,8 +4,9 @@ use jokers_of_neon_lib::models::external::profile::{PlayerStats, Profile, Profil
 use starknet::ContractAddress;
 use crate::constants::constants::{NFT_MANAGER_KEY, PERMISSION_CONFIG_KEY};
 use crate::models::{
-    DailyProgress, GameData, LevelXPConfig, MissionXPConfig, NFTManager, PlayerProgression,
-    PokerHandData, RoundData, SeasonConfig, SeasonLevelConfig, SeasonProgress, SeasonRewardClaim,
+    DailyProgress, GameData, LevelXPConfig, MissionXPAward, MissionXPConfig, MissionXPProgress,
+    NFTManager, PlayerProgression, PokerHandData, RoundData, SeasonConfig, SeasonLevelConfig,
+    SeasonProgress, SeasonRewardClaim, StreakDayCompletion, StreakProtectorGrant, StreakState,
     XPMultiplier,
 };
 use crate::systems::permission_system::PermissionConfig;
@@ -54,6 +55,59 @@ pub impl StoreImpl of StoreTrait {
 
     fn set_daily_progress(ref self: Store, daily_progress: DailyProgress) {
         self.world.write_model(@daily_progress)
+    }
+
+    fn get_mission_xp_progress(
+        ref self: Store, address: ContractAddress, season_id: u32, period_type: u8, period_id: u64,
+    ) -> MissionXPProgress {
+        self.world.read_model((address, season_id, period_type, period_id))
+    }
+
+    fn set_mission_xp_progress(ref self: Store, progress: MissionXPProgress) {
+        self.world.write_model(@progress)
+    }
+
+    fn get_mission_xp_award(
+        ref self: Store,
+        address: ContractAddress,
+        season_id: u32,
+        period_type: u8,
+        period_id: u64,
+        mission_id: felt252,
+    ) -> MissionXPAward {
+        self.world.read_model((address, season_id, period_type, period_id, mission_id))
+    }
+
+    fn set_mission_xp_award(ref self: Store, award: MissionXPAward) {
+        self.world.write_model(@award)
+    }
+
+    fn get_streak_state(ref self: Store, player: ContractAddress) -> StreakState {
+        self.world.read_model(player)
+    }
+
+    fn set_streak_state(ref self: Store, state: StreakState) {
+        self.world.write_model(@state)
+    }
+
+    fn get_streak_day_completion(
+        ref self: Store, player: ContractAddress, day: u64,
+    ) -> StreakDayCompletion {
+        self.world.read_model((player, day))
+    }
+
+    fn set_streak_day_completion(ref self: Store, completion: StreakDayCompletion) {
+        self.world.write_model(@completion)
+    }
+
+    fn get_streak_protector_grant(
+        ref self: Store, player: ContractAddress, source: felt252, source_id: felt252,
+    ) -> StreakProtectorGrant {
+        self.world.read_model((player, source, source_id))
+    }
+
+    fn set_streak_protector_grant(ref self: Store, grant: StreakProtectorGrant) {
+        self.world.write_model(@grant)
     }
 
     fn get_mission_xp_config(

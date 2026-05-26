@@ -2,7 +2,7 @@ use crate::constants::constants::TOURNAMENT_TICKET_REWARD_ID;
 use crate::constants::packs::{
     ADVANCED_SEASON_3_PACK_ID, EPIC_SEASON_3_PACK_ID, LEGENDARY_SEASON_3_PACK_ID,
 };
-use crate::models::{SeasonLevelConfig, MissionXPConfig, LevelXPConfig};
+use crate::models::{LevelXPConfig, MissionXPConfig, SeasonLevelConfig};
 
 pub fn get_season_level_data(season_id: u32, level: u32) -> SeasonLevelConfig {
     match season_id {
@@ -304,9 +304,21 @@ fn get_season_3_mission_xp(
     season_id: u32, difficulty: u8, completion_count: u32,
 ) -> MissionXPConfig {
     let xp_reward = match difficulty {
-        1 => if completion_count == 0 { 10 } else { 0 },
-        2 => if completion_count == 0 { 20 } else { 0 },
-        3 => if completion_count == 0 { 30 } else { 0 },
+        1 => if completion_count == 0 {
+            10
+        } else {
+            0
+        },
+        2 => if completion_count == 0 {
+            20
+        } else {
+            0
+        },
+        3 => if completion_count == 0 {
+            30
+        } else {
+            0
+        },
         _ => 0,
     };
     MissionXPConfig { season_id, difficulty, completion_count, xp_reward }
@@ -314,8 +326,16 @@ fn get_season_3_mission_xp(
 
 fn get_season_3_level_xp(season_id: u32, level: u32, completion_count: u32) -> LevelXPConfig {
     let xp_reward = match level {
-        1 => if completion_count == 0 { 5 } else { 0 },
-        2 => if completion_count == 0 { 10 } else { 0 },
+        1 => if completion_count == 0 {
+            5
+        } else {
+            0
+        },
+        2 => if completion_count == 0 {
+            10
+        } else {
+            0
+        },
         3 => match completion_count {
             0 => 15,
             1 => 5,

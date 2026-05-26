@@ -29,7 +29,94 @@ pub struct DailyProgress {
     pub level_completions: Span<u32>,
 }
 
-// TODO: MissionXPConfig is no longer written on-chain. Config is now in constants/season_configs.cairo.
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+pub struct MissionXPProgress {
+    #[key]
+    pub address: ContractAddress,
+    #[key]
+    pub season_id: u32,
+    #[key]
+    pub period_type: u8,
+    #[key]
+    pub period_id: u64,
+    pub period_xp: u32,
+    pub easy_missions: u32,
+    pub medium_missions: u32,
+    pub hard_missions: u32,
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+pub struct MissionXPAward {
+    #[key]
+    pub address: ContractAddress,
+    #[key]
+    pub season_id: u32,
+    #[key]
+    pub period_type: u8,
+    #[key]
+    pub period_id: u64,
+    #[key]
+    pub mission_id: felt252,
+    pub template_id: felt252,
+    pub difficulty: u8,
+    pub xp_earned: u32,
+    pub completed: bool,
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+pub struct StreakState {
+    #[key]
+    pub player: ContractAddress,
+    pub last_completed_day: u64,
+    pub longest_streak: u16,
+    pub protectors_available: u16,
+    pub protectors_used_total: u32,
+    pub has_started: bool,
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+pub struct StreakDayCompletion {
+    #[key]
+    pub player: ContractAddress,
+    #[key]
+    pub day: u64,
+    pub completed: bool,
+    pub mission_id: felt252,
+    pub period_id: u64,
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+pub struct StreakProtectorGrant {
+    #[key]
+    pub player: ContractAddress,
+    #[key]
+    pub source: felt252,
+    #[key]
+    pub source_id: felt252,
+    pub quantity: u16,
+    pub claimed: bool,
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+pub struct StreakStatus {
+    pub player: ContractAddress,
+    pub current_streak: u16,
+    pub longest_streak: u16,
+    pub last_completed_day: u64,
+    pub protectors_available: u16,
+    pub protectors_needed: u64,
+    pub days_missed: u64,
+    pub is_protected: bool,
+    pub is_broken: bool,
+}
+
+// TODO: MissionXPConfig is no longer written on-chain. Config is now in
+// constants/season_configs.cairo.
 // Keep this model for now to avoid breaking Dojo migrations.
 #[derive(Copy, Drop, Serde, Debug)]
 #[dojo::model]
@@ -43,7 +130,8 @@ pub struct MissionXPConfig {
     pub xp_reward: u32,
 }
 
-// TODO: LevelXPConfig is no longer written on-chain. Config is now in constants/season_configs.cairo.
+// TODO: LevelXPConfig is no longer written on-chain. Config is now in
+// constants/season_configs.cairo.
 // Keep this model for now to avoid breaking Dojo migrations.
 #[derive(Copy, Drop, Serde, Debug)]
 #[dojo::model]
@@ -65,7 +153,8 @@ pub struct SeasonConfig {
     pub is_active: bool,
 }
 
-// TODO: SeasonLevelConfig is no longer written on-chain. Config is now in constants/season_configs.cairo.
+// TODO: SeasonLevelConfig is no longer written on-chain. Config is now in
+// constants/season_configs.cairo.
 // Keep this model for now to avoid breaking Dojo migrations.
 #[derive(Drop, Serde, Debug)]
 #[dojo::model]
