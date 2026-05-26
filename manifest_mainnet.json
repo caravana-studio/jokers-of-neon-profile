@@ -85,7 +85,7 @@
     },
     {
       "address": "0x315572ea5bc40c02a9126e01c8d5be2a033125bc3fb154c73d8220af132f1dd",
-      "class_hash": "0x62ae90396b3506044b1bf1cc4059e6f2a6a8aa4b3d0c80d90de0e088df7a94d",
+      "class_hash": "0x2b2144660bf5533dae40588d2353ec3af94b6d22baef6068de4823a1c05139a",
       "init_calldata": [],
       "tag": "jokers_of_neon_profile20-season_system",
       "selector": "0x377a169d49baeac6c54af168f78c0bb67b94ad4b5abbbf01956277a447e5d8e",
@@ -106,12 +106,14 @@
     },
     {
       "address": "0x6b734db9fd1244f26622204a89dc6e212620f1413ec8cbc46f2c0bb53fc7deb",
-      "class_hash": "0x55d584ad48ebb639780f07c977a4e6bdad3b050669b58bfd8e317b943db2ac4",
+      "class_hash": "0x278d44d8f621cd9e23746a09b75ca9849cba55c6a9722dd1c9c77e0f23040d6",
       "init_calldata": [],
       "tag": "jokers_of_neon_profile20-xp_system",
       "selector": "0x1ff5053d3ee86db378c5828c4e5be7d36ec215e471ddfe9d2e1e29f15e765e0",
       "systems": [
         "add_daily_mission_xp",
+        "add_mission_xp",
+        "grant_streak_protectors",
         "add_level_completion_xp",
         "setup_default_profile_config",
         "set_xp_multiplier",
@@ -246,6 +248,58 @@
     {
       "members": [
         {
+          "name": "address",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "key": true
+        },
+        {
+          "name": "season_id",
+          "type": "core::integer::u32",
+          "key": true
+        },
+        {
+          "name": "period_type",
+          "type": "core::integer::u8",
+          "key": true
+        },
+        {
+          "name": "period_id",
+          "type": "core::integer::u64",
+          "key": true
+        },
+        {
+          "name": "mission_id",
+          "type": "core::felt252",
+          "key": true
+        },
+        {
+          "name": "template_id",
+          "type": "core::felt252",
+          "key": false
+        },
+        {
+          "name": "difficulty",
+          "type": "core::integer::u8",
+          "key": false
+        },
+        {
+          "name": "xp_earned",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "completed",
+          "type": "core::bool",
+          "key": false
+        }
+      ],
+      "class_hash": "0x6e93505f730e0c9e5a88f4fddc0c07c8a7c739cc108b12b9610bdd4e73d5eff",
+      "tag": "jokers_of_neon_profile20-MissionXPAward",
+      "selector": "0x5724dbaee998ff3a0af2ab14856bfa542bf6744408be7ebba636e4c4cfa718e"
+    },
+    {
+      "members": [
+        {
           "name": "season_id",
           "type": "core::integer::u32",
           "key": true
@@ -269,6 +323,53 @@
       "class_hash": "0x40ee4287d2cb1990c1c6723488918c38f5d01977f1df899aa89242f8ad7ed03",
       "tag": "jokers_of_neon_profile20-MissionXPConfig",
       "selector": "0x4df781b5a54bffb8c463bed77660e3bd4676c8481f3995be17de24f2a75d593"
+    },
+    {
+      "members": [
+        {
+          "name": "address",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "key": true
+        },
+        {
+          "name": "season_id",
+          "type": "core::integer::u32",
+          "key": true
+        },
+        {
+          "name": "period_type",
+          "type": "core::integer::u8",
+          "key": true
+        },
+        {
+          "name": "period_id",
+          "type": "core::integer::u64",
+          "key": true
+        },
+        {
+          "name": "period_xp",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "easy_missions",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "medium_missions",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "hard_missions",
+          "type": "core::integer::u32",
+          "key": false
+        }
+      ],
+      "class_hash": "0xc70de65be6ca0ae4748a84beb8da76451a4360bc26dd99e734684a5bd5d6ee",
+      "tag": "jokers_of_neon_profile20-MissionXPProgress",
+      "selector": "0x2893f72c0b7db17c99ac19d7b84ffdac8a337b512bbcded676653992f1ecd0b"
     },
     {
       "members": [
@@ -795,6 +896,107 @@
       "class_hash": "0x4fe396406b0036f174a1ee24fd82aac8baca166ed7e37ddbcab0865212fdd37",
       "tag": "jokers_of_neon_profile20-SeasonRewardClaim",
       "selector": "0x2486afe899f5d90a12845098a34e078bf0c4430d34770a153bc7c4c5d4eeef5"
+    },
+    {
+      "members": [
+        {
+          "name": "player",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "key": true
+        },
+        {
+          "name": "day",
+          "type": "core::integer::u64",
+          "key": true
+        },
+        {
+          "name": "completed",
+          "type": "core::bool",
+          "key": false
+        },
+        {
+          "name": "mission_id",
+          "type": "core::felt252",
+          "key": false
+        },
+        {
+          "name": "period_id",
+          "type": "core::integer::u64",
+          "key": false
+        }
+      ],
+      "class_hash": "0x74692dffc2f13e97d1efedeff5e9f45491db33bc25f07d0220d63b86057cf59",
+      "tag": "jokers_of_neon_profile20-StreakDayCompletion",
+      "selector": "0x731d3218bcaa74a73d8d91999f3acc6760f22fde1df9d33b9f2ccbc9793ce5b"
+    },
+    {
+      "members": [
+        {
+          "name": "player",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "key": true
+        },
+        {
+          "name": "source",
+          "type": "core::felt252",
+          "key": true
+        },
+        {
+          "name": "source_id",
+          "type": "core::felt252",
+          "key": true
+        },
+        {
+          "name": "quantity",
+          "type": "core::integer::u16",
+          "key": false
+        },
+        {
+          "name": "claimed",
+          "type": "core::bool",
+          "key": false
+        }
+      ],
+      "class_hash": "0x55d768f4f42ba1da865f1c578fda48f585cb3ec6cf9b2e76f5efa9ac08926b4",
+      "tag": "jokers_of_neon_profile20-StreakProtectorGrant",
+      "selector": "0x38a3915fba920cdf98d241ee3438976d67425337fd5ad60f6b697b3282392a0"
+    },
+    {
+      "members": [
+        {
+          "name": "player",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "key": true
+        },
+        {
+          "name": "last_completed_day",
+          "type": "core::integer::u64",
+          "key": false
+        },
+        {
+          "name": "longest_streak",
+          "type": "core::integer::u16",
+          "key": false
+        },
+        {
+          "name": "protectors_available",
+          "type": "core::integer::u16",
+          "key": false
+        },
+        {
+          "name": "protectors_used_total",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "has_started",
+          "type": "core::bool",
+          "key": false
+        }
+      ],
+      "class_hash": "0x6eb725c8ddd5310e79f2a64659d66f851baa5ef7480f6b427c646b7ece5a7fc",
+      "tag": "jokers_of_neon_profile20-StreakState",
+      "selector": "0x64afcfe6968984e393a0f634a9d16ff7969c338a5fd62634b003ddd65082e53"
     },
     {
       "members": [
@@ -3214,6 +3416,70 @@
     },
     {
       "type": "struct",
+      "name": "jokers_of_neon_profile::models::MissionXPAward",
+      "members": [
+        {
+          "name": "address",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "season_id",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "period_type",
+          "type": "core::integer::u8"
+        },
+        {
+          "name": "period_id",
+          "type": "core::integer::u64"
+        },
+        {
+          "name": "mission_id",
+          "type": "core::felt252"
+        },
+        {
+          "name": "template_id",
+          "type": "core::felt252"
+        },
+        {
+          "name": "difficulty",
+          "type": "core::integer::u8"
+        },
+        {
+          "name": "xp_earned",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "completed",
+          "type": "core::bool"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "jokers_of_neon_profile::models::MissionXPAwardValue",
+      "members": [
+        {
+          "name": "template_id",
+          "type": "core::felt252"
+        },
+        {
+          "name": "difficulty",
+          "type": "core::integer::u8"
+        },
+        {
+          "name": "xp_earned",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "completed",
+          "type": "core::bool"
+        }
+      ]
+    },
+    {
+      "type": "struct",
       "name": "jokers_of_neon_profile::models::MissionXPConfig",
       "members": [
         {
@@ -3240,6 +3506,66 @@
       "members": [
         {
           "name": "xp_reward",
+          "type": "core::integer::u32"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "jokers_of_neon_profile::models::MissionXPProgress",
+      "members": [
+        {
+          "name": "address",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "season_id",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "period_type",
+          "type": "core::integer::u8"
+        },
+        {
+          "name": "period_id",
+          "type": "core::integer::u64"
+        },
+        {
+          "name": "period_xp",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "easy_missions",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "medium_missions",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "hard_missions",
+          "type": "core::integer::u32"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "jokers_of_neon_profile::models::MissionXPProgressValue",
+      "members": [
+        {
+          "name": "period_xp",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "easy_missions",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "medium_missions",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "hard_missions",
           "type": "core::integer::u32"
         }
       ]
@@ -3680,6 +4006,188 @@
     },
     {
       "type": "struct",
+      "name": "jokers_of_neon_profile::models::StreakDayCompletion",
+      "members": [
+        {
+          "name": "player",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "day",
+          "type": "core::integer::u64"
+        },
+        {
+          "name": "completed",
+          "type": "core::bool"
+        },
+        {
+          "name": "mission_id",
+          "type": "core::felt252"
+        },
+        {
+          "name": "period_id",
+          "type": "core::integer::u64"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "jokers_of_neon_profile::models::StreakDayCompletionValue",
+      "members": [
+        {
+          "name": "completed",
+          "type": "core::bool"
+        },
+        {
+          "name": "mission_id",
+          "type": "core::felt252"
+        },
+        {
+          "name": "period_id",
+          "type": "core::integer::u64"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "jokers_of_neon_profile::models::StreakProtectorGrant",
+      "members": [
+        {
+          "name": "player",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "source",
+          "type": "core::felt252"
+        },
+        {
+          "name": "source_id",
+          "type": "core::felt252"
+        },
+        {
+          "name": "quantity",
+          "type": "core::integer::u16"
+        },
+        {
+          "name": "claimed",
+          "type": "core::bool"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "jokers_of_neon_profile::models::StreakProtectorGrantValue",
+      "members": [
+        {
+          "name": "quantity",
+          "type": "core::integer::u16"
+        },
+        {
+          "name": "claimed",
+          "type": "core::bool"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "jokers_of_neon_profile::models::StreakState",
+      "members": [
+        {
+          "name": "player",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "last_completed_day",
+          "type": "core::integer::u64"
+        },
+        {
+          "name": "longest_streak",
+          "type": "core::integer::u16"
+        },
+        {
+          "name": "protectors_available",
+          "type": "core::integer::u16"
+        },
+        {
+          "name": "protectors_used_total",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "has_started",
+          "type": "core::bool"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "jokers_of_neon_profile::models::StreakStateValue",
+      "members": [
+        {
+          "name": "last_completed_day",
+          "type": "core::integer::u64"
+        },
+        {
+          "name": "longest_streak",
+          "type": "core::integer::u16"
+        },
+        {
+          "name": "protectors_available",
+          "type": "core::integer::u16"
+        },
+        {
+          "name": "protectors_used_total",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "has_started",
+          "type": "core::bool"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "jokers_of_neon_profile::models::StreakStatus",
+      "members": [
+        {
+          "name": "player",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "current_streak",
+          "type": "core::integer::u16"
+        },
+        {
+          "name": "longest_streak",
+          "type": "core::integer::u16"
+        },
+        {
+          "name": "last_completed_day",
+          "type": "core::integer::u64"
+        },
+        {
+          "name": "protectors_available",
+          "type": "core::integer::u16"
+        },
+        {
+          "name": "protectors_needed",
+          "type": "core::integer::u64"
+        },
+        {
+          "name": "days_missed",
+          "type": "core::integer::u64"
+        },
+        {
+          "name": "is_protected",
+          "type": "core::bool"
+        },
+        {
+          "name": "is_broken",
+          "type": "core::bool"
+        }
+      ]
+    },
+    {
+      "type": "struct",
       "name": "jokers_of_neon_profile::models::XPMultiplier",
       "members": [
         {
@@ -3722,7 +4230,19 @@
     },
     {
       "type": "event",
+      "name": "jokers_of_neon_profile::models::m_MissionXPAward::Event",
+      "kind": "enum",
+      "variants": []
+    },
+    {
+      "type": "event",
       "name": "jokers_of_neon_profile::models::m_MissionXPConfig::Event",
+      "kind": "enum",
+      "variants": []
+    },
+    {
+      "type": "event",
+      "name": "jokers_of_neon_profile::models::m_MissionXPProgress::Event",
       "kind": "enum",
       "variants": []
     },
@@ -3771,6 +4291,24 @@
     {
       "type": "event",
       "name": "jokers_of_neon_profile::models::m_SeasonRewardClaim::Event",
+      "kind": "enum",
+      "variants": []
+    },
+    {
+      "type": "event",
+      "name": "jokers_of_neon_profile::models::m_StreakDayCompletion::Event",
+      "kind": "enum",
+      "variants": []
+    },
+    {
+      "type": "event",
+      "name": "jokers_of_neon_profile::models::m_StreakProtectorGrant::Event",
+      "kind": "enum",
+      "variants": []
+    },
+    {
+      "type": "event",
+      "name": "jokers_of_neon_profile::models::m_StreakState::Event",
       "kind": "enum",
       "variants": []
     },
@@ -4735,6 +5273,82 @@
         },
         {
           "type": "function",
+          "name": "add_mission_xp",
+          "inputs": [
+            {
+              "name": "address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "period_type",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "period_id",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "mission_id",
+              "type": "core::felt252"
+            },
+            {
+              "name": "template_id",
+              "type": "core::felt252"
+            },
+            {
+              "name": "difficulty",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "xp",
+              "type": "core::integer::u32"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "get_streak_status",
+          "inputs": [
+            {
+              "name": "address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "jokers_of_neon_profile::models::StreakStatus"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "grant_streak_protectors",
+          "inputs": [
+            {
+              "name": "address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "quantity",
+              "type": "core::integer::u16"
+            },
+            {
+              "name": "source",
+              "type": "core::felt252"
+            },
+            {
+              "name": "source_id",
+              "type": "core::felt252"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
           "name": "add_level_completion_xp",
           "inputs": [
             {
@@ -4807,6 +5421,53 @@
     },
     {
       "type": "event",
+      "name": "jokers_of_neon_profile::systems::xp_system::xp_system::DailyStreakUpdated",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "player",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "key"
+        },
+        {
+          "name": "period_id",
+          "type": "core::integer::u64",
+          "kind": "data"
+        },
+        {
+          "name": "mission_id",
+          "type": "core::felt252",
+          "kind": "data"
+        },
+        {
+          "name": "current_streak",
+          "type": "core::integer::u16",
+          "kind": "data"
+        },
+        {
+          "name": "longest_streak",
+          "type": "core::integer::u16",
+          "kind": "data"
+        },
+        {
+          "name": "protectors_used",
+          "type": "core::integer::u16",
+          "kind": "data"
+        },
+        {
+          "name": "protectors_available",
+          "type": "core::integer::u16",
+          "kind": "data"
+        },
+        {
+          "name": "reset",
+          "type": "core::bool",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
       "name": "jokers_of_neon_profile::systems::xp_system::xp_system::Event",
       "kind": "enum",
       "variants": [
@@ -4823,6 +5484,21 @@
         {
           "name": "MissionXPAdded",
           "type": "jokers_of_neon_profile::systems::xp_system::xp_system::MissionXPAdded",
+          "kind": "nested"
+        },
+        {
+          "name": "MissionXPAddedV2",
+          "type": "jokers_of_neon_profile::systems::xp_system::xp_system::MissionXPAddedV2",
+          "kind": "nested"
+        },
+        {
+          "name": "DailyStreakUpdated",
+          "type": "jokers_of_neon_profile::systems::xp_system::xp_system::DailyStreakUpdated",
+          "kind": "nested"
+        },
+        {
+          "name": "StreakProtectorsGranted",
+          "type": "jokers_of_neon_profile::systems::xp_system::xp_system::StreakProtectorsGranted",
           "kind": "nested"
         },
         {
@@ -4892,6 +5568,90 @@
         {
           "name": "day",
           "type": "core::integer::u64",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "jokers_of_neon_profile::systems::xp_system::xp_system::MissionXPAddedV2",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "player",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "key"
+        },
+        {
+          "name": "season_id",
+          "type": "core::integer::u32",
+          "kind": "data"
+        },
+        {
+          "name": "period_type",
+          "type": "core::integer::u8",
+          "kind": "data"
+        },
+        {
+          "name": "period_id",
+          "type": "core::integer::u64",
+          "kind": "data"
+        },
+        {
+          "name": "mission_id",
+          "type": "core::felt252",
+          "kind": "data"
+        },
+        {
+          "name": "template_id",
+          "type": "core::felt252",
+          "kind": "data"
+        },
+        {
+          "name": "difficulty",
+          "type": "core::integer::u8",
+          "kind": "data"
+        },
+        {
+          "name": "base_xp",
+          "type": "core::integer::u32",
+          "kind": "data"
+        },
+        {
+          "name": "xp_earned",
+          "type": "core::integer::u32",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "jokers_of_neon_profile::systems::xp_system::xp_system::StreakProtectorsGranted",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "player",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "key"
+        },
+        {
+          "name": "source",
+          "type": "core::felt252",
+          "kind": "data"
+        },
+        {
+          "name": "source_id",
+          "type": "core::felt252",
+          "kind": "data"
+        },
+        {
+          "name": "quantity",
+          "type": "core::integer::u16",
+          "kind": "data"
+        },
+        {
+          "name": "protectors_available",
+          "type": "core::integer::u16",
           "kind": "data"
         }
       ]
