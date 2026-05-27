@@ -646,6 +646,10 @@ pub mod xp_system {
 
             loop {
                 let level_config = store.get_profile_level_config(level_to_check);
+                if level_config.required_xp == 0 {
+                    break;
+                }
+
                 if profile.total_xp >= level_config.required_xp {
                     new_level = level_to_check;
                     level_to_check += 1;

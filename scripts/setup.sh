@@ -33,13 +33,13 @@ world_address=$(sozo -P ${profile} inspect | awk '/World/ {getline; getline; pri
 # NOTE: setup_default_season_config ya no es necesario.
 # Las configs de season ahora estan en constants/season_configs.cairo como funciones puras.
 
+echo -e "\n🎮 Default config xp profile en profile..."
+sozo -P ${profile} execute xp_system setup_default_profile_config \
+    --wait \
+    --world $world_address
+
 echo -e "\n🎮 Create season 3 en profile..."
-sozo -P mainnet execute season_system create_season \
+sozo -P ${profile} execute season_system create_season \
     3 \
     --wait \
-    --world 0x039c8aff3ceda2fffddf0ac20a94c465de6c0020372d43d225cf83655ef99477
-
-# echo -e "\n🎮 Default config xp profile en profile..."
-# sozo -P ${profile} execute xp_system setup_default_profile_config \
-#     --wait \
-#     --world $world_address
+    --world $world_address
