@@ -1,0 +1,26 @@
+[world]
+description = "jokers_of_neon_profile"
+name = "jokers_of_neon_profile"
+seed = "jokers_of_neon_profile"
+
+[namespace]
+default = "jokers_of_neon_profile20"
+
+[env]
+rpc_url = "https://api.cartridge.gg/x/starknet/sepolia"
+account_address = "0x03edf0f6f28a7fac80f070efb6545ec2d5f0f2d84699cf55ef2a3152046bbe00"
+private_key = "0x05d50a28a9cffeb4018ecba5bae8015cdc081f716878f4f2ae206edaa30c7260"
+
+[writers]
+"jokers_of_neon_profile20" = [
+    "jokers_of_neon_profile20-profile_system",
+    "jokers_of_neon_profile20-xp_system",
+    "jokers_of_neon_profile20-season_system",
+    "jokers_of_neon_profile20-permission_system",
+    "jokers_of_neon_profile20-progression_system",
+]
+
+[init_call_args]
+"jokers_of_neon_profile20-permission_system" = [
+    "0x03b4cea30c8499e90ff4fd7e830eb9120740391cae15ad3bc28ad04087417053",
+]
