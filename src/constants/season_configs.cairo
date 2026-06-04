@@ -1,4 +1,4 @@
-use crate::constants::constants::TOURNAMENT_TICKET_REWARD_ID;
+use crate::constants::constants::{STREAK_PROTECTOR_REWARD_ID, TOURNAMENT_TICKET_REWARD_ID};
 use crate::constants::packs::{
     ADVANCED_SEASON_3_PACK_ID, EPIC_SEASON_3_PACK_ID, LEGENDARY_SEASON_3_PACK_ID,
 };
@@ -47,7 +47,7 @@ fn get_season_3_level_data(season_id: u32, level: u32) -> SeasonLevelConfig {
             season_id,
             level,
             required_xp: 50,
-            free_rewards: [].span(),
+            free_rewards: [STREAK_PROTECTOR_REWARD_ID].span(),
             premium_rewards: [EPIC_SEASON_3_PACK_ID].span(),
         },
         3 => SeasonLevelConfig {
@@ -69,7 +69,7 @@ fn get_season_3_level_data(season_id: u32, level: u32) -> SeasonLevelConfig {
             level,
             required_xp: 150,
             free_rewards: [EPIC_SEASON_3_PACK_ID].span(),
-            premium_rewards: [].span(),
+            premium_rewards: [STREAK_PROTECTOR_REWARD_ID].span(),
         },
         6 => SeasonLevelConfig {
             season_id,
@@ -118,7 +118,7 @@ fn get_season_3_level_data(season_id: u32, level: u32) -> SeasonLevelConfig {
             season_id,
             level,
             required_xp: 800,
-            free_rewards: [].span(),
+            free_rewards: [STREAK_PROTECTOR_REWARD_ID].span(),
             premium_rewards: [EPIC_SEASON_3_PACK_ID].span(),
         },
         13 => SeasonLevelConfig {
@@ -126,7 +126,7 @@ fn get_season_3_level_data(season_id: u32, level: u32) -> SeasonLevelConfig {
             level,
             required_xp: 900,
             free_rewards: [ADVANCED_SEASON_3_PACK_ID].span(),
-            premium_rewards: [].span(),
+            premium_rewards: [STREAK_PROTECTOR_REWARD_ID].span(),
         },
         14 => SeasonLevelConfig {
             season_id,
@@ -161,7 +161,7 @@ fn get_season_3_level_data(season_id: u32, level: u32) -> SeasonLevelConfig {
             level,
             required_xp: 1400,
             free_rewards: [EPIC_SEASON_3_PACK_ID].span(),
-            premium_rewards: [].span(),
+            premium_rewards: [STREAK_PROTECTOR_REWARD_ID].span(),
         },
         19 => SeasonLevelConfig {
             season_id,
@@ -203,7 +203,7 @@ fn get_season_3_level_data(season_id: u32, level: u32) -> SeasonLevelConfig {
             level,
             required_xp: 2000,
             free_rewards: [LEGENDARY_SEASON_3_PACK_ID].span(),
-            premium_rewards: [].span(),
+            premium_rewards: [STREAK_PROTECTOR_REWARD_ID].span(),
         },
         25 => SeasonLevelConfig {
             season_id,
@@ -224,7 +224,7 @@ fn get_season_3_level_data(season_id: u32, level: u32) -> SeasonLevelConfig {
             season_id,
             level,
             required_xp: 2300,
-            free_rewards: [].span(),
+            free_rewards: [STREAK_PROTECTOR_REWARD_ID].span(),
             premium_rewards: [ADVANCED_SEASON_3_PACK_ID, EPIC_SEASON_3_PACK_ID].span(),
         },
         28 => SeasonLevelConfig {
@@ -253,7 +253,7 @@ fn get_season_3_level_data(season_id: u32, level: u32) -> SeasonLevelConfig {
             level,
             required_xp: 3000,
             free_rewards: [LEGENDARY_SEASON_3_PACK_ID].span(),
-            premium_rewards: [].span(),
+            premium_rewards: [STREAK_PROTECTOR_REWARD_ID].span(),
         },
         32 => SeasonLevelConfig {
             season_id,

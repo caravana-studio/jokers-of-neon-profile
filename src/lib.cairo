@@ -22,5 +22,6 @@ pub mod utils {
 
 #[cfg(test)]
 pub mod tests {
+    pub mod test_season_rewards;
     pub mod test_streak;
 }
