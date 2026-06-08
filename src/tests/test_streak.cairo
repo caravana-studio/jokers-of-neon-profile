@@ -205,4 +205,16 @@ mod tests {
         assert(status.is_protected, 'status protected');
         assert(!status.is_broken, 'status not broken');
     }
+
+    #[test]
+    #[available_gas(100000000)]
+    #[should_panic(expected: ('Protector slots full', 'ENTRYPOINT_FAILED',))]
+    fn protector_grant_reverts_when_slots_are_full() {
+        let (mut world, xp) = setup_world();
+        let player = PLAYER_TWO();
+        seed_profile(ref world, player);
+
+        xp.grant_streak_protectors(player, 2, 'admin', 'grant-max');
+        xp.grant_streak_protectors(player, 1, 'admin', 'grant-over');
+    }
 }

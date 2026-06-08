@@ -295,11 +295,8 @@ pub mod xp_system {
             let current_available: u32 = state.protectors_available.into();
             let requested: u32 = quantity.into();
             let max_protectors: u32 = MAX_STREAK_PROTECTORS.into();
-            let next_available = if current_available + requested > max_protectors {
-                max_protectors
-            } else {
-                current_available + requested
-            };
+            assert(current_available + requested <= max_protectors, 'Protector slots full');
+            let next_available = current_available + requested;
             let applied_quantity: u16 = (next_available - current_available).try_into().unwrap();
 
             state.player = address;
