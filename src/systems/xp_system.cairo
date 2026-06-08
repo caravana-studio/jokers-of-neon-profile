@@ -291,6 +291,9 @@ pub mod xp_system {
                 return;
             }
 
+            let current_day = get_current_day();
+            self._materialize_streak_gap(ref store, address, current_day);
+
             let mut state = store.get_streak_state(address);
             let current_available: u32 = state.protectors_available.into();
             let requested: u32 = quantity.into();
@@ -514,26 +517,29 @@ pub mod xp_system {
             let profile = store.get_profile(address);
             let state = store.get_streak_state(address);
             let current_day = get_current_day();
-            let days_missed = if state.has_started && current_day > state.last_completed_day {
-                current_day - state.last_completed_day - 1
-            } else {
-                0
-            };
-            let available: u64 = state.protectors_available.into();
-            let is_broken = state.has_started && days_missed > available;
-            let is_protected = state.has_started && days_missed > 0 && days_missed <= available;
-            let longest_streak = if state.longest_streak > profile.daily_streak {
+            let (
+                current_streak, last_completed_day, protectors_available, days_missed,
+                _protectors_used, is_protected, is_broken,
+            ) = self
+                ._project_streak_gap(
+                    profile.daily_streak,
+                    state.last_completed_day,
+                    state.protectors_available,
+                    state.has_started,
+                    current_day,
+                );
+            let longest_streak = if state.longest_streak > current_streak {
                 state.longest_streak
             } else {
-                profile.daily_streak
+                current_streak
             };
 
             StreakStatus {
                 player: address,
-                current_streak: profile.daily_streak,
+                current_streak,
                 longest_streak,
-                last_completed_day: state.last_completed_day,
-                protectors_available: state.protectors_available,
+                last_completed_day,
+                protectors_available,
                 protectors_needed: days_missed,
                 days_missed,
                 is_protected,
@@ -549,6 +555,86 @@ pub mod xp_system {
             }
         }
 
+        fn _project_streak_gap(
+            self: @ContractState,
+            current_streak: u16,
+            last_completed_day: u64,
+            protectors_available: u16,
+            has_started: bool,
+            as_of_day: u64,
+        ) -> (u16, u64, u16, u64, u16, bool, bool) {
+            let days_missed = if has_started && as_of_day > last_completed_day {
+                as_of_day - last_completed_day - 1
+            } else {
+                0
+            };
+            let available: u64 = protectors_available.into();
+            let used_u64 = if days_missed < available {
+                days_missed
+            } else {
+                available
+            };
+            let protectors_used: u16 = used_u64.try_into().unwrap();
+            let is_broken = has_started && days_missed > available;
+            let is_protected = has_started && days_missed > 0 && days_missed <= available;
+            let effective_streak = if is_broken {
+                0
+            } else {
+                current_streak
+            };
+            let effective_last_completed_day = if has_started && days_missed > 0 {
+                as_of_day - 1
+            } else {
+                last_completed_day
+            };
+            let effective_protectors_available = protectors_available - protectors_used;
+
+            (
+                effective_streak, effective_last_completed_day, effective_protectors_available,
+                days_missed, protectors_used, is_protected, is_broken,
+            )
+        }
+
+        fn _materialize_streak_gap(
+            ref self: ContractState, ref store: Store, address: ContractAddress, as_of_day: u64,
+        ) -> (u16, bool) {
+            let mut state = store.get_streak_state(address);
+            if !state.has_started {
+                return (0, false);
+            }
+
+            let mut profile = store.get_profile(address);
+            let (
+                current_streak, last_completed_day, protectors_available, days_missed,
+                protectors_used, _is_protected, is_broken,
+            ) = self
+                ._project_streak_gap(
+                    profile.daily_streak,
+                    state.last_completed_day,
+                    state.protectors_available,
+                    state.has_started,
+                    as_of_day,
+                );
+
+            if days_missed == 0 {
+                return (0, false);
+            }
+
+            profile.daily_streak = current_streak;
+            state.player = address;
+            state.last_completed_day = last_completed_day;
+            state.protectors_available = protectors_available;
+            state.protectors_used_total += protectors_used.into();
+            if current_streak > state.longest_streak {
+                state.longest_streak = current_streak;
+            }
+
+            store.set_profile(@profile);
+            store.set_streak_state(state);
+
+            (protectors_used, is_broken)
+        }
+
         fn _apply_daily_streak(
             ref self: ContractState,
             ref store: Store,
@@ -561,36 +647,17 @@ pub mod xp_system {
                 return;
             }
 
+            let (protectors_used, reset) = self
+                ._materialize_streak_gap(ref store, address, period_id);
+
             let mut state = store.get_streak_state(address);
             if state.has_started && period_id <= state.last_completed_day {
                 return;
             }
 
             let mut profile = store.get_profile(address);
-            let mut protectors_used: u16 = 0;
-            let mut reset = false;
             let new_streak = if state.has_started {
-                let missed_days = period_id - state.last_completed_day - 1;
-                if missed_days == 0 {
-                    self._increment_streak(profile.daily_streak)
-                } else {
-                    let available: u64 = state.protectors_available.into();
-                    let used_u64 = if missed_days < available {
-                        missed_days
-                    } else {
-                        available
-                    };
-                    protectors_used = used_u64.try_into().unwrap();
-                    state.protectors_available -= protectors_used;
-                    state.protectors_used_total += protectors_used.into();
-
-                    if missed_days <= available {
-                        self._increment_streak(profile.daily_streak)
-                    } else {
-                        reset = true;
-                        1
-                    }
-                }
+                self._increment_streak(profile.daily_streak)
             } else {
                 1
             };
