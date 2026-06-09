@@ -106,7 +106,7 @@
     },
     {
       "address": "0x2ae789f7613b414da2036b1bc7db8333c6a61acf797bf0c3b51c6bfef1333cf",
-      "class_hash": "0x99ceb4e63372860ef36c999d388b8c486a9684d87604ab084313f727dd86ae",
+      "class_hash": "0x508a89e5216ee0e61526b01c3d86da5f691baa2f0e120f4d34d20f037f3b683",
       "init_calldata": [],
       "tag": "jokers_of_neon_profile20-xp_system",
       "selector": "0x1ff5053d3ee86db378c5828c4e5be7d36ec215e471ddfe9d2e1e29f15e765e0",
