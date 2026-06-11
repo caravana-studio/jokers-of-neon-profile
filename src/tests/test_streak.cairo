@@ -13,8 +13,9 @@ mod tests {
         DEFAULT_NS_BYTE, MISSION_PERIOD_DAILY, MISSION_PERIOD_WEEKLY,
     };
     use jokers_of_neon_profile::models::{
-        StreakDayCompletion, StreakState, m_MissionXPAward, m_MissionXPProgress, m_SeasonConfig,
-        m_SeasonProgress, m_StreakDayCompletion, m_StreakProtectorGrant, m_StreakState,
+        SeasonConfig, SeasonProgress, StreakDayCompletion, StreakRewardGrant, StreakState,
+        m_MissionXPAward, m_MissionXPProgress, m_SeasonConfig, m_SeasonProgress,
+        m_StreakDayCompletion, m_StreakProtectorGrant, m_StreakRewardGrant, m_StreakState,
         m_XPMultiplier,
     };
     use jokers_of_neon_profile::systems::permission_system::{m_PermissionConfig, permission_system};
@@ -59,6 +60,7 @@ mod tests {
                 TestResource::Model(m_StreakState::TEST_CLASS_HASH),
                 TestResource::Model(m_StreakDayCompletion::TEST_CLASS_HASH),
                 TestResource::Model(m_StreakProtectorGrant::TEST_CLASS_HASH),
+                TestResource::Model(m_StreakRewardGrant::TEST_CLASS_HASH),
                 TestResource::Contract(permission_system::TEST_CLASS_HASH),
                 TestResource::Contract(xp_system::TEST_CLASS_HASH),
             ]
@@ -111,6 +113,35 @@ mod tests {
 
     fn streak_state(ref world: WorldStorage, player: ContractAddress) -> StreakState {
         world.read_model(player)
+    }
+
+    fn seed_active_season(ref world: WorldStorage, player: ContractAddress, season_id: u32) {
+        world.write_model_test(@SeasonConfig { season_id, is_active: true });
+        world
+            .write_model_test(
+                @SeasonProgress {
+                    address: player,
+                    season_id,
+                    season_xp: 0,
+                    has_season_pass: false,
+                    claimable_rewards_id: array![].span(),
+                    season_pass_unlocked_at_level: 0,
+                    level: 0,
+                    tournament_ticket: 0,
+                },
+            );
+    }
+
+    fn season_progress(
+        ref world: WorldStorage, player: ContractAddress, season_id: u32,
+    ) -> SeasonProgress {
+        world.read_model((player, season_id))
+    }
+
+    fn streak_reward_grant(
+        ref world: WorldStorage, player: ContractAddress, source: felt252, source_id: felt252,
+    ) -> StreakRewardGrant {
+        world.read_model((player, source, source_id))
     }
 
     fn set_current_day(day: u64) {
@@ -291,5 +322,72 @@ mod tests {
         set_current_day(1);
         xp.grant_streak_protectors(player, 2, 'admin', 'grant-max');
         xp.grant_streak_protectors(player, 1, 'admin', 'grant-over');
+    }
+
+    #[test]
+    #[available_gas(100000000)]
+    fn streak_reward_grants_xp_tickets_and_protectors() {
+        let (mut world, xp) = setup_world();
+        let player = PLAYER_ONE();
+        let season_id = 3;
+        seed_profile(ref world, player);
+        seed_active_season(ref world, player, season_id);
+
+        xp.claim_streak_reward(player, season_id, 50, 1, 1, 'streak', 'd7');
+
+        let player_profile = profile(ref world, player);
+        let progress = season_progress(ref world, player, season_id);
+        let state = streak_state(ref world, player);
+        let grant = streak_reward_grant(ref world, player, 'streak', 'd7');
+
+        assert(player_profile.total_xp == 50, 'profile total xp');
+        assert(player_profile.xp == 50, 'profile xp');
+        assert(progress.season_xp == 50, 'season xp');
+        assert(progress.tournament_ticket == 1, 'ticket granted');
+        assert(state.protectors_available == 1, 'protector granted');
+        assert(grant.claimed, 'grant claimed');
+        assert(grant.xp_amount == 50, 'grant xp');
+        assert(grant.ticket_quantity == 1, 'grant ticket');
+        assert(grant.protectors_requested == 1, 'requested protector');
+        assert(grant.protectors_granted == 1, 'granted protector');
+    }
+
+    #[test]
+    #[available_gas(100000000)]
+    fn streak_reward_is_idempotent_by_source() {
+        let (mut world, xp) = setup_world();
+        let player = PLAYER_TWO();
+        let season_id = 3;
+        seed_profile(ref world, player);
+        seed_active_season(ref world, player, season_id);
+
+        xp.claim_streak_reward(player, season_id, 50, 1, 1, 'streak', 'd7');
+        xp.claim_streak_reward(player, season_id, 50, 1, 1, 'streak', 'd7');
+
+        assert(profile(ref world, player).total_xp == 50, 'profile xp once');
+        assert(season_progress(ref world, player, season_id).season_xp == 50, 'season xp once');
+        assert(season_progress(ref world, player, season_id).tournament_ticket == 1, 'ticket once');
+        assert(streak_state(ref world, player).protectors_available == 1, 'protector once');
+    }
+
+    #[test]
+    #[available_gas(100000000)]
+    fn streak_reward_protector_without_slot_does_not_revert() {
+        let (mut world, xp) = setup_world();
+        let player = PLAYER_THREE();
+        let season_id = 3;
+        seed_profile(ref world, player);
+        seed_active_season(ref world, player, season_id);
+
+        xp.grant_streak_protectors(player, 2, 'admin', 'grant-max');
+        xp.claim_streak_reward(player, season_id, 0, 0, 1, 'streak', 'slot-full');
+
+        let state = streak_state(ref world, player);
+        let grant = streak_reward_grant(ref world, player, 'streak', 'slot-full');
+
+        assert(state.protectors_available == 2, 'protectors stay full');
+        assert(grant.claimed, 'claim stored');
+        assert(grant.protectors_requested == 1, 'requested stored');
+        assert(grant.protectors_granted == 0, 'none granted');
     }
 }

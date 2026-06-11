@@ -103,6 +103,23 @@ pub struct StreakProtectorGrant {
 }
 
 #[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+pub struct StreakRewardGrant {
+    #[key]
+    pub player: ContractAddress,
+    #[key]
+    pub source: felt252,
+    #[key]
+    pub source_id: felt252,
+    pub season_id: u32,
+    pub xp_amount: u32,
+    pub ticket_quantity: u32,
+    pub protectors_requested: u16,
+    pub protectors_granted: u16,
+    pub claimed: bool,
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
 pub struct StreakStatus {
     pub player: ContractAddress,
     pub current_streak: u16,
