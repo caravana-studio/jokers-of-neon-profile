@@ -6,8 +6,8 @@ use crate::constants::constants::{NFT_MANAGER_KEY, PERMISSION_CONFIG_KEY};
 use crate::models::{
     DailyProgress, GameData, LevelXPConfig, MissionXPAward, MissionXPConfig, MissionXPProgress,
     NFTManager, PlayerProgression, PokerHandData, RoundData, SeasonConfig, SeasonLevelConfig,
-    SeasonProgress, SeasonRewardClaim, StreakDayCompletion, StreakProtectorGrant, StreakState,
-    XPMultiplier,
+    SeasonProgress, SeasonRewardClaim, StreakDayCompletion, StreakProtectorGrant,
+    StreakRewardGrant, StreakState, XPMultiplier,
 };
 use crate::systems::permission_system::PermissionConfig;
 
@@ -107,6 +107,16 @@ pub impl StoreImpl of StoreTrait {
     }
 
     fn set_streak_protector_grant(ref self: Store, grant: StreakProtectorGrant) {
+        self.world.write_model(@grant)
+    }
+
+    fn get_streak_reward_grant(
+        ref self: Store, player: ContractAddress, source: felt252, source_id: felt252,
+    ) -> StreakRewardGrant {
+        self.world.read_model((player, source, source_id))
+    }
+
+    fn set_streak_reward_grant(ref self: Store, grant: StreakRewardGrant) {
         self.world.write_model(@grant)
     }
 
