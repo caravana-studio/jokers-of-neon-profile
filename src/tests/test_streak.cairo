@@ -162,6 +162,7 @@ mod tests {
         let player = PLAYER_THREE();
         seed_profile(ref world, player);
 
+        set_current_day(1);
         xp.add_mission_xp(player, MISSION_PERIOD_DAILY, 1, 'm1', 'tpl', 1, 10);
         xp.grant_streak_protectors(player, 1, 'admin', 'grant1');
         xp.add_mission_xp(player, MISSION_PERIOD_DAILY, 3, 'm2', 'tpl', 1, 10);
@@ -245,6 +246,7 @@ mod tests {
         let player = PLAYER_FOUR();
         seed_profile(ref world, player);
 
+        set_current_day(1);
         xp.add_mission_xp(player, MISSION_PERIOD_DAILY, 1, 'm1', 'tpl', 1, 10);
         xp.grant_streak_protectors(player, 2, 'admin', 'grant-two');
         xp.add_mission_xp(player, MISSION_PERIOD_DAILY, 5, 'm2', 'tpl', 1, 10);
@@ -286,6 +288,7 @@ mod tests {
         let player = PLAYER_TWO();
         seed_profile(ref world, player);
 
+        set_current_day(1);
         xp.grant_streak_protectors(player, 2, 'admin', 'grant-max');
         xp.grant_streak_protectors(player, 1, 'admin', 'grant-over');
     }
