@@ -113,6 +113,10 @@ mod tests {
         world.read_model(player)
     }
 
+    fn set_current_day(day: u64) {
+        set_block_timestamp(21600 + 86400 * day);
+    }
+
     #[test]
     #[available_gas(100000000)]
     fn daily_streak_starts_once_per_day_and_continues() {
@@ -158,6 +162,7 @@ mod tests {
         let player = PLAYER_THREE();
         seed_profile(ref world, player);
 
+        set_current_day(1);
         xp.add_mission_xp(player, MISSION_PERIOD_DAILY, 1, 'm1', 'tpl', 1, 10);
         xp.grant_streak_protectors(player, 1, 'admin', 'grant1');
         xp.add_mission_xp(player, MISSION_PERIOD_DAILY, 3, 'm2', 'tpl', 1, 10);
@@ -191,18 +196,100 @@ mod tests {
         let (mut world, xp) = setup_world();
         let player = PLAYER_ONE();
         seed_profile(ref world, player);
-        set_block_timestamp(21600 + 86400 * 3);
+        set_current_day(1);
 
         xp.add_mission_xp(player, MISSION_PERIOD_DAILY, 1, 'm1', 'tpl', 1, 10);
         xp.grant_streak_protectors(player, 1, 'admin', 'grant-status');
         xp.grant_streak_protectors(player, 1, 'admin', 'grant-status');
 
         let state = streak_state(ref world, player);
+        set_current_day(3);
         let status = xp.get_streak_status(player);
         assert(state.protectors_available == 1, 'grant idempotent');
         assert(status.days_missed == 1, 'status missed days');
-        assert(status.protectors_available == 1, 'status protectors');
+        assert(status.protectors_available == 0, 'status protectors');
+        assert(status.last_completed_day == 2, 'status accounted day');
         assert(status.is_protected, 'status protected');
         assert(!status.is_broken, 'status not broken');
+    }
+
+    #[test]
+    #[available_gas(100000000)]
+    fn status_reports_broken_when_missed_days_exceed_protectors() {
+        let (mut world, xp) = setup_world();
+        let player = PLAYER_THREE();
+        seed_profile(ref world, player);
+        set_current_day(1);
+
+        xp.add_mission_xp(player, MISSION_PERIOD_DAILY, 1, 'm1', 'tpl', 1, 10);
+        xp.grant_streak_protectors(player, 2, 'admin', 'grant-two');
+
+        set_current_day(5);
+        let status = xp.get_streak_status(player);
+        let state = streak_state(ref world, player);
+
+        assert(profile(ref world, player).daily_streak == 1, 'view keeps raw streak');
+        assert(state.protectors_available == 2, 'view keeps raw protectors');
+        assert(status.current_streak == 0, 'effective broken streak');
+        assert(status.protectors_available == 0, 'effective protectors spent');
+        assert(status.protectors_needed == 3, 'status needed');
+        assert(status.days_missed == 3, 'status missed days');
+        assert(status.last_completed_day == 4, 'effective accounted day');
+        assert(!status.is_protected, 'not protected');
+        assert(status.is_broken, 'status broken');
+    }
+
+    #[test]
+    #[available_gas(100000000)]
+    fn daily_mission_after_uncovered_gap_consumes_all_protectors_and_restarts() {
+        let (mut world, xp) = setup_world();
+        let player = PLAYER_FOUR();
+        seed_profile(ref world, player);
+
+        set_current_day(1);
+        xp.add_mission_xp(player, MISSION_PERIOD_DAILY, 1, 'm1', 'tpl', 1, 10);
+        xp.grant_streak_protectors(player, 2, 'admin', 'grant-two');
+        xp.add_mission_xp(player, MISSION_PERIOD_DAILY, 5, 'm2', 'tpl', 1, 10);
+
+        let state = streak_state(ref world, player);
+        assert(profile(ref world, player).daily_streak == 1, 'restarted streak');
+        assert(state.last_completed_day == 5, 'last completed day');
+        assert(state.protectors_available == 0, 'all protectors spent');
+        assert(state.protectors_used_total == 2, 'used total');
+        assert(state.longest_streak == 1, 'longest after restart');
+    }
+
+    #[test]
+    #[available_gas(100000000)]
+    fn protector_grant_materializes_stale_gap_before_slot_check() {
+        let (mut world, xp) = setup_world();
+        let player = PLAYER_ONE();
+        seed_profile(ref world, player);
+        set_current_day(1);
+
+        xp.add_mission_xp(player, MISSION_PERIOD_DAILY, 1, 'm1', 'tpl', 1, 10);
+        xp.grant_streak_protectors(player, 1, 'admin', 'grant-one');
+
+        set_current_day(3);
+        xp.grant_streak_protectors(player, 2, 'season', 'reward-two');
+
+        let state = streak_state(ref world, player);
+        assert(profile(ref world, player).daily_streak == 1, 'streak preserved');
+        assert(state.last_completed_day == 2, 'gap accounted');
+        assert(state.protectors_available == 2, 'slots refilled');
+        assert(state.protectors_used_total == 1, 'old protector consumed');
+    }
+
+    #[test]
+    #[available_gas(100000000)]
+    #[should_panic(expected: ('Protector slots full', 'ENTRYPOINT_FAILED'))]
+    fn protector_grant_reverts_when_slots_are_full() {
+        let (mut world, xp) = setup_world();
+        let player = PLAYER_TWO();
+        seed_profile(ref world, player);
+
+        set_current_day(1);
+        xp.grant_streak_protectors(player, 2, 'admin', 'grant-max');
+        xp.grant_streak_protectors(player, 1, 'admin', 'grant-over');
     }
 }

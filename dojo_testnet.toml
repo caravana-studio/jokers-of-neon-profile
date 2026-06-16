@@ -7,7 +7,7 @@ seed = "jokers_of_neon_profile"
 default = "jokers_of_neon_profile20"
 
 [env]
-rpc_url = "https://api.cartridge.gg/x/starknet/sepolia"
+rpc_url = "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_9/ktdjhZ3uOVSLmcnH8fO3k"
 account_address = "0x03edf0f6f28a7fac80f070efb6545ec2d5f0f2d84699cf55ef2a3152046bbe00"
 private_key = "0x05d50a28a9cffeb4018ecba5bae8015cdc081f716878f4f2ae206edaa30c7260"
 
