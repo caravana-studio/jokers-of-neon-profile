@@ -243,7 +243,9 @@ pub mod season_system {
             store.set_season_level_config(config);
         }
 
-        fn set_season_level_config(ref self: ContractState, config: SeasonLevelConfig) {// TODO: No longer used. Config is now in constants/season_configs.cairo.
+        fn set_season_level_config(
+            ref self: ContractState, config: SeasonLevelConfig,
+        ) { // TODO: No longer used. Config is now in constants/season_configs.cairo.
         }
 
         // TODO: No longer used. Config is now in constants/season_configs.cairo.

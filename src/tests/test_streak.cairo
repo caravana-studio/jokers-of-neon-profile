@@ -280,7 +280,7 @@ mod tests {
 
     #[test]
     #[available_gas(100000000)]
-    #[should_panic(expected: ('Protector slots full', 'ENTRYPOINT_FAILED',))]
+    #[should_panic(expected: ('Protector slots full', 'ENTRYPOINT_FAILED'))]
     fn protector_grant_reverts_when_slots_are_full() {
         let (mut world, xp) = setup_world();
         let player = PLAYER_TWO();

@@ -518,9 +518,15 @@ pub mod xp_system {
             let state = store.get_streak_state(address);
             let current_day = get_current_day();
             let (
-                current_streak, last_completed_day, protectors_available, days_missed,
-                _protectors_used, is_protected, is_broken,
-            ) = self
+                current_streak,
+                last_completed_day,
+                protectors_available,
+                days_missed,
+                _protectors_used,
+                is_protected,
+                is_broken,
+            ) =
+                self
                 ._project_streak_gap(
                     profile.daily_streak,
                     state.last_completed_day,
@@ -590,8 +596,13 @@ pub mod xp_system {
             let effective_protectors_available = protectors_available - protectors_used;
 
             (
-                effective_streak, effective_last_completed_day, effective_protectors_available,
-                days_missed, protectors_used, is_protected, is_broken,
+                effective_streak,
+                effective_last_completed_day,
+                effective_protectors_available,
+                days_missed,
+                protectors_used,
+                is_protected,
+                is_broken,
             )
         }
 
@@ -605,9 +616,15 @@ pub mod xp_system {
 
             let mut profile = store.get_profile(address);
             let (
-                current_streak, last_completed_day, protectors_available, days_missed,
-                protectors_used, _is_protected, is_broken,
-            ) = self
+                current_streak,
+                last_completed_day,
+                protectors_available,
+                days_missed,
+                protectors_used,
+                _is_protected,
+                is_broken,
+            ) =
+                self
                 ._project_streak_gap(
                     profile.daily_streak,
                     state.last_completed_day,
