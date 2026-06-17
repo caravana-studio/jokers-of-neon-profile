@@ -38,8 +38,6 @@ pub mod progression_system {
                 .assert_has_permission(get_contract_address(), get_caller_address());
 
             let existing = store.get_player_progression(player);
-
-            // Use max values to avoid overwriting better progression
             let new_tier = if tier > existing.tier {
                 tier
             } else {
@@ -50,18 +48,6 @@ pub mod progression_system {
             } else {
                 existing.total_runs
             };
-            let new_max_level = if max_level > existing.max_level {
-                max_level
-            } else {
-                existing.max_level
-            };
-            let new_max_round = if max_level > existing.max_level {
-                max_round
-            } else if max_level == existing.max_level && max_round > existing.max_round {
-                max_round
-            } else {
-                existing.max_round
-            };
 
             store
                 .set_player_progression(
@@ -69,8 +55,8 @@ pub mod progression_system {
                         address: player,
                         tier: new_tier,
                         total_runs: new_total_runs,
-                        max_level: new_max_level,
-                        max_round: new_max_round,
+                        max_level,
+                        max_round,
                     },
                 );
         }
