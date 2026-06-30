@@ -8,6 +8,9 @@ mod tests {
     };
     use jokers_of_neon_lib::models::external::profile::{Profile, m_Profile};
     use jokers_of_neon_profile::constants::constants::{DEFAULT_NS_BYTE, STREAK_PROTECTOR_REWARD_ID};
+    use jokers_of_neon_profile::constants::packs::{
+        EPIC_SEASON_3_PACK_ID, LEGENDARY_SEASON_3_PACK_ID,
+    };
     use jokers_of_neon_profile::constants::season_configs::get_season_level_data;
     use jokers_of_neon_profile::models::{
         SeasonConfig, SeasonProgress, SeasonRewardClaim, m_SeasonConfig, m_SeasonProgress,
@@ -106,7 +109,6 @@ mod tests {
         let level_18 = get_season_level_data(SEASON_ID, 18);
         let level_24 = get_season_level_data(SEASON_ID, 24);
         let level_27 = get_season_level_data(SEASON_ID, 27);
-        let level_31 = get_season_level_data(SEASON_ID, 31);
 
         assert(*level_2.free_rewards.at(0) == STREAK_PROTECTOR_REWARD_ID, 'bad l2 free');
         assert(*level_5.premium_rewards.at(0) == STREAK_PROTECTOR_REWARD_ID, 'bad l5 premium');
@@ -115,7 +117,38 @@ mod tests {
         assert(*level_18.premium_rewards.at(0) == STREAK_PROTECTOR_REWARD_ID, 'bad l18 premium');
         assert(*level_24.premium_rewards.at(0) == STREAK_PROTECTOR_REWARD_ID, 'bad l24 premium');
         assert(*level_27.free_rewards.at(0) == STREAK_PROTECTOR_REWARD_ID, 'bad l27 free');
-        assert(*level_31.premium_rewards.at(0) == STREAK_PROTECTOR_REWARD_ID, 'bad l31 premium');
+    }
+
+    #[test]
+    fn season_config_expands_endgame_progression() {
+        let level_31 = get_season_level_data(SEASON_ID, 31);
+        let level_32 = get_season_level_data(SEASON_ID, 32);
+        let level_35 = get_season_level_data(SEASON_ID, 35);
+        let level_39 = get_season_level_data(SEASON_ID, 39);
+        let level_45 = get_season_level_data(SEASON_ID, 45);
+
+        assert(level_31.required_xp == 3000, 'bad l31 xp');
+        assert(*level_31.free_rewards.at(0) == LEGENDARY_SEASON_3_PACK_ID, 'bad l31 free');
+        assert(level_31.premium_rewards.len() == 0, 'bad l31 premium');
+
+        assert(level_32.required_xp == 3250, 'bad l32 xp');
+        assert(level_32.free_rewards.len() == 0, 'bad l32 free');
+        assert(*level_32.premium_rewards.at(0) == LEGENDARY_SEASON_3_PACK_ID, 'bad l32 premium');
+
+        assert(level_35.required_xp == 4000, 'bad l35 xp');
+        assert(*level_35.free_rewards.at(0) == EPIC_SEASON_3_PACK_ID, 'bad l35 free');
+        assert(level_35.premium_rewards.len() == 2, 'bad l35 premium len');
+        assert(*level_35.premium_rewards.at(0) == LEGENDARY_SEASON_3_PACK_ID, 'bad l35 premium');
+
+        assert(level_39.required_xp == 5000, 'bad l39 xp');
+        assert(*level_39.free_rewards.at(0) == LEGENDARY_SEASON_3_PACK_ID, 'bad l39 free');
+        assert(level_39.premium_rewards.len() == 2, 'bad l39 premium len');
+
+        assert(level_45.required_xp == 10000, 'bad l45 xp');
+        assert(level_45.free_rewards.len() == 2, 'bad l45 free len');
+        assert(level_45.premium_rewards.len() == 2, 'bad l45 premium len');
+        assert(*level_45.free_rewards.at(0) == LEGENDARY_SEASON_3_PACK_ID, 'bad l45 free');
+        assert(*level_45.premium_rewards.at(0) == LEGENDARY_SEASON_3_PACK_ID, 'bad l45 premium');
     }
 
     #[test]
