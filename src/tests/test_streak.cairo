@@ -326,14 +326,14 @@ mod tests {
 
     #[test]
     #[available_gas(100000000)]
-    fn streak_reward_grants_xp_tickets_and_protectors() {
+    fn streak_reward_grants_xp_and_protectors() {
         let (mut world, xp) = setup_world();
         let player = PLAYER_ONE();
         let season_id = 3;
         seed_profile(ref world, player);
         seed_active_season(ref world, player, season_id);
 
-        xp.claim_streak_reward(player, season_id, 50, 1, 1, 'streak', 'd7');
+        xp.claim_streak_reward(player, season_id, 50, 1, 'streak', 'd7');
 
         let player_profile = profile(ref world, player);
         let progress = season_progress(ref world, player, season_id);
@@ -343,11 +343,10 @@ mod tests {
         assert(player_profile.total_xp == 50, 'profile total xp');
         assert(player_profile.xp == 50, 'profile xp');
         assert(progress.season_xp == 50, 'season xp');
-        assert(progress.tournament_ticket == 1, 'ticket granted');
+        assert(progress.tournament_ticket == 0, 'ticket unchanged');
         assert(state.protectors_available == 1, 'protector granted');
         assert(grant.claimed, 'grant claimed');
         assert(grant.xp_amount == 50, 'grant xp');
-        assert(grant.ticket_quantity == 1, 'grant ticket');
         assert(grant.protectors_requested == 1, 'requested protector');
         assert(grant.protectors_granted == 1, 'granted protector');
     }
@@ -361,12 +360,12 @@ mod tests {
         seed_profile(ref world, player);
         seed_active_season(ref world, player, season_id);
 
-        xp.claim_streak_reward(player, season_id, 50, 1, 1, 'streak', 'd7');
-        xp.claim_streak_reward(player, season_id, 50, 1, 1, 'streak', 'd7');
+        xp.claim_streak_reward(player, season_id, 50, 1, 'streak', 'd7');
+        xp.claim_streak_reward(player, season_id, 50, 1, 'streak', 'd7');
 
         assert(profile(ref world, player).total_xp == 50, 'profile xp once');
         assert(season_progress(ref world, player, season_id).season_xp == 50, 'season xp once');
-        assert(season_progress(ref world, player, season_id).tournament_ticket == 1, 'ticket once');
+        assert(season_progress(ref world, player, season_id).tournament_ticket == 0, 'ticket unchanged');
         assert(streak_state(ref world, player).protectors_available == 1, 'protector once');
     }
 
@@ -380,7 +379,7 @@ mod tests {
         seed_active_season(ref world, player, season_id);
 
         xp.grant_streak_protectors(player, 2, 'admin', 'grant-max');
-        xp.claim_streak_reward(player, season_id, 0, 0, 1, 'streak', 'slot-full');
+        xp.claim_streak_reward(player, season_id, 0, 1, 'streak', 'slot-full');
 
         let state = streak_state(ref world, player);
         let grant = streak_reward_grant(ref world, player, 'streak', 'slot-full');

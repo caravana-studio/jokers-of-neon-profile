@@ -22,7 +22,6 @@ pub trait IXPSystem<T> {
         address: ContractAddress,
         season_id: u32,
         xp_amount: u32,
-        ticket_quantity: u32,
         protector_quantity: u16,
         source: felt252,
         source_id: felt252,
@@ -130,7 +129,6 @@ pub mod xp_system {
         source: felt252,
         source_id: felt252,
         xp_amount: u32,
-        ticket_quantity: u32,
         protectors_requested: u16,
         protectors_granted: u16,
     }
@@ -360,7 +358,6 @@ pub mod xp_system {
             address: ContractAddress,
             season_id: u32,
             xp_amount: u32,
-            ticket_quantity: u32,
             protector_quantity: u16,
             source: felt252,
             source_id: felt252,
@@ -380,12 +377,6 @@ pub mod xp_system {
             let season_config = store.get_season_config(season_id);
             if xp_amount > 0 {
                 self._apply_xp(ref store, address, season_id, season_config.is_active, xp_amount);
-            }
-
-            if ticket_quantity > 0 {
-                let mut season_progress = store.get_season_progress(address, season_id);
-                season_progress.tournament_ticket += ticket_quantity;
-                store.set_season_progress(@season_progress);
             }
 
             let mut protectors_granted: u16 = 0;
@@ -429,7 +420,6 @@ pub mod xp_system {
                         source_id,
                         season_id,
                         xp_amount,
-                        ticket_quantity,
                         protectors_requested: protector_quantity,
                         protectors_granted,
                         claimed: true,
@@ -444,7 +434,6 @@ pub mod xp_system {
                         source,
                         source_id,
                         xp_amount,
-                        ticket_quantity,
                         protectors_requested: protector_quantity,
                         protectors_granted,
                     },

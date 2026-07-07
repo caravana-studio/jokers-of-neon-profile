@@ -113,7 +113,6 @@ pub struct StreakRewardGrant {
     pub source_id: felt252,
     pub season_id: u32,
     pub xp_amount: u32,
-    pub ticket_quantity: u32,
     pub protectors_requested: u16,
     pub protectors_granted: u16,
     pub claimed: bool,
