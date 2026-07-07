@@ -315,10 +315,13 @@ pub mod xp_system {
                 return;
             }
 
-            let current_day = get_current_day();
-            self._materialize_streak_gap(ref store, address, current_day);
-
             let mut state = store.get_streak_state(address);
+            if state.has_started {
+                let current_day = get_current_day();
+                self._materialize_streak_gap(ref store, address, current_day);
+                state = store.get_streak_state(address);
+            }
+
             let current_available: u32 = state.protectors_available.into();
             let requested: u32 = quantity.into();
             let max_protectors: u32 = MAX_STREAK_PROTECTORS.into();
@@ -387,10 +390,13 @@ pub mod xp_system {
 
             let mut protectors_granted: u16 = 0;
             if protector_quantity > 0 {
-                let current_day = get_current_day();
-                self._materialize_streak_gap(ref store, address, current_day);
-
                 let mut state = store.get_streak_state(address);
+                if state.has_started {
+                    let current_day = get_current_day();
+                    self._materialize_streak_gap(ref store, address, current_day);
+                    state = store.get_streak_state(address);
+                }
+
                 let current_available: u32 = state.protectors_available.into();
                 let requested: u32 = protector_quantity.into();
                 let max_protectors: u32 = MAX_STREAK_PROTECTORS.into();
