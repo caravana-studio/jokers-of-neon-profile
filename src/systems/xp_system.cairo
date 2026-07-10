@@ -17,6 +17,15 @@ pub trait IXPSystem<T> {
     fn grant_streak_protectors(
         ref self: T, address: ContractAddress, quantity: u16, source: felt252, source_id: felt252,
     );
+    fn claim_streak_reward(
+        ref self: T,
+        address: ContractAddress,
+        season_id: u32,
+        xp_amount: u32,
+        protector_quantity: u16,
+        source: felt252,
+        source_id: felt252,
+    );
     fn add_level_completion_xp(ref self: T, address: ContractAddress, level: u32);
 
     // Configuration methods
@@ -44,7 +53,7 @@ pub mod xp_system {
     use crate::constants::season_configs::get_season_level_data;
     use crate::models::{
         MissionXPAward, MissionXPProgress, SeasonProgress, StreakDayCompletion,
-        StreakProtectorGrant, StreakStatus, XPMultiplier,
+        StreakProtectorGrant, StreakRewardGrant, StreakStatus, XPMultiplier,
     };
     use crate::store::{Store, StoreTrait};
     use crate::systems::permission_system::IPermissionSystemDispatcherTrait;
@@ -61,6 +70,7 @@ pub mod xp_system {
         MissionXPAddedV2: MissionXPAddedV2,
         DailyStreakUpdated: DailyStreakUpdated,
         StreakProtectorsGranted: StreakProtectorsGranted,
+        StreakRewardClaimed: StreakRewardClaimed,
         LevelXPAdded: LevelXPAdded,
     }
 
@@ -109,6 +119,18 @@ pub mod xp_system {
         source_id: felt252,
         quantity: u16,
         protectors_available: u16,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct StreakRewardClaimed {
+        #[key]
+        player: ContractAddress,
+        season_id: u32,
+        source: felt252,
+        source_id: felt252,
+        xp_amount: u32,
+        protectors_requested: u16,
+        protectors_granted: u16,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -291,10 +313,13 @@ pub mod xp_system {
                 return;
             }
 
-            let current_day = get_current_day();
-            self._materialize_streak_gap(ref store, address, current_day);
-
             let mut state = store.get_streak_state(address);
+            if state.has_started {
+                let current_day = get_current_day();
+                self._materialize_streak_gap(ref store, address, current_day);
+                state = store.get_streak_state(address);
+            }
+
             let current_available: u32 = state.protectors_available.into();
             let requested: u32 = quantity.into();
             let max_protectors: u32 = MAX_STREAK_PROTECTORS.into();
@@ -324,6 +349,93 @@ pub mod xp_system {
                         source_id,
                         quantity: applied_quantity,
                         protectors_available: state.protectors_available,
+                    },
+                );
+        }
+
+        fn claim_streak_reward(
+            ref self: ContractState,
+            address: ContractAddress,
+            season_id: u32,
+            xp_amount: u32,
+            protector_quantity: u16,
+            source: felt252,
+            source_id: felt252,
+        ) {
+            assert(source != 0, 'Invalid source');
+            assert(source_id != 0, 'Invalid source id');
+
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
+
+            let existing_grant = store.get_streak_reward_grant(address, source, source_id);
+            if existing_grant.claimed {
+                return;
+            }
+
+            let season_config = store.get_season_config(season_id);
+            if xp_amount > 0 {
+                self._apply_xp(ref store, address, season_id, season_config.is_active, xp_amount);
+            }
+
+            let mut protectors_granted: u16 = 0;
+            if protector_quantity > 0 {
+                let mut state = store.get_streak_state(address);
+                if state.has_started {
+                    let current_day = get_current_day();
+                    self._materialize_streak_gap(ref store, address, current_day);
+                    state = store.get_streak_state(address);
+                }
+
+                let current_available: u32 = state.protectors_available.into();
+                let requested: u32 = protector_quantity.into();
+                let max_protectors: u32 = MAX_STREAK_PROTECTORS.into();
+                let available_slots = if current_available >= max_protectors {
+                    0
+                } else {
+                    max_protectors - current_available
+                };
+                let applied_quantity = if requested > available_slots {
+                    available_slots
+                } else {
+                    requested
+                };
+
+                if applied_quantity > 0 {
+                    state.player = address;
+                    state.protectors_available = (current_available + applied_quantity)
+                        .try_into()
+                        .unwrap();
+                    store.set_streak_state(state);
+                    protectors_granted = applied_quantity.try_into().unwrap();
+                }
+            }
+
+            store
+                .set_streak_reward_grant(
+                    StreakRewardGrant {
+                        player: address,
+                        source,
+                        source_id,
+                        season_id,
+                        xp_amount,
+                        protectors_requested: protector_quantity,
+                        protectors_granted,
+                        claimed: true,
+                    },
+                );
+
+            self
+                .emit(
+                    StreakRewardClaimed {
+                        player: address,
+                        season_id,
+                        source,
+                        source_id,
+                        xp_amount,
+                        protectors_requested: protector_quantity,
+                        protectors_granted,
                     },
                 );
         }
