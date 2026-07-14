@@ -74,7 +74,7 @@
     },
     {
       "address": "0x6968a95fcffb72eac37e0df879cfa0ccae866ad3ad28c8bdd93ecc727b839da",
-      "class_hash": "0x2a07eabe0399f505858b78953ed40558fbaa2283f06667e937a5faaf71b2455",
+      "class_hash": "0x3a6e7dd7adff460d16e44e6577e8274d4583db845d93c28052f698eb14181e3",
       "init_calldata": [],
       "tag": "jokers_of_neon_profile20-progression_system",
       "selector": "0x2bb2ecbf50f11c5c754d8b635d1cd9ff82659df1cfcab5a247d6e0149cd942d",
@@ -85,7 +85,7 @@
     },
     {
       "address": "0x315572ea5bc40c02a9126e01c8d5be2a033125bc3fb154c73d8220af132f1dd",
-      "class_hash": "0x2b2144660bf5533dae40588d2353ec3af94b6d22baef6068de4823a1c05139a",
+      "class_hash": "0x742c674c9c2b6d0969c7fdbf69fb08c5808a0ed0f301a957f1007d8b4115037",
       "init_calldata": [],
       "tag": "jokers_of_neon_profile20-season_system",
       "selector": "0x377a169d49baeac6c54af168f78c0bb67b94ad4b5abbbf01956277a447e5d8e",
@@ -106,7 +106,7 @@
     },
     {
       "address": "0x6b734db9fd1244f26622204a89dc6e212620f1413ec8cbc46f2c0bb53fc7deb",
-      "class_hash": "0x278d44d8f621cd9e23746a09b75ca9849cba55c6a9722dd1c9c77e0f23040d6",
+      "class_hash": "0x2dbbdfb45c35ebb36241bac6eb4ba54ce71ad49a3a152b5977e00fe64eddc5f",
       "init_calldata": [],
       "tag": "jokers_of_neon_profile20-xp_system",
       "selector": "0x1ff5053d3ee86db378c5828c4e5be7d36ec215e471ddfe9d2e1e29f15e765e0",
@@ -114,6 +114,7 @@
         "add_daily_mission_xp",
         "add_mission_xp",
         "grant_streak_protectors",
+        "claim_streak_reward",
         "add_level_completion_xp",
         "setup_default_profile_config",
         "set_xp_multiplier",
@@ -960,6 +961,53 @@
       "class_hash": "0x55d768f4f42ba1da865f1c578fda48f585cb3ec6cf9b2e76f5efa9ac08926b4",
       "tag": "jokers_of_neon_profile20-StreakProtectorGrant",
       "selector": "0x38a3915fba920cdf98d241ee3438976d67425337fd5ad60f6b697b3282392a0"
+    },
+    {
+      "members": [
+        {
+          "name": "player",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "key": true
+        },
+        {
+          "name": "source",
+          "type": "core::felt252",
+          "key": true
+        },
+        {
+          "name": "source_id",
+          "type": "core::felt252",
+          "key": true
+        },
+        {
+          "name": "season_id",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "xp_amount",
+          "type": "core::integer::u32",
+          "key": false
+        },
+        {
+          "name": "protectors_requested",
+          "type": "core::integer::u16",
+          "key": false
+        },
+        {
+          "name": "protectors_granted",
+          "type": "core::integer::u16",
+          "key": false
+        },
+        {
+          "name": "claimed",
+          "type": "core::bool",
+          "key": false
+        }
+      ],
+      "class_hash": "0x59feeb20b8b1353251a925aacdc47021fe8791884668b1cc1b5419f5af11a81",
+      "tag": "jokers_of_neon_profile20-StreakRewardGrant",
+      "selector": "0x701cced69cea61cde7316fdfe27a4e9acd5a75cf102c327b3abac4e80863d6a"
     },
     {
       "members": [
@@ -4090,6 +4138,70 @@
     },
     {
       "type": "struct",
+      "name": "jokers_of_neon_profile::models::StreakRewardGrant",
+      "members": [
+        {
+          "name": "player",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "source",
+          "type": "core::felt252"
+        },
+        {
+          "name": "source_id",
+          "type": "core::felt252"
+        },
+        {
+          "name": "season_id",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "xp_amount",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "protectors_requested",
+          "type": "core::integer::u16"
+        },
+        {
+          "name": "protectors_granted",
+          "type": "core::integer::u16"
+        },
+        {
+          "name": "claimed",
+          "type": "core::bool"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "jokers_of_neon_profile::models::StreakRewardGrantValue",
+      "members": [
+        {
+          "name": "season_id",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "xp_amount",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "protectors_requested",
+          "type": "core::integer::u16"
+        },
+        {
+          "name": "protectors_granted",
+          "type": "core::integer::u16"
+        },
+        {
+          "name": "claimed",
+          "type": "core::bool"
+        }
+      ]
+    },
+    {
+      "type": "struct",
       "name": "jokers_of_neon_profile::models::StreakState",
       "members": [
         {
@@ -4303,6 +4415,12 @@
     {
       "type": "event",
       "name": "jokers_of_neon_profile::models::m_StreakProtectorGrant::Event",
+      "kind": "enum",
+      "variants": []
+    },
+    {
+      "type": "event",
+      "name": "jokers_of_neon_profile::models::m_StreakRewardGrant::Event",
       "kind": "enum",
       "variants": []
     },
@@ -5349,6 +5467,38 @@
         },
         {
           "type": "function",
+          "name": "claim_streak_reward",
+          "inputs": [
+            {
+              "name": "address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "season_id",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "xp_amount",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "protector_quantity",
+              "type": "core::integer::u16"
+            },
+            {
+              "name": "source",
+              "type": "core::felt252"
+            },
+            {
+              "name": "source_id",
+              "type": "core::felt252"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
           "name": "add_level_completion_xp",
           "inputs": [
             {
@@ -5502,6 +5652,11 @@
           "kind": "nested"
         },
         {
+          "name": "StreakRewardClaimed",
+          "type": "jokers_of_neon_profile::systems::xp_system::xp_system::StreakRewardClaimed",
+          "kind": "nested"
+        },
+        {
           "name": "LevelXPAdded",
           "type": "jokers_of_neon_profile::systems::xp_system::xp_system::LevelXPAdded",
           "kind": "nested"
@@ -5651,6 +5806,48 @@
         },
         {
           "name": "protectors_available",
+          "type": "core::integer::u16",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "jokers_of_neon_profile::systems::xp_system::xp_system::StreakRewardClaimed",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "player",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "key"
+        },
+        {
+          "name": "season_id",
+          "type": "core::integer::u32",
+          "kind": "data"
+        },
+        {
+          "name": "source",
+          "type": "core::felt252",
+          "kind": "data"
+        },
+        {
+          "name": "source_id",
+          "type": "core::felt252",
+          "kind": "data"
+        },
+        {
+          "name": "xp_amount",
+          "type": "core::integer::u32",
+          "kind": "data"
+        },
+        {
+          "name": "protectors_requested",
+          "type": "core::integer::u16",
+          "kind": "data"
+        },
+        {
+          "name": "protectors_granted",
           "type": "core::integer::u16",
           "kind": "data"
         }
