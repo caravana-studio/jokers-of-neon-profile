@@ -39,6 +39,7 @@ pub trait IXPSystem<T> {
     fn test_xp(
         ref self: T, address: ContractAddress, season_id: u32, season_xp: u256, profile_xp: u256,
     );
+    fn reset_xp(ref self: T, address: ContractAddress, season_id: u32);
 }
 
 #[dojo::contract]
@@ -584,6 +585,23 @@ pub mod xp_system {
             if season_xp > 0 {
                 self._add_season_xp(ref store, address, season_id, season_xp);
             }
+        }
+
+        fn reset_xp(ref self: ContractState, address: ContractAddress, season_id: u32) {
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
+
+            let mut profile = store.get_profile(address);
+            profile.total_xp = 0;
+            profile.xp = 0;
+            profile.level = 0;
+            store.set_profile(@profile);
+
+            let mut season_progress = store.get_season_progress(address, season_id);
+            season_progress.season_xp = 0;
+            season_progress.level = 0;
+            store.set_season_progress(@season_progress);
         }
     }
 

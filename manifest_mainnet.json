@@ -106,7 +106,7 @@
     },
     {
       "address": "0x6b734db9fd1244f26622204a89dc6e212620f1413ec8cbc46f2c0bb53fc7deb",
-      "class_hash": "0x2dbbdfb45c35ebb36241bac6eb4ba54ce71ad49a3a152b5977e00fe64eddc5f",
+      "class_hash": "0x834a7c904ff6738f831344d22273f2a9b77e2820b8d3b3008739263619ea83",
       "init_calldata": [],
       "tag": "jokers_of_neon_profile20-xp_system",
       "selector": "0x1ff5053d3ee86db378c5828c4e5be7d36ec215e471ddfe9d2e1e29f15e765e0",
@@ -119,6 +119,7 @@
         "setup_default_profile_config",
         "set_xp_multiplier",
         "test_xp",
+        "reset_xp",
         "upgrade"
       ]
     }
@@ -5562,6 +5563,22 @@
             {
               "name": "profile_xp",
               "type": "core::integer::u256"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "reset_xp",
+          "inputs": [
+            {
+              "name": "address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "season_id",
+              "type": "core::integer::u32"
             }
           ],
           "outputs": [],
