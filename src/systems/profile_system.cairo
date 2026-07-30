@@ -7,6 +7,7 @@ pub trait IJokersProfile<T> {
     fn create_profile(ref self: T, address: ContractAddress, username: ByteArray, avatar_id: u16);
     fn add_stats(ref self: T, player_stats: PlayerStats);
     fn update_avatar(ref self: T, player_address: ContractAddress, avatar_id: u16);
+    fn update_username(ref self: T, player_address: ContractAddress, username: ByteArray);
     fn get_profile(self: @T, player_address: ContractAddress) -> Profile;
     fn get_player_stats(self: @T, player_address: ContractAddress) -> PlayerStats;
     fn get_profile_level_config_by_level(self: @T, level: u32) -> ProfileLevelConfig;
@@ -83,6 +84,18 @@ pub mod profile_system {
 
             let mut profile = store.get_profile(player_address);
             profile.avatar_id = avatar_id;
+            store.set_profile(@profile);
+        }
+
+        fn update_username(
+            ref self: ContractState, player_address: ContractAddress, username: ByteArray,
+        ) {
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
+
+            let mut profile = store.get_profile(player_address);
+            profile.username = username;
             store.set_profile(@profile);
         }
 
