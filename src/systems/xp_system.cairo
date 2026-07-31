@@ -699,7 +699,8 @@ pub mod xp_system {
             has_started: bool,
             as_of_day: u64,
         ) -> (u16, u64, u16, u64, u16, bool, bool) {
-            let days_missed = if has_started && as_of_day > last_completed_day {
+            let has_active_streak = has_started && current_streak > 0;
+            let days_missed = if has_active_streak && as_of_day > last_completed_day {
                 as_of_day - last_completed_day - 1
             } else {
                 0
@@ -711,14 +712,14 @@ pub mod xp_system {
                 available
             };
             let protectors_used: u16 = used_u64.try_into().unwrap();
-            let is_broken = has_started && days_missed > available;
-            let is_protected = has_started && days_missed > 0 && days_missed <= available;
+            let is_broken = has_active_streak && days_missed > available;
+            let is_protected = has_active_streak && days_missed > 0 && days_missed <= available;
             let effective_streak = if is_broken {
                 0
             } else {
                 current_streak
             };
-            let effective_last_completed_day = if has_started && days_missed > 0 {
+            let effective_last_completed_day = if has_active_streak && days_missed > 0 {
                 as_of_day - 1
             } else {
                 last_completed_day

@@ -292,6 +292,29 @@ mod tests {
 
     #[test]
     #[available_gas(100000000)]
+    fn zero_streak_does_not_consume_a_protector_before_restarting() {
+        let (mut world, xp) = setup_world();
+        let player = PLAYER_ONE();
+        seed_profile(ref world, player);
+
+        set_current_day(1);
+        xp.add_mission_xp(player, MISSION_PERIOD_DAILY, 1, 'm1', 'tpl', 1, 10);
+
+        set_current_day(4);
+        xp.grant_streak_protectors(player, 1, 'admin', 'grant-after-break');
+        assert(profile(ref world, player).daily_streak == 0, 'streak already broken');
+
+        set_current_day(5);
+        xp.add_mission_xp(player, MISSION_PERIOD_DAILY, 5, 'm2', 'tpl', 1, 10);
+
+        let state = streak_state(ref world, player);
+        assert(profile(ref world, player).daily_streak == 1, 'streak restarted');
+        assert(state.protectors_available == 1, 'protector preserved');
+        assert(state.protectors_used_total == 0, 'protector not consumed');
+    }
+
+    #[test]
+    #[available_gas(100000000)]
     fn protector_grant_materializes_stale_gap_before_slot_check() {
         let (mut world, xp) = setup_world();
         let player = PLAYER_ONE();
