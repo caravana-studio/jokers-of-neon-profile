@@ -46,9 +46,10 @@ streaks already reset by the incident.
 - The configured start and end days are inclusive.
 - The incident starts on 2026-09-18 at the daily boundary (`start_day =
   20714`), as confirmed by the team.
-- `end_day` is the last daily period affected when maintenance is disabled. For
-  the planned reopening on 2026-09-29, the configured inclusive end is period
-  `20724` (2026-09-28 at the 03:00 ART boundary).
+- `end_day` is the last daily period affected when maintenance is disabled. The
+  configured inclusive end is period `20724` (2026-09-28 at the 03:00 ART
+  boundary). This covers a reopening on Monday 2026-09-28 and lets players
+  resume their streak in period `20725` beginning Tuesday 2026-09-29 at 03:00 ART.
 - The first implementation supports one retained maintenance range. It must
   remain configured until affected dormant players have had their state repaired
   or materialized; replacing it is an explicit operational decision.
@@ -90,8 +91,8 @@ streaks already reset by the incident.
 
 1. [x] Keep maintenance enabled while deploying the profile migration.
 2. [x] Configure incident `maintenance-2026-09-18` with `start_day = 20714` and
-   inclusive `end_day = 20724` for the planned 2026-09-29 reopening.
-3. [ ] Configure `STREAK_MAINTENANCE_START_DAY` and
+   inclusive `end_day = 20724` for the planned Monday 2026-09-28 reopening.
+3. [x] Configure `STREAK_MAINTENANCE_START_DAY` and
    `STREAK_MAINTENANCE_END_DAY` with the same values in the API and Torii worker,
    then deploy both services. No Supabase schema migration is required.
 4. [x] Reconstruct every affected player's uninterrupted value from Starknet event
@@ -101,7 +102,7 @@ streaks already reset by the incident.
    restored value, last completed day, and evidence block for review.
 6. [x] Execute one `restore_streak` per affected player with the same incident ID.
    The receipt makes retries safe and the repair never reduces newer progress.
-7. [ ] Refresh repaired players from chain into `player_streaks`, then verify the
+7. [x] Refresh repaired players from chain into `player_streaks`, then verify the
    cache matches the on-chain status.
 8. [ ] Verify configuration, repair receipts, emitted events, and a sample of
    post-maintenance streak continuations before reopening the app.
@@ -166,5 +167,17 @@ repair candidates:
   `0x04c0ba4567e4d43a7874dc3fc5cc0f5a212d579571b689c101e6eba65ae33f02`.
 - Post-transaction reads confirmed the restored streak for every repaired
   player with `days_missed = 0` and `is_broken = false`.
+- On 2026-09-28, the API and unified worker were deployed from `develop` with
+  `STREAK_MAINTENANCE_START_DAY=20714` and
+  `STREAK_MAINTENANCE_END_DAY=20724`. The API's live refresh returned the
+  expected chain streak for all 9 repaired players.
+- Supabase `player_streaks` was refreshed for all 9 players; cached reads
+  matched the chain with `days_missed = 0`, `is_broken = false`, and confirmed
+  sync status. Their stable `run_start_day` values were restored from the
+  completion history.
+- Six existing reward receipts were re-associated with their restored streak
+  runs, earned milestone receipts were reconciled, and ten milestone period IDs
+  were aligned with the actual completion days. A second rewards read left
+  receipt counts unchanged and no duplicate claim scope was found.
 - The owner signer was supplied through the ignored local `.env`; no credential
   was written to tracked configuration.
