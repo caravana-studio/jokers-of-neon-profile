@@ -14,6 +14,17 @@ pub trait IXPSystem<T> {
         xp: u32,
     );
     fn get_streak_status(self: @T, address: ContractAddress) -> crate::models::StreakStatus;
+    fn get_streak_maintenance(self: @T) -> crate::models::StreakMaintenanceConfig;
+    fn configure_streak_maintenance(
+        ref self: T, incident_id: felt252, start_day: u64, end_day: u64, enabled: bool,
+    );
+    fn restore_streak(
+        ref self: T,
+        address: ContractAddress,
+        restored_streak: u16,
+        restored_last_completed_day: u64,
+        incident_id: felt252,
+    );
     fn grant_streak_protectors(
         ref self: T, address: ContractAddress, quantity: u16, source: felt252, source_id: felt252,
     );
@@ -49,12 +60,13 @@ pub mod xp_system {
     use starknet::{ContractAddress, get_caller_address, get_contract_address};
     use crate::constants::constants::{
         CURRENT_SEASON_ID, DEFAULT_NS_BYTE, MAX_STREAK_PROTECTORS, MISSION_PERIOD_DAILY,
-        MISSION_PERIOD_WEEKLY,
+        MISSION_PERIOD_WEEKLY, STREAK_MAINTENANCE_CONFIG_KEY,
     };
     use crate::constants::season_configs::get_season_level_data;
     use crate::models::{
         MissionXPAward, MissionXPProgress, SeasonProgress, StreakDayCompletion,
-        StreakProtectorGrant, StreakRewardGrant, StreakStatus, XPMultiplier,
+        StreakMaintenanceConfig, StreakProtectorGrant, StreakRepair, StreakRewardGrant,
+        StreakStatus, XPMultiplier,
     };
     use crate::store::{Store, StoreTrait};
     use crate::systems::permission_system::IPermissionSystemDispatcherTrait;
@@ -72,6 +84,8 @@ pub mod xp_system {
         DailyStreakUpdated: DailyStreakUpdated,
         StreakProtectorsGranted: StreakProtectorsGranted,
         StreakRewardClaimed: StreakRewardClaimed,
+        StreakMaintenanceConfigured: StreakMaintenanceConfigured,
+        StreakRestored: StreakRestored,
         LevelXPAdded: LevelXPAdded,
     }
 
@@ -132,6 +146,27 @@ pub mod xp_system {
         xp_amount: u32,
         protectors_requested: u16,
         protectors_granted: u16,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct StreakMaintenanceConfigured {
+        #[key]
+        incident_id: felt252,
+        start_day: u64,
+        end_day: u64,
+        enabled: bool,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct StreakRestored {
+        #[key]
+        player: ContractAddress,
+        #[key]
+        incident_id: felt252,
+        previous_streak: u16,
+        restored_streak: u16,
+        previous_last_completed_day: u64,
+        restored_last_completed_day: u64,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -294,6 +329,111 @@ pub mod xp_system {
             self._streak_status(ref store, address)
         }
 
+        fn get_streak_maintenance(self: @ContractState) -> StreakMaintenanceConfig {
+            let mut store = self.create_store();
+            store.get_streak_maintenance_config(STREAK_MAINTENANCE_CONFIG_KEY)
+        }
+
+        fn configure_streak_maintenance(
+            ref self: ContractState,
+            incident_id: felt252,
+            start_day: u64,
+            end_day: u64,
+            enabled: bool,
+        ) {
+            assert(incident_id != 0, 'Invalid incident id');
+            assert(start_day <= end_day, 'Invalid maintenance range');
+
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
+
+            store
+                .set_streak_maintenance_config(
+                    StreakMaintenanceConfig {
+                        key: STREAK_MAINTENANCE_CONFIG_KEY,
+                        incident_id,
+                        start_day,
+                        end_day,
+                        enabled,
+                    },
+                );
+
+            self.emit(StreakMaintenanceConfigured { incident_id, start_day, end_day, enabled });
+        }
+
+        fn restore_streak(
+            ref self: ContractState,
+            address: ContractAddress,
+            restored_streak: u16,
+            restored_last_completed_day: u64,
+            incident_id: felt252,
+        ) {
+            assert(restored_streak > 0, 'Invalid streak');
+            assert(incident_id != 0, 'Invalid incident id');
+
+            let mut store = self.create_store();
+            SystemsTrait::permission(store.world)
+                .assert_has_permission(get_contract_address(), get_caller_address());
+
+            let existing_repair = store.get_streak_repair(address, incident_id);
+            if existing_repair.applied {
+                return;
+            }
+
+            let mut profile = store.get_profile(address);
+            let mut state = store.get_streak_state(address);
+            assert(state.has_started, 'Streak not started');
+            let previous_streak = profile.daily_streak;
+            let previous_last_completed_day = state.last_completed_day;
+            let applied_streak = if restored_streak > previous_streak {
+                restored_streak
+            } else {
+                previous_streak
+            };
+            let applied_last_completed_day =
+                if restored_last_completed_day > previous_last_completed_day {
+                restored_last_completed_day
+            } else {
+                previous_last_completed_day
+            };
+
+            profile.daily_streak = applied_streak;
+            state.player = address;
+            state.last_completed_day = applied_last_completed_day;
+            state.has_started = true;
+            if applied_streak > state.longest_streak {
+                state.longest_streak = applied_streak;
+            }
+
+            store.set_profile(@profile);
+            store.set_streak_state(state);
+            store
+                .set_streak_repair(
+                    StreakRepair {
+                        player: address,
+                        incident_id,
+                        previous_streak,
+                        restored_streak: applied_streak,
+                        previous_last_completed_day,
+                        restored_last_completed_day: applied_last_completed_day,
+                        applied: true,
+                    },
+                );
+
+            self
+                .emit(
+                    StreakRestored {
+                        player: address,
+                        incident_id,
+                        previous_streak,
+                        restored_streak: applied_streak,
+                        previous_last_completed_day,
+                        restored_last_completed_day: applied_last_completed_day,
+                    },
+                );
+        }
+
         fn grant_streak_protectors(
             ref self: ContractState,
             address: ContractAddress,
@@ -405,7 +545,8 @@ pub mod xp_system {
 
                 if applied_quantity > 0 {
                     state.player = address;
-                    state.protectors_available = (current_available + applied_quantity)
+                    state
+                        .protectors_available = (current_available + applied_quantity)
                         .try_into()
                         .unwrap();
                     store.set_streak_state(state);
@@ -646,6 +787,7 @@ pub mod xp_system {
         ) -> StreakStatus {
             let profile = store.get_profile(address);
             let state = store.get_streak_state(address);
+            let maintenance = store.get_streak_maintenance_config(STREAK_MAINTENANCE_CONFIG_KEY);
             let current_day = get_current_day();
             let (
                 current_streak,
@@ -663,6 +805,7 @@ pub mod xp_system {
                     state.protectors_available,
                     state.has_started,
                     current_day,
+                    maintenance,
                 );
             let longest_streak = if state.longest_streak > current_streak {
                 state.longest_streak
@@ -698,13 +841,20 @@ pub mod xp_system {
             protectors_available: u16,
             has_started: bool,
             as_of_day: u64,
+            maintenance: StreakMaintenanceConfig,
         ) -> (u16, u64, u16, u64, u16, bool, bool) {
             let has_active_streak = has_started && current_streak > 0;
-            let days_missed = if has_active_streak && as_of_day > last_completed_day {
+            let raw_days_missed = if has_active_streak && as_of_day > last_completed_day {
                 as_of_day - last_completed_day - 1
             } else {
                 0
             };
+            let maintenance_days = if has_active_streak {
+                self._maintenance_days_in_gap(last_completed_day, as_of_day, maintenance)
+            } else {
+                0
+            };
+            let days_missed = raw_days_missed - maintenance_days;
             let available: u64 = protectors_available.into();
             let used_u64 = if days_missed < available {
                 days_missed
@@ -737,6 +887,35 @@ pub mod xp_system {
             )
         }
 
+        fn _maintenance_days_in_gap(
+            self: @ContractState,
+            last_completed_day: u64,
+            as_of_day: u64,
+            maintenance: StreakMaintenanceConfig,
+        ) -> u64 {
+            if !maintenance.enabled || as_of_day <= last_completed_day + 1 {
+                return 0;
+            }
+
+            let first_missed_day = last_completed_day + 1;
+            let last_missed_day = as_of_day - 1;
+            if maintenance.end_day < first_missed_day || maintenance.start_day > last_missed_day {
+                return 0;
+            }
+
+            let overlap_start = if maintenance.start_day > first_missed_day {
+                maintenance.start_day
+            } else {
+                first_missed_day
+            };
+            let overlap_end = if maintenance.end_day < last_missed_day {
+                maintenance.end_day
+            } else {
+                last_missed_day
+            };
+            overlap_end - overlap_start + 1
+        }
+
         fn _materialize_streak_gap(
             ref self: ContractState, ref store: Store, address: ContractAddress, as_of_day: u64,
         ) -> (u16, bool) {
@@ -746,6 +925,7 @@ pub mod xp_system {
             }
 
             let mut profile = store.get_profile(address);
+            let maintenance = store.get_streak_maintenance_config(STREAK_MAINTENANCE_CONFIG_KEY);
             let (
                 current_streak,
                 last_completed_day,
@@ -762,6 +942,7 @@ pub mod xp_system {
                     state.protectors_available,
                     state.has_started,
                     as_of_day,
+                    maintenance,
                 );
 
             if days_missed == 0 {
