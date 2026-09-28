@@ -107,13 +107,15 @@
     },
     {
       "address": "0x6b734db9fd1244f26622204a89dc6e212620f1413ec8cbc46f2c0bb53fc7deb",
-      "class_hash": "0x834a7c904ff6738f831344d22273f2a9b77e2820b8d3b3008739263619ea83",
+      "class_hash": "0x2f3e469f6067722b20490bf5c263dcfa1f5e873e6b9977876b0b763c907ca38",
       "init_calldata": [],
       "tag": "jokers_of_neon_profile20-xp_system",
       "selector": "0x1ff5053d3ee86db378c5828c4e5be7d36ec215e471ddfe9d2e1e29f15e765e0",
       "systems": [
         "add_daily_mission_xp",
         "add_mission_xp",
+        "configure_streak_maintenance",
+        "restore_streak",
         "grant_streak_protectors",
         "claim_streak_reward",
         "add_level_completion_xp",
@@ -935,6 +937,38 @@
     {
       "members": [
         {
+          "name": "key",
+          "type": "core::felt252",
+          "key": true
+        },
+        {
+          "name": "incident_id",
+          "type": "core::felt252",
+          "key": false
+        },
+        {
+          "name": "start_day",
+          "type": "core::integer::u64",
+          "key": false
+        },
+        {
+          "name": "end_day",
+          "type": "core::integer::u64",
+          "key": false
+        },
+        {
+          "name": "enabled",
+          "type": "core::bool",
+          "key": false
+        }
+      ],
+      "class_hash": "0x253c696edc67035f5309dbd57a51e3004dc23ea2e500931a5bd971dbd3b7300",
+      "tag": "jokers_of_neon_profile20-StreakMaintenanceConfig",
+      "selector": "0x7bd7e78e2b0caffcbe11e2bd5a03b9fe29cc9fb058071388b204cbeea9f3fe"
+    },
+    {
+      "members": [
+        {
           "name": "player",
           "type": "core::starknet::contract_address::ContractAddress",
           "key": true
@@ -963,6 +997,48 @@
       "class_hash": "0x55d768f4f42ba1da865f1c578fda48f585cb3ec6cf9b2e76f5efa9ac08926b4",
       "tag": "jokers_of_neon_profile20-StreakProtectorGrant",
       "selector": "0x38a3915fba920cdf98d241ee3438976d67425337fd5ad60f6b697b3282392a0"
+    },
+    {
+      "members": [
+        {
+          "name": "player",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "key": true
+        },
+        {
+          "name": "incident_id",
+          "type": "core::felt252",
+          "key": true
+        },
+        {
+          "name": "previous_streak",
+          "type": "core::integer::u16",
+          "key": false
+        },
+        {
+          "name": "restored_streak",
+          "type": "core::integer::u16",
+          "key": false
+        },
+        {
+          "name": "previous_last_completed_day",
+          "type": "core::integer::u64",
+          "key": false
+        },
+        {
+          "name": "restored_last_completed_day",
+          "type": "core::integer::u64",
+          "key": false
+        },
+        {
+          "name": "applied",
+          "type": "core::bool",
+          "key": false
+        }
+      ],
+      "class_hash": "0x2bdf317f5177e625c1d4f1c64b1bd9173439a56e78e271a1f4e337750b0fab",
+      "tag": "jokers_of_neon_profile20-StreakRepair",
+      "selector": "0xa6959290317bc14adb04eac3bb0d915901de71f19ca7b29d8f535c6782108a"
     },
     {
       "members": [
@@ -4100,6 +4176,54 @@
     },
     {
       "type": "struct",
+      "name": "jokers_of_neon_profile::models::StreakMaintenanceConfig",
+      "members": [
+        {
+          "name": "key",
+          "type": "core::felt252"
+        },
+        {
+          "name": "incident_id",
+          "type": "core::felt252"
+        },
+        {
+          "name": "start_day",
+          "type": "core::integer::u64"
+        },
+        {
+          "name": "end_day",
+          "type": "core::integer::u64"
+        },
+        {
+          "name": "enabled",
+          "type": "core::bool"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "jokers_of_neon_profile::models::StreakMaintenanceConfigValue",
+      "members": [
+        {
+          "name": "incident_id",
+          "type": "core::felt252"
+        },
+        {
+          "name": "start_day",
+          "type": "core::integer::u64"
+        },
+        {
+          "name": "end_day",
+          "type": "core::integer::u64"
+        },
+        {
+          "name": "enabled",
+          "type": "core::bool"
+        }
+      ]
+    },
+    {
+      "type": "struct",
       "name": "jokers_of_neon_profile::models::StreakProtectorGrant",
       "members": [
         {
@@ -4134,6 +4258,66 @@
         },
         {
           "name": "claimed",
+          "type": "core::bool"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "jokers_of_neon_profile::models::StreakRepair",
+      "members": [
+        {
+          "name": "player",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "incident_id",
+          "type": "core::felt252"
+        },
+        {
+          "name": "previous_streak",
+          "type": "core::integer::u16"
+        },
+        {
+          "name": "restored_streak",
+          "type": "core::integer::u16"
+        },
+        {
+          "name": "previous_last_completed_day",
+          "type": "core::integer::u64"
+        },
+        {
+          "name": "restored_last_completed_day",
+          "type": "core::integer::u64"
+        },
+        {
+          "name": "applied",
+          "type": "core::bool"
+        }
+      ]
+    },
+    {
+      "type": "struct",
+      "name": "jokers_of_neon_profile::models::StreakRepairValue",
+      "members": [
+        {
+          "name": "previous_streak",
+          "type": "core::integer::u16"
+        },
+        {
+          "name": "restored_streak",
+          "type": "core::integer::u16"
+        },
+        {
+          "name": "previous_last_completed_day",
+          "type": "core::integer::u64"
+        },
+        {
+          "name": "restored_last_completed_day",
+          "type": "core::integer::u64"
+        },
+        {
+          "name": "applied",
           "type": "core::bool"
         }
       ]
@@ -4416,7 +4600,19 @@
     },
     {
       "type": "event",
+      "name": "jokers_of_neon_profile::models::m_StreakMaintenanceConfig::Event",
+      "kind": "enum",
+      "variants": []
+    },
+    {
+      "type": "event",
       "name": "jokers_of_neon_profile::models::m_StreakProtectorGrant::Event",
+      "kind": "enum",
+      "variants": []
+    },
+    {
+      "type": "event",
+      "name": "jokers_of_neon_profile::models::m_StreakRepair::Event",
       "kind": "enum",
       "variants": []
     },
@@ -5461,6 +5657,65 @@
         },
         {
           "type": "function",
+          "name": "get_streak_maintenance",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "jokers_of_neon_profile::models::StreakMaintenanceConfig"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "configure_streak_maintenance",
+          "inputs": [
+            {
+              "name": "incident_id",
+              "type": "core::felt252"
+            },
+            {
+              "name": "start_day",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "end_day",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "enabled",
+              "type": "core::bool"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "restore_streak",
+          "inputs": [
+            {
+              "name": "address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "restored_streak",
+              "type": "core::integer::u16"
+            },
+            {
+              "name": "restored_last_completed_day",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "incident_id",
+              "type": "core::felt252"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
           "name": "grant_streak_protectors",
           "inputs": [
             {
@@ -5691,6 +5946,16 @@
           "kind": "nested"
         },
         {
+          "name": "StreakMaintenanceConfigured",
+          "type": "jokers_of_neon_profile::systems::xp_system::xp_system::StreakMaintenanceConfigured",
+          "kind": "nested"
+        },
+        {
+          "name": "StreakRestored",
+          "type": "jokers_of_neon_profile::systems::xp_system::xp_system::StreakRestored",
+          "kind": "nested"
+        },
+        {
           "name": "LevelXPAdded",
           "type": "jokers_of_neon_profile::systems::xp_system::xp_system::LevelXPAdded",
           "kind": "nested"
@@ -5815,6 +6080,33 @@
     },
     {
       "type": "event",
+      "name": "jokers_of_neon_profile::systems::xp_system::xp_system::StreakMaintenanceConfigured",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "incident_id",
+          "type": "core::felt252",
+          "kind": "key"
+        },
+        {
+          "name": "start_day",
+          "type": "core::integer::u64",
+          "kind": "data"
+        },
+        {
+          "name": "end_day",
+          "type": "core::integer::u64",
+          "kind": "data"
+        },
+        {
+          "name": "enabled",
+          "type": "core::bool",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
       "name": "jokers_of_neon_profile::systems::xp_system::xp_system::StreakProtectorsGranted",
       "kind": "struct",
       "members": [
@@ -5841,6 +6133,43 @@
         {
           "name": "protectors_available",
           "type": "core::integer::u16",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "jokers_of_neon_profile::systems::xp_system::xp_system::StreakRestored",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "player",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "key"
+        },
+        {
+          "name": "incident_id",
+          "type": "core::felt252",
+          "kind": "key"
+        },
+        {
+          "name": "previous_streak",
+          "type": "core::integer::u16",
+          "kind": "data"
+        },
+        {
+          "name": "restored_streak",
+          "type": "core::integer::u16",
+          "kind": "data"
+        },
+        {
+          "name": "previous_last_completed_day",
+          "type": "core::integer::u64",
+          "kind": "data"
+        },
+        {
+          "name": "restored_last_completed_day",
+          "type": "core::integer::u64",
           "kind": "data"
         }
       ]
