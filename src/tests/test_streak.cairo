@@ -13,10 +13,10 @@ mod tests {
         DEFAULT_NS_BYTE, MISSION_PERIOD_DAILY, MISSION_PERIOD_WEEKLY,
     };
     use jokers_of_neon_profile::models::{
-        SeasonConfig, SeasonProgress, StreakDayCompletion, StreakRewardGrant, StreakState,
-        m_MissionXPAward, m_MissionXPProgress, m_SeasonConfig, m_SeasonProgress,
-        m_StreakDayCompletion, m_StreakProtectorGrant, m_StreakRewardGrant, m_StreakState,
-        m_XPMultiplier,
+        SeasonConfig, SeasonProgress, StreakDayCompletion, StreakRepair, StreakRewardGrant,
+        StreakState, m_MissionXPAward, m_MissionXPProgress, m_SeasonConfig, m_SeasonProgress,
+        m_StreakDayCompletion, m_StreakMaintenanceConfig, m_StreakProtectorGrant, m_StreakRepair,
+        m_StreakRewardGrant, m_StreakState, m_XPMultiplier,
     };
     use jokers_of_neon_profile::systems::permission_system::{m_PermissionConfig, permission_system};
     use jokers_of_neon_profile::systems::xp_system::{
@@ -58,6 +58,8 @@ mod tests {
                 TestResource::Model(m_MissionXPAward::TEST_CLASS_HASH),
                 TestResource::Model(m_XPMultiplier::TEST_CLASS_HASH),
                 TestResource::Model(m_StreakState::TEST_CLASS_HASH),
+                TestResource::Model(m_StreakMaintenanceConfig::TEST_CLASS_HASH),
+                TestResource::Model(m_StreakRepair::TEST_CLASS_HASH),
                 TestResource::Model(m_StreakDayCompletion::TEST_CLASS_HASH),
                 TestResource::Model(m_StreakProtectorGrant::TEST_CLASS_HASH),
                 TestResource::Model(m_StreakRewardGrant::TEST_CLASS_HASH),
@@ -142,6 +144,12 @@ mod tests {
         ref world: WorldStorage, player: ContractAddress, source: felt252, source_id: felt252,
     ) -> StreakRewardGrant {
         world.read_model((player, source, source_id))
+    }
+
+    fn streak_repair(
+        ref world: WorldStorage, player: ContractAddress, incident_id: felt252,
+    ) -> StreakRepair {
+        world.read_model((player, incident_id))
     }
 
     fn set_current_day(day: u64) {
@@ -315,6 +323,92 @@ mod tests {
 
     #[test]
     #[available_gas(100000000)]
+    fn maintenance_days_preserve_streak_without_consuming_protectors() {
+        let (mut world, xp) = setup_world();
+        let player = PLAYER_ONE();
+        seed_profile(ref world, player);
+
+        set_current_day(1);
+        xp.add_mission_xp(player, MISSION_PERIOD_DAILY, 1, 'm1', 'tpl', 1, 10);
+        xp.grant_streak_protectors(player, 1, 'admin', 'maintenance-protector');
+        xp.configure_streak_maintenance('incident-1', 2, 3, true);
+
+        set_current_day(4);
+        let status = xp.get_streak_status(player);
+        assert(status.current_streak == 1, 'maintenance keeps streak');
+        assert(status.days_missed == 0, 'maintenance gap excluded');
+        assert(status.protectors_available == 1, 'protector preserved');
+
+        xp.add_mission_xp(player, MISSION_PERIOD_DAILY, 4, 'm2', 'tpl', 1, 10);
+        let state = streak_state(ref world, player);
+        assert(profile(ref world, player).daily_streak == 2, 'streak continues');
+        assert(state.last_completed_day == 4, 'completion advances day');
+        assert(state.protectors_available == 1, 'protector not spent');
+        assert(state.protectors_used_total == 0, 'no protector usage');
+    }
+
+    #[test]
+    #[available_gas(100000000)]
+    fn non_maintenance_gap_still_resets_streak() {
+        let (mut world, xp) = setup_world();
+        let player = PLAYER_TWO();
+        seed_profile(ref world, player);
+
+        set_current_day(1);
+        xp.add_mission_xp(player, MISSION_PERIOD_DAILY, 1, 'm1', 'tpl', 1, 10);
+        xp.configure_streak_maintenance('incident-2', 2, 3, true);
+
+        set_current_day(5);
+        xp.add_mission_xp(player, MISSION_PERIOD_DAILY, 5, 'm2', 'tpl', 1, 10);
+
+        assert(profile(ref world, player).daily_streak == 1, 'outside gap resets');
+        assert(streak_state(ref world, player).last_completed_day == 5, 'day advances');
+    }
+
+    #[test]
+    #[available_gas(100000000)]
+    #[should_panic(expected: ('Invalid maintenance range', 'ENTRYPOINT_FAILED'))]
+    fn invalid_maintenance_range_is_rejected() {
+        let (_world, xp) = setup_world();
+        xp.configure_streak_maintenance('invalid-incident', 4, 3, true);
+    }
+
+    #[test]
+    #[available_gas(100000000)]
+    fn repair_is_atomic_idempotent_and_continues() {
+        let (mut world, xp) = setup_world();
+        let player = PLAYER_THREE();
+        seed_profile(ref world, player);
+
+        set_current_day(1);
+        xp.add_mission_xp(player, MISSION_PERIOD_DAILY, 1, 'm1', 'tpl', 1, 10);
+        xp.grant_streak_protectors(player, 1, 'admin', 'repair-protector');
+
+        xp.restore_streak(player, 7, 3, 'incident-repair');
+        xp.restore_streak(player, 9, 4, 'incident-repair');
+
+        let repaired_profile = profile(ref world, player);
+        let repaired_state = streak_state(ref world, player);
+        let repair = streak_repair(ref world, player, 'incident-repair');
+        assert(repaired_profile.daily_streak == 7, 'streak repaired once');
+        assert(repaired_state.last_completed_day == 3, 'repair advances day');
+        assert(repaired_state.longest_streak == 7, 'longest preserved');
+        assert(repaired_state.protectors_available == 1, 'protectors preserved');
+        assert(repair.previous_streak == 1, 'previous streak audited');
+        assert(repair.restored_streak == 7, 'restored streak audited');
+        assert(repair.applied, 'repair receipt stored');
+
+        set_current_day(4);
+        xp.add_mission_xp(player, MISSION_PERIOD_DAILY, 4, 'm2', 'tpl', 1, 10);
+        assert(profile(ref world, player).daily_streak == 8, 'repaired streak continues');
+
+        xp.restore_streak(player, 6, 2, 'lower-repair');
+        assert(profile(ref world, player).daily_streak == 8, 'repair never lowers streak');
+        assert(streak_state(ref world, player).last_completed_day == 4, 'repair never lowers day');
+    }
+
+    #[test]
+    #[available_gas(100000000)]
     fn protector_grant_materializes_stale_gap_before_slot_check() {
         let (mut world, xp) = setup_world();
         let player = PLAYER_ONE();
@@ -388,7 +482,10 @@ mod tests {
 
         assert(profile(ref world, player).total_xp == 50, 'profile xp once');
         assert(season_progress(ref world, player, season_id).season_xp == 50, 'season xp once');
-        assert(season_progress(ref world, player, season_id).tournament_ticket == 0, 'ticket unchanged');
+        assert(
+            season_progress(ref world, player, season_id).tournament_ticket == 0,
+            'ticket unchanged',
+        );
         assert(streak_state(ref world, player).protectors_available == 1, 'protector once');
     }
 

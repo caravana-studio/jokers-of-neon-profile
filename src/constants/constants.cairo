@@ -18,3 +18,4 @@ pub const CURRENT_SEASON_ID: u32 = 4;
 pub const MISSION_PERIOD_DAILY: u8 = 1;
 pub const MISSION_PERIOD_WEEKLY: u8 = 2;
 pub const MAX_STREAK_PROTECTORS: u16 = 2;
+pub const STREAK_MAINTENANCE_CONFIG_KEY: felt252 = 'streak-maintenance';

@@ -79,6 +79,31 @@ pub struct StreakState {
 
 #[derive(Copy, Drop, Serde, Debug)]
 #[dojo::model]
+pub struct StreakMaintenanceConfig {
+    #[key]
+    pub key: felt252,
+    pub incident_id: felt252,
+    pub start_day: u64,
+    pub end_day: u64,
+    pub enabled: bool,
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+pub struct StreakRepair {
+    #[key]
+    pub player: ContractAddress,
+    #[key]
+    pub incident_id: felt252,
+    pub previous_streak: u16,
+    pub restored_streak: u16,
+    pub previous_last_completed_day: u64,
+    pub restored_last_completed_day: u64,
+    pub applied: bool,
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
 pub struct StreakDayCompletion {
     #[key]
     pub player: ContractAddress,

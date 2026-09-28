@@ -6,8 +6,8 @@ use crate::constants::constants::{NFT_MANAGER_KEY, PERMISSION_CONFIG_KEY};
 use crate::models::{
     DailyProgress, GameData, LevelXPConfig, MissionXPAward, MissionXPConfig, MissionXPProgress,
     NFTManager, PlayerProgression, PokerHandData, RoundData, SeasonConfig, SeasonLevelConfig,
-    SeasonProgress, SeasonRewardClaim, StreakDayCompletion, StreakProtectorGrant,
-    StreakRewardGrant, StreakState, XPMultiplier,
+    SeasonProgress, SeasonRewardClaim, StreakDayCompletion, StreakMaintenanceConfig,
+    StreakProtectorGrant, StreakRepair, StreakRewardGrant, StreakState, XPMultiplier,
 };
 use crate::systems::permission_system::PermissionConfig;
 
@@ -88,6 +88,24 @@ pub impl StoreImpl of StoreTrait {
 
     fn set_streak_state(ref self: Store, state: StreakState) {
         self.world.write_model(@state)
+    }
+
+    fn get_streak_maintenance_config(ref self: Store, key: felt252) -> StreakMaintenanceConfig {
+        self.world.read_model(key)
+    }
+
+    fn set_streak_maintenance_config(ref self: Store, config: StreakMaintenanceConfig) {
+        self.world.write_model(@config)
+    }
+
+    fn get_streak_repair(
+        ref self: Store, player: ContractAddress, incident_id: felt252,
+    ) -> StreakRepair {
+        self.world.read_model((player, incident_id))
+    }
+
+    fn set_streak_repair(ref self: Store, repair: StreakRepair) {
+        self.world.write_model(@repair)
     }
 
     fn get_streak_day_completion(
